@@ -1,6 +1,14 @@
-use super::{ExchangeChannel, StreamBuilder, Streams};
-use crate::{error::DataError, event::MarketEvent, exchange::ExchangeId, subscription::SubKind};
-use std::{collections::HashMap, fmt::Debug, future::Future, pin::Pin};
+use super::ExchangeChannel;
+use super::StreamBuilder;
+use super::Streams;
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::exchange::ExchangeId;
+use crate::subscription::SubKind;
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::future::Future;
+use std::pin::Pin;
 
 /// Communicative type alias representing the [`Future`] result of a [`StreamBuilder::init`] call
 /// generated whilst executing [`MultiStreamBuilder::add`].

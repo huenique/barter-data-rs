@@ -1,5 +1,7 @@
-use barter_integration::{error::SocketError, Validator};
-use serde::{Deserialize, Serialize};
+use barter_integration::error::SocketError;
+use barter_integration::Validator;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// [`Bitfinex`](super::Bitfinex) platform event detailing the variants expected to be received
 /// while connecting and subscribing.

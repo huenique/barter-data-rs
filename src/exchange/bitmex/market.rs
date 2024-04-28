@@ -1,5 +1,8 @@
-use crate::{exchange::bitmex::Bitmex, subscription::Subscription, Identifier};
-use serde::{Deserialize, Serialize};
+use crate::exchange::bitmex::Bitmex;
+use crate::subscription::Subscription;
+use crate::Identifier;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a [`Bitmex`]
 /// market that can be subscribed to.

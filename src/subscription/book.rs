@@ -1,12 +1,16 @@
 use super::SubKind;
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::ExchangeId,
-};
-use barter_integration::model::{instrument::Instrument, Exchange, Side};
-use barter_macro::{DeSubKind, SerSubKind};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use barter_macro::DeSubKind;
+use barter_macro::SerSubKind;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 use std::cmp::Ordering;
 use tracing::debug;
 

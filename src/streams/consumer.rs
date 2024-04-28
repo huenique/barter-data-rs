@@ -1,14 +1,16 @@
-use crate::{
-    error::DataError,
-    event::MarketEvent,
-    exchange::StreamSelector,
-    subscription::{SubKind, Subscription},
-    Identifier, MarketStream,
-};
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::exchange::StreamSelector;
+use crate::subscription::SubKind;
+use crate::subscription::Subscription;
+use crate::Identifier;
+use crate::MarketStream;
 use futures::StreamExt;
 use std::time::Duration;
 use tokio::sync::mpsc;
-use tracing::{error, info, warn};
+use tracing::error;
+use tracing::info;
+use tracing::warn;
 
 /// Initial duration that the [`consume`] function should wait after disconnecting before attempting
 /// to re-initialise a [`MarketStream`]. This duration will increase exponentially as a result

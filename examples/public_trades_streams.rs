@@ -1,8 +1,7 @@
-use barter_data::{
-    exchange::{binance::futures::BinanceFuturesUsd, ExchangeId},
-    streams::Streams,
-    subscription::trade::PublicTrades,
-};
+use barter_data::exchange::binance::futures::BinanceFuturesUsd;
+use barter_data::exchange::ExchangeId;
+use barter_data::streams::Streams;
+use barter_data::subscription::trade::PublicTrades;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use tracing::info;
 

@@ -1,6 +1,8 @@
 use super::Coinbase;
-use crate::{subscription::Subscription, Identifier};
-use serde::{Deserialize, Serialize};
+use crate::subscription::Subscription;
+use crate::Identifier;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Coinbase`](super::Coinbase) market that can be subscribed to.

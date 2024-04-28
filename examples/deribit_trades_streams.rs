@@ -1,8 +1,7 @@
-use barter_data::{
-    exchange::{ExchangeId, deribit::Deribit},
-    streams::Streams,
-    subscription::trade::PublicTrades,
-};
+use barter_data::exchange::deribit::Deribit;
+use barter_data::exchange::ExchangeId;
+use barter_data::streams::Streams;
+use barter_data::subscription::trade::PublicTrades;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use tracing::info;
 

@@ -1,10 +1,13 @@
-use barter_data::{
-    exchange::{ExchangeId, deribit::Deribit, aevo::Aevo},
-    streams::Streams,
-    subscription::book::OrderBooksL2,
-};
-use barter_integration::model::instrument::kind::{InstrumentKind, OptionContract, OptionKind, OptionExercise};
-use chrono::{Utc, TimeZone};
+use barter_data::exchange::aevo::Aevo;
+use barter_data::exchange::ExchangeId;
+use barter_data::streams::Streams;
+use barter_data::subscription::book::OrderBooksL2;
+use barter_integration::model::instrument::kind::InstrumentKind;
+use barter_integration::model::instrument::kind::OptionContract;
+use barter_integration::model::instrument::kind::OptionExercise;
+use barter_integration::model::instrument::kind::OptionKind;
+use chrono::TimeZone;
+use chrono::Utc;
 use tracing::info;
 
 #[rustfmt::skip]
@@ -53,7 +56,6 @@ fn init_logging() {
         // Install this Tracing subscriber as global default
         .init()
 }
-
 
 fn call_contract() -> OptionContract {
     OptionContract {

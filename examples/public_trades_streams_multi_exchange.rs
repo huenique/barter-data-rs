@@ -1,23 +1,23 @@
-use barter_data::{
-    exchange::{
-        binance::{futures::BinanceFuturesUsd, spot::BinanceSpot},
-        bitmex::Bitmex,
-        bybit::{futures::BybitPerpetualsUsd, spot::BybitSpot},
-        coinbase::Coinbase,
-        gateio::{
-            option::GateioOptions,
-            perpetual::{GateioPerpetualsBtc, GateioPerpetualsUsd},
-            spot::GateioSpot,
-        },
-        okx::Okx,
-    },
-    streams::Streams,
-    subscription::trade::PublicTrades,
-};
-use barter_integration::model::instrument::kind::{
-    FutureContract, InstrumentKind, OptionContract, OptionExercise, OptionKind,
-};
-use chrono::{TimeZone, Utc};
+use barter_data::exchange::binance::futures::BinanceFuturesUsd;
+use barter_data::exchange::binance::spot::BinanceSpot;
+use barter_data::exchange::bitmex::Bitmex;
+use barter_data::exchange::bybit::futures::BybitPerpetualsUsd;
+use barter_data::exchange::bybit::spot::BybitSpot;
+use barter_data::exchange::coinbase::Coinbase;
+use barter_data::exchange::gateio::option::GateioOptions;
+use barter_data::exchange::gateio::perpetual::GateioPerpetualsBtc;
+use barter_data::exchange::gateio::perpetual::GateioPerpetualsUsd;
+use barter_data::exchange::gateio::spot::GateioSpot;
+use barter_data::exchange::okx::Okx;
+use barter_data::streams::Streams;
+use barter_data::subscription::trade::PublicTrades;
+use barter_integration::model::instrument::kind::FutureContract;
+use barter_integration::model::instrument::kind::InstrumentKind;
+use barter_integration::model::instrument::kind::OptionContract;
+use barter_integration::model::instrument::kind::OptionExercise;
+use barter_integration::model::instrument::kind::OptionKind;
+use chrono::TimeZone;
+use chrono::Utc;
 use futures::StreamExt;
 use tracing::info;
 

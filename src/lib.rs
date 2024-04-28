@@ -81,22 +81,27 @@
 //! }
 //! ```
 
-use crate::{
-    error::DataError,
-    event::MarketEvent,
-    exchange::{Connector, ExchangeId, PingInterval},
-    subscriber::Subscriber,
-    subscription::{SubKind, Subscription},
-    transformer::ExchangeTransformer,
-};
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::PingInterval;
+use crate::subscriber::Subscriber;
+use crate::subscription::SubKind;
+use crate::subscription::Subscription;
+use crate::transformer::ExchangeTransformer;
 use async_trait::async_trait;
-use barter_integration::{
-    protocol::websocket::{WebSocketParser, WsMessage, WsSink, WsStream},
-    ExchangeStream,
-};
-use futures::{SinkExt, Stream, StreamExt};
+use barter_integration::protocol::websocket::WebSocketParser;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_integration::protocol::websocket::WsSink;
+use barter_integration::protocol::websocket::WsStream;
+use barter_integration::ExchangeStream;
+use futures::SinkExt;
+use futures::Stream;
+use futures::StreamExt;
 use tokio::sync::mpsc;
-use tracing::{debug, error};
+use tracing::debug;
+use tracing::error;
 
 /// All [`Error`](std::error::Error)s generated in Barter-Data.
 pub mod error;

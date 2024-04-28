@@ -1,18 +1,30 @@
-use barter_integration::{model::{SubscriptionId, Side, instrument::Instrument}, protocol::websocket::WsMessage};
+use super::AevoLevel;
+use crate::error::DataError;
+use crate::exchange::aevo::channel::AevoChannel;
+use crate::exchange::aevo::message::AevoMessage;
+use crate::exchange::subscription::ExchangeSub;
+use crate::subscription::book::Level;
+use crate::subscription::book::OrderBook;
+use crate::subscription::book::OrderBookSide;
+use crate::transformer::book::InstrumentOrderBook;
+use crate::transformer::book::OrderBookUpdater;
+use crate::Identifier;
+use async_trait::async_trait;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use barter_integration::protocol::websocket::WsMessage;
 use chrono::Utc;
 use crc32fast::Hasher;
-use serde::{Deserialize, Serialize};
-use async_trait::async_trait;
-use crate::{exchange::{aevo::{message::AevoMessage, channel::AevoChannel}, subscription::ExchangeSub}, Identifier, subscription::book::{OrderBook, OrderBookSide, Level}, transformer::book::{OrderBookUpdater, InstrumentOrderBook}, error::DataError};
+use serde::Deserialize;
+use serde::Serialize;
 use tokio::sync::mpsc;
-use super::AevoLevel;
-
 
 /// Terse type alias for an [`Aevo`](super::Aevo) real-time trades WebSocket message.
 pub type AevoOrderBookL2 = AevoMessage<AevoOrderBookL2Delta>;
 
 #[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
-pub struct AevoOrderBookL2Delta{
+pub struct AevoOrderBookL2Delta {
     pub r#type: String,
     pub instrument_id: String,
     pub instrument_name: String,
@@ -50,19 +62,19 @@ impl AevoBookUpdater {
     pub fn new(checksum: u32) -> Self {
         Self {
             updates_processed: 0,
-            last_checksum: checksum
+            last_checksum: checksum,
         }
     }
 
     pub fn checksum(&self, bids: &Vec<Level>, asks: &Vec<Level>) -> u32 {
         let mut preimage = String::new();
         let iterations = bids.len().max(asks.len());
-        
+
         for index in 0..iterations.min(100) {
             if let Some(bid) = bids.get(index) {
                 preimage.push_str(&format!("{}:{}:", bid.price, bid.amount));
             }
-    
+
             if let Some(ask) = asks.get(index) {
                 preimage.push_str(&format!("{}:{}:", ask.price, ask.amount));
             }
@@ -77,12 +89,12 @@ impl AevoBookUpdater {
     pub fn checksum2(&self, bids: &Vec<AevoLevel>, asks: &Vec<AevoLevel>) -> u32 {
         let mut preimage = String::new();
         let iterations = bids.len().max(asks.len());
-        
+
         for index in 0..iterations.min(100) {
             if let Some(bid) = bids.get(index) {
                 preimage.push_str(&format!("{}:{}:", bid.price, bid.amount));
             }
-    
+
             if let Some(ask) = asks.get(index) {
                 preimage.push_str(&format!("{}:{}:", ask.price, ask.amount));
             }
@@ -96,7 +108,7 @@ impl AevoBookUpdater {
 }
 
 #[async_trait]
-impl OrderBookUpdater for AevoBookUpdater{
+impl OrderBookUpdater for AevoBookUpdater {
     type OrderBook = OrderBook;
     type Update = AevoOrderBookL2;
 
@@ -120,7 +132,7 @@ impl OrderBookUpdater for AevoBookUpdater{
                 instrument_type: String::new(),
                 bids: Vec::new(),
                 asks: Vec::new(),
-                checksum: 0
+                checksum: 0,
             }),
         })
     }
@@ -130,7 +142,6 @@ impl OrderBookUpdater for AevoBookUpdater{
         book: &mut Self::OrderBook,
         update: Self::Update,
     ) -> Result<Option<Self::OrderBook>, DataError> {
-
         // If the checksum is the same as the previous message, ignore the message. No changes have occurred.
         // Aevo subsequently sends a snapshot message with the full order book for now. But will change to incremental updates in the future.
         if self.last_checksum == update.data.checksum && update.data.r#type == "snapshot" {
@@ -143,20 +154,19 @@ impl OrderBookUpdater for AevoBookUpdater{
         book.last_update_time = Utc::now();
         book.bids.upsert(update.data.bids);
         book.asks.upsert(update.data.asks);
-        
+
         if update.data.r#type == "snapshot" {
             let checksum = self.checksum(&book.bids.levels, &book.asks.levels);
             if checksum != update.data.checksum {
                 return Err(DataError::InvalidSequence {
                     prev_last_update_id: self.last_checksum as u64,
                     first_update_id: update.data.checksum as u64,
-                })
+                });
             }
-    
+
             self.last_checksum = checksum;
         }
 
-  
         // Update OrderBookUpdater metadata
         self.updates_processed += 1;
         Ok(Some(book.snapshot()))

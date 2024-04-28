@@ -1,11 +1,12 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde::Serialize;
 
 use crate::subscription::book::Level;
 
 pub mod l2;
 
 #[derive(Clone, Copy, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
-pub struct AevoLevel{
+pub struct AevoLevel {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub price: f64,
     #[serde(deserialize_with = "barter_integration::de::de_str")]

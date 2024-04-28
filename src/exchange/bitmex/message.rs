@@ -1,6 +1,8 @@
-use crate::{exchange::bitmex::trade::BitmexTrade, Identifier};
+use crate::exchange::bitmex::trade::BitmexTrade;
+use crate::Identifier;
 use barter_integration::model::SubscriptionId;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde::Serialize;
 
 /// ### Raw Payload Examples
 /// See docs: <https://www.bitmex.com/app/wsAPI#Response-Format>

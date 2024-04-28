@@ -19,19 +19,23 @@
 //! - Both appear to be identical payloads, but "te" arriving marginally faster.
 //! - Therefore, tag="tu" trades are filtered out and considered only as additional Heartbeats.
 
-use self::{
-    channel::BitfinexChannel, market::BitfinexMarket, message::BitfinexMessage,
-    subscription::BitfinexPlatformEvent, validator::BitfinexWebSocketSubValidator,
-};
-use crate::{
-    exchange::{Connector, ExchangeId, ExchangeSub, StreamSelector},
-    subscriber::WebSocketSubscriber,
-    subscription::trade::PublicTrades,
-    transformer::stateless::StatelessTransformer,
-    ExchangeWsStream,
-};
-use barter_integration::{error::SocketError, protocol::websocket::WsMessage};
-use barter_macro::{DeExchange, SerExchange};
+use self::channel::BitfinexChannel;
+use self::market::BitfinexMarket;
+use self::message::BitfinexMessage;
+use self::subscription::BitfinexPlatformEvent;
+use self::validator::BitfinexWebSocketSubValidator;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::exchange::StreamSelector;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::trade::PublicTrades;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
 use serde_json::json;
 use url::Url;
 

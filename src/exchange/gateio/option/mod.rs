@@ -1,12 +1,11 @@
-use crate::{
-    exchange::{
-        gateio::{perpetual::trade::GateioFuturesTrades, Gateio},
-        ExchangeId, ExchangeServer, StreamSelector,
-    },
-    subscription::trade::PublicTrades,
-    transformer::stateless::StatelessTransformer,
-    ExchangeWsStream,
-};
+use crate::exchange::gateio::perpetual::trade::GateioFuturesTrades;
+use crate::exchange::gateio::Gateio;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeServer;
+use crate::exchange::StreamSelector;
+use crate::subscription::trade::PublicTrades;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
 
 /// [`GateioOptions`] WebSocket server base url.
 ///

@@ -1,12 +1,18 @@
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::{binance::channel::BinanceChannel, subscription::ExchangeSub, ExchangeId},
-    subscription::book::{Level, OrderBookL1},
-    Identifier,
-};
-use barter_integration::model::{instrument::Instrument, Exchange, SubscriptionId};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::binance::channel::BinanceChannel;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::ExchangeId;
+use crate::subscription::book::Level;
+use crate::subscription::book::OrderBookL1;
+use crate::Identifier;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// [`Binance`](super::super::Binance) real-time OrderBook Level1 (top of book) message.
 ///

@@ -1,11 +1,8 @@
-use barter_data::{
-    exchange::{
-        binance::{futures::BinanceFuturesUsd, spot::BinanceSpot},
-        kraken::Kraken,
-    },
-    streams::Streams,
-    subscription::book::OrderBooksL1,
-};
+use barter_data::exchange::binance::futures::BinanceFuturesUsd;
+use barter_data::exchange::binance::spot::BinanceSpot;
+use barter_data::exchange::kraken::Kraken;
+use barter_data::streams::Streams;
+use barter_data::subscription::book::OrderBooksL1;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use futures::StreamExt;
 use tracing::info;

@@ -1,18 +1,18 @@
-use super::super::book::{l2::BinanceOrderBookL2Snapshot, BinanceLevel};
-use crate::{
-    error::DataError,
-    subscription::book::OrderBook,
-    transformer::book::{InstrumentOrderBook, OrderBookUpdater},
-    Identifier,
-};
+use super::super::book::l2::BinanceOrderBookL2Snapshot;
+use super::super::book::BinanceLevel;
+use crate::error::DataError;
+use crate::subscription::book::OrderBook;
+use crate::transformer::book::InstrumentOrderBook;
+use crate::transformer::book::OrderBookUpdater;
+use crate::Identifier;
 use async_trait::async_trait;
-use barter_integration::{
-    error::SocketError,
-    model::{instrument::Instrument, SubscriptionId},
-    protocol::websocket::WsMessage,
-};
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::SubscriptionId;
+use barter_integration::protocol::websocket::WsMessage;
 use chrono::Utc;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde::Serialize;
 use tokio::sync::mpsc;
 
 /// [`BinanceFuturesUsd`](super::BinanceFuturesUsd) HTTP OrderBook L2 snapshot url.
@@ -283,7 +283,8 @@ mod tests {
 
     mod binance_futures_book_updater {
         use super::*;
-        use crate::subscription::book::{Level, OrderBookSide};
+        use crate::subscription::book::Level;
+        use crate::subscription::book::OrderBookSide;
         use barter_integration::model::Side;
 
         #[test]

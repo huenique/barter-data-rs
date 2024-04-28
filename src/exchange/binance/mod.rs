@@ -1,18 +1,25 @@
-use self::{
-    book::l1::BinanceOrderBookL1, channel::BinanceChannel, market::BinanceMarket,
-    subscription::BinanceSubResponse, trade::BinanceTrade,
-};
-use crate::{
-    exchange::{Connector, ExchangeId, ExchangeServer, ExchangeSub, StreamSelector},
-    subscriber::{validator::WebSocketSubValidator, WebSocketSubscriber},
-    subscription::{book::OrderBooksL1, trade::PublicTrades, Map},
-    transformer::stateless::StatelessTransformer,
-    ExchangeWsStream,
-};
-use barter_integration::{
-    error::SocketError, model::instrument::Instrument, protocol::websocket::WsMessage,
-};
-use std::{fmt::Debug, marker::PhantomData};
+use self::book::l1::BinanceOrderBookL1;
+use self::channel::BinanceChannel;
+use self::market::BinanceMarket;
+use self::subscription::BinanceSubResponse;
+use self::trade::BinanceTrade;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeServer;
+use crate::exchange::ExchangeSub;
+use crate::exchange::StreamSelector;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::book::OrderBooksL1;
+use crate::subscription::trade::PublicTrades;
+use crate::subscription::Map;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WsMessage;
+use std::fmt::Debug;
+use std::marker::PhantomData;
 use url::Url;
 
 /// OrderBook types common to both [`BinanceSpot`](spot::BinanceSpot) and

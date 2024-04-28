@@ -1,14 +1,15 @@
 use super::Gateio;
-use crate::{subscription::Subscription, Identifier};
-use barter_integration::model::instrument::{
-    kind::{InstrumentKind, OptionKind},
-    Instrument,
-};
-use chrono::{
-    format::{DelayedFormat, StrftimeItems},
-    DateTime, Utc,
-};
-use serde::{Deserialize, Serialize};
+use crate::subscription::Subscription;
+use crate::Identifier;
+use barter_integration::model::instrument::kind::InstrumentKind;
+use barter_integration::model::instrument::kind::OptionKind;
+use barter_integration::model::instrument::Instrument;
+use chrono::format::DelayedFormat;
+use chrono::format::StrftimeItems;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Gateio`](super::Gateio) market that can be subscribed to.

@@ -1,13 +1,18 @@
-use super::{consumer::consume, Streams};
-use crate::{
-    error::DataError,
-    event::MarketEvent,
-    exchange::{ExchangeId, StreamSelector},
-    subscription::{SubKind, Subscription},
-    Identifier,
-};
-use barter_integration::{error::SocketError, Validator};
-use std::{collections::HashMap, fmt::Debug, future::Future, pin::Pin};
+use super::consumer::consume;
+use super::Streams;
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::exchange::ExchangeId;
+use crate::exchange::StreamSelector;
+use crate::subscription::SubKind;
+use crate::subscription::Subscription;
+use crate::Identifier;
+use barter_integration::error::SocketError;
+use barter_integration::Validator;
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::future::Future;
+use std::pin::Pin;
 use tokio::sync::mpsc;
 
 /// Defines the [`MultiStreamBuilder`](multi::MultiStreamBuilder) API for ergonomically
@@ -164,7 +169,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{exchange::coinbase::Coinbase, subscription::trade::PublicTrades};
+    use crate::exchange::coinbase::Coinbase;
+    use crate::subscription::trade::PublicTrades;
     use barter_integration::model::instrument::kind::InstrumentKind;
 
     #[test]

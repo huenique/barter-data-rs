@@ -1,18 +1,25 @@
-use barter_integration::{error::SocketError, protocol::websocket::WsMessage};
-use barter_macro::{DeExchange, SerExchange};
-use url::Url;
-use std::time::Duration;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
 use serde_json::json;
+use std::time::Duration;
+use url::Url;
 
-use crate::{
-    exchange::{Connector, ExchangeId, ExchangeSub, StreamSelector},
-    subscriber::{validator::WebSocketSubValidator, WebSocketSubscriber},
-    subscription::{book::{OrderBooksL2}},
-    transformer::{book::MultiBookTransformer},
-    ExchangeWsStream,
-};
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::exchange::StreamSelector;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::book::OrderBooksL2;
+use crate::transformer::book::MultiBookTransformer;
+use crate::ExchangeWsStream;
 
-use self::{channel::AevoChannel, market::AevoMarket, subscription::AevoSubResponse, book::l2::AevoBookUpdater};
+use self::book::l2::AevoBookUpdater;
+use self::channel::AevoChannel;
+use self::market::AevoMarket;
+use self::subscription::AevoSubResponse;
 
 pub mod channel;
 
@@ -23,7 +30,6 @@ pub mod subscription;
 pub mod message;
 
 pub mod book;
-
 
 /// [`Aevo`] server base url.
 ///
@@ -72,6 +78,5 @@ impl Connector for Aevo {
 }
 
 impl StreamSelector<OrderBooksL2> for Aevo {
-    type Stream =
-        ExchangeWsStream<MultiBookTransformer<Self, OrderBooksL2, AevoBookUpdater>>;
+    type Stream = ExchangeWsStream<MultiBookTransformer<Self, OrderBooksL2, AevoBookUpdater>>;
 }

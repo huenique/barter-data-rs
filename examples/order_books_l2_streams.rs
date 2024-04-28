@@ -1,8 +1,7 @@
-use barter_data::{
-    exchange::{binance::spot::BinanceSpot, ExchangeId},
-    streams::Streams,
-    subscription::book::OrderBooksL2,
-};
+use barter_data::exchange::binance::spot::BinanceSpot;
+use barter_data::exchange::ExchangeId;
+use barter_data::streams::Streams;
+use barter_data::subscription::book::OrderBooksL2;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use tracing::info;
 

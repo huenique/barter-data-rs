@@ -1,15 +1,21 @@
-use self::{
-    channel::OkxChannel, market::OkxMarket, subscription::OkxSubResponse, trade::OkxTrades,
-};
-use crate::{
-    exchange::{Connector, ExchangeId, ExchangeSub, PingInterval, StreamSelector},
-    subscriber::{validator::WebSocketSubValidator, WebSocketSubscriber},
-    subscription::trade::PublicTrades,
-    transformer::stateless::StatelessTransformer,
-    ExchangeWsStream,
-};
-use barter_integration::{error::SocketError, protocol::websocket::WsMessage};
-use barter_macro::{DeExchange, SerExchange};
+use self::channel::OkxChannel;
+use self::market::OkxMarket;
+use self::subscription::OkxSubResponse;
+use self::trade::OkxTrades;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::exchange::PingInterval;
+use crate::exchange::StreamSelector;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::trade::PublicTrades;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
 use serde_json::json;
 use std::time::Duration;
 use url::Url;

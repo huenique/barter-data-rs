@@ -1,10 +1,13 @@
-use crate::{
-    exchange::{subscription::ExchangeSub, Connector},
-    subscription::{Map, SubKind, Subscription, SubscriptionMeta},
-    Identifier,
-};
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::Connector;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
+use crate::subscription::Subscription;
+use crate::subscription::SubscriptionMeta;
+use crate::Identifier;
 use barter_integration::model::SubscriptionId;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashMap;
 
 /// Defines how to map a collection of Barter [`Subscription`]s into exchange specific

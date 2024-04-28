@@ -1,7 +1,12 @@
-use super::{channel::OkxChannel, market::OkxMarket};
+use super::channel::OkxChannel;
+use super::market::OkxMarket;
 use crate::exchange::subscription::ExchangeSub;
-use barter_integration::{error::SocketError, Validator};
-use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
+use barter_integration::error::SocketError;
+use barter_integration::Validator;
+use serde::ser::SerializeStruct;
+use serde::Deserialize;
+use serde::Serialize;
+use serde::Serializer;
 
 // Implement custom Serialize to assist aesthetics of <Okx as Connector>::requests() function.
 impl Serialize for ExchangeSub<OkxChannel, OkxMarket> {

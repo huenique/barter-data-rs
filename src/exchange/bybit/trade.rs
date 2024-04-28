@@ -1,11 +1,15 @@
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::{bybit::message::BybitPayload, ExchangeId},
-    subscription::trade::PublicTrade,
-};
-use barter_integration::model::{instrument::Instrument, Exchange, Side};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::bybit::message::BybitPayload;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Terse type alias for an [`BybitTrade`](BybitTradeInner) real-time trades WebSocket message.
 pub type BybitTrade = BybitPayload<Vec<BybitTradeInner>>;
@@ -80,9 +84,9 @@ mod tests {
 
     mod de {
         use super::*;
-        use barter_integration::{
-            de::datetime_utc_from_epoch_duration, error::SocketError, model::SubscriptionId,
-        };
+        use barter_integration::de::datetime_utc_from_epoch_duration;
+        use barter_integration::error::SocketError;
+        use barter_integration::model::SubscriptionId;
         use std::time::Duration;
 
         #[test]

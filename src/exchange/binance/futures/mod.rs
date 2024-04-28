@@ -1,11 +1,14 @@
-use self::{l2::BinanceFuturesBookUpdater, liquidation::BinanceLiquidation};
-use super::{Binance, ExchangeServer};
-use crate::{
-    exchange::{ExchangeId, StreamSelector},
-    subscription::{book::OrderBooksL2, liquidation::Liquidations},
-    transformer::{book::MultiBookTransformer, stateless::StatelessTransformer},
-    ExchangeWsStream,
-};
+use self::l2::BinanceFuturesBookUpdater;
+use self::liquidation::BinanceLiquidation;
+use super::Binance;
+use super::ExchangeServer;
+use crate::exchange::ExchangeId;
+use crate::exchange::StreamSelector;
+use crate::subscription::book::OrderBooksL2;
+use crate::subscription::liquidation::Liquidations;
+use crate::transformer::book::MultiBookTransformer;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
 
 /// Level 2 OrderBook types (top of book) and perpetual
 /// [`OrderBookUpdater`](crate::transformer::book::OrderBookUpdater) implementation.

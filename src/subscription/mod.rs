@@ -1,18 +1,17 @@
 use crate::exchange::StreamSelector;
-use barter_integration::{
-    error::SocketError,
-    model::{
-        instrument::{kind::InstrumentKind, symbol::Symbol, Instrument},
-        SubscriptionId,
-    },
-    protocol::websocket::WsMessage,
-    Validator,
-};
-use serde::{Deserialize, Serialize};
-use std::{
-    collections::HashMap,
-    fmt::{Debug, Display, Formatter},
-};
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::kind::InstrumentKind;
+use barter_integration::model::instrument::symbol::Symbol;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::SubscriptionId;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_integration::Validator;
+use serde::Deserialize;
+use serde::Serialize;
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::fmt::Display;
+use std::fmt::Formatter;
 
 /// OrderBook [`SubKind`]s and the associated Barter output data models.
 pub mod book;
@@ -167,22 +166,19 @@ mod tests {
 
     mod subscription {
         use super::*;
-        use crate::{
-            exchange::{coinbase::Coinbase, okx::Okx},
-            subscription::trade::PublicTrades,
-        };
+        use crate::exchange::coinbase::Coinbase;
+        use crate::exchange::okx::Okx;
+        use crate::subscription::trade::PublicTrades;
         use barter_integration::model::instrument::kind::InstrumentKind;
 
         mod de {
             use super::*;
-            use crate::{
-                exchange::{
-                    binance::{futures::BinanceFuturesUsd, spot::BinanceSpot},
-                    gateio::perpetual::GateioPerpetualsUsd,
-                    okx::Okx,
-                },
-                subscription::{book::OrderBooksL2, trade::PublicTrades},
-            };
+            use crate::exchange::binance::futures::BinanceFuturesUsd;
+            use crate::exchange::binance::spot::BinanceSpot;
+            use crate::exchange::gateio::perpetual::GateioPerpetualsUsd;
+            use crate::exchange::okx::Okx;
+            use crate::subscription::book::OrderBooksL2;
+            use crate::subscription::trade::PublicTrades;
 
             #[test]
             fn test_subscription_okx_spot_public_trades() {
@@ -369,7 +365,8 @@ mod tests {
 
     mod instrument_map {
         use super::*;
-        use barter_integration::model::instrument::{kind::InstrumentKind, Instrument};
+        use barter_integration::model::instrument::kind::InstrumentKind;
+        use barter_integration::model::instrument::Instrument;
 
         #[test]
         fn test_find_instrument() {

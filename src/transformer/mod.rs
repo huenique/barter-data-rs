@@ -1,12 +1,11 @@
-use crate::{
-    error::DataError,
-    event::MarketEvent,
-    subscription::{Map, SubKind},
-};
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
 use async_trait::async_trait;
-use barter_integration::{
-    model::instrument::Instrument, protocol::websocket::WsMessage, Transformer,
-};
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_integration::Transformer;
 use tokio::sync::mpsc;
 
 /// Generic OrderBook [`ExchangeTransformer`]s.

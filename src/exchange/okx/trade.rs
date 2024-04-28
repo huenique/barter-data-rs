@@ -1,12 +1,17 @@
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::{ExchangeId, ExchangeSub},
-    subscription::trade::PublicTrade,
-    Identifier,
-};
-use barter_integration::model::{instrument::Instrument, Exchange, Side, SubscriptionId};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Terse type alias for an [`Okx`](super::Okx) real-time trades WebSocket message.
 pub type OkxTrades = OkxMessage<OkxTrade>;
@@ -138,7 +143,8 @@ mod tests {
 
     mod de {
         use super::*;
-        use barter_integration::{de::datetime_utc_from_epoch_duration, error::SocketError};
+        use barter_integration::de::datetime_utc_from_epoch_duration;
+        use barter_integration::error::SocketError;
         use std::time::Duration;
 
         #[test]

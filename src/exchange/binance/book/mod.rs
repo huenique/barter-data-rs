@@ -1,5 +1,6 @@
 use crate::subscription::book::Level;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Level 1 OrderBook types (top of book).
 pub mod l1;

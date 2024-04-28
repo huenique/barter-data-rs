@@ -1,13 +1,17 @@
 use super::super::BinanceChannel;
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::ExchangeId,
-    subscription::liquidation::Liquidation,
-    Identifier,
-};
-use barter_integration::model::{instrument::Instrument, Exchange, Side, SubscriptionId};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use crate::subscription::liquidation::Liquidation;
+use crate::Identifier;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// [`BinanceFuturesUsd`](super::BinanceFuturesUsd) Liquidation order message.
 ///

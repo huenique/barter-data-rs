@@ -1,22 +1,21 @@
-use serde::{Deserialize, Serialize};
-
+use serde::Deserialize;
+use serde::Serialize;
 
 // Separated into two message types: Single and Multiple data message types for easier deserialization.
 
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
-pub struct DeribitSingleDataMessage <T> {
+pub struct DeribitSingleDataMessage<T> {
     pub jsonrpc: String,
     pub method: SubscriptionMethod,
-    pub params: SingleData<T>
+    pub params: SingleData<T>,
 }
 
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
-pub struct DeribitMultipleDataMessage <T> {
+pub struct DeribitMultipleDataMessage<T> {
     pub jsonrpc: String,
     pub method: SubscriptionMethod,
-    pub params: MultipleData<T>
+    pub params: MultipleData<T>,
 }
-
 
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
 pub struct SingleData<T> {
@@ -30,26 +29,25 @@ pub struct MultipleData<T> {
     pub channel: String,
 }
 
-
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SubscriptionMethod {
     Subscription,
-    Heartbeat
+    Heartbeat,
 }
 
 impl SubscriptionMethod {
-    pub fn is_subscription(self) -> bool { 
+    pub fn is_subscription(self) -> bool {
         match self {
             SubscriptionMethod::Subscription => true,
-            SubscriptionMethod::Heartbeat => false
+            SubscriptionMethod::Heartbeat => false,
         }
     }
-    
+
     pub fn is_heartbeat(self) -> bool {
         match self {
             SubscriptionMethod::Subscription => false,
-            SubscriptionMethod::Heartbeat => true
+            SubscriptionMethod::Heartbeat => true,
         }
     }
 }

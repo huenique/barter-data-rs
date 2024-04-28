@@ -1,13 +1,14 @@
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::ExchangeId,
-    subscription::trade::PublicTrade,
-};
-use barter_integration::{
-    de::{datetime_utc_from_epoch_duration, extract_next},
-    model::{instrument::Instrument, Exchange, Side},
-};
-use chrono::{DateTime, Utc};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use barter_integration::de::datetime_utc_from_epoch_duration;
+use barter_integration::de::extract_next;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use chrono::DateTime;
+use chrono::Utc;
 use serde::Serialize;
 
 /// [`Bitfinex`](super::Bitfinex) real-time trade message.

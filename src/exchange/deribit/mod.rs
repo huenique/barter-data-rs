@@ -1,18 +1,31 @@
-use barter_integration::{error::SocketError, protocol::websocket::WsMessage};
-use barter_macro::{DeExchange, SerExchange};
-use url::Url;
-use std::time::Duration;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
 use serde_json::json;
+use std::time::Duration;
+use url::Url;
 
-use crate::{
-    exchange::{Connector, ExchangeId, ExchangeSub, PingInterval, StreamSelector},
-    subscriber::{validator::WebSocketSubValidator, WebSocketSubscriber},
-    subscription::{trade::PublicTrades, book::{OrderBooksL1, OrderBooksL2}},
-    transformer::{stateless::StatelessTransformer, book::MultiBookTransformer},
-    ExchangeWsStream,
-};
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::exchange::PingInterval;
+use crate::exchange::StreamSelector;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::book::OrderBooksL1;
+use crate::subscription::book::OrderBooksL2;
+use crate::subscription::trade::PublicTrades;
+use crate::transformer::book::MultiBookTransformer;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
 
-use self::{channel::DeribitChannel, market::DeribitMarket, subscription::{DeribitSubResponse}, trade::DeribitTrades, book::{l1::DeribitOrderBookL1, l2::DeribitBookUpdater}};
+use self::book::l1::DeribitOrderBookL1;
+use self::book::l2::DeribitBookUpdater;
+use self::channel::DeribitChannel;
+use self::market::DeribitMarket;
+use self::subscription::DeribitSubResponse;
+use self::trade::DeribitTrades;
 
 pub mod channel;
 
@@ -25,7 +38,6 @@ pub mod message;
 pub mod trade;
 
 pub mod book;
-
 
 /// [`Deribit`] server base url.
 ///
@@ -68,7 +80,12 @@ impl Connector for Deribit {
     fn requests(exchange_subs: Vec<ExchangeSub<Self::Channel, Self::Market>>) -> Vec<WsMessage> {
         let stream_names = exchange_subs
             .into_iter()
-            .map(|sub| format!("{}", sub.channel.as_ref().replace("{}", sub.market.as_ref())))
+            .map(|sub| {
+                format!(
+                    "{}",
+                    sub.channel.as_ref().replace("{}", sub.market.as_ref())
+                )
+            })
             .collect::<Vec<String>>();
 
         vec![WsMessage::Text(
@@ -93,7 +110,5 @@ impl StreamSelector<OrderBooksL1> for Deribit {
 }
 
 impl StreamSelector<OrderBooksL2> for Deribit {
-    type Stream =
-        ExchangeWsStream<MultiBookTransformer<Self, OrderBooksL2, DeribitBookUpdater>>;
+    type Stream = ExchangeWsStream<MultiBookTransformer<Self, OrderBooksL2, DeribitBookUpdater>>;
 }
-

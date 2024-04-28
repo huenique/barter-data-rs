@@ -1,8 +1,7 @@
-use crate::{
-    exchange::bitmex::Bitmex,
-    subscription::{trade::PublicTrades, Subscription},
-    Identifier,
-};
+use crate::exchange::bitmex::Bitmex;
+use crate::subscription::trade::PublicTrades;
+use crate::subscription::Subscription;
+use crate::Identifier;
 use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a [`Bitmex`](super::Bitmex)

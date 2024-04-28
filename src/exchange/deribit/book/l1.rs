@@ -1,10 +1,20 @@
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
-use barter_integration::model::{instrument::Instrument, Exchange, SubscriptionId};
-use chrono::{Utc, DateTime};
-use serde::{Deserialize, Serialize};
-
-use crate::{exchange::{ExchangeId, deribit::{message::DeribitSingleDataMessage, channel::DeribitChannel}, subscription::ExchangeSub}, event::{MarketIter, MarketEvent}, subscription::book::{OrderBookL1, Level}, Identifier};
-
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::deribit::channel::DeribitChannel;
+use crate::exchange::deribit::message::DeribitSingleDataMessage;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::ExchangeId;
+use crate::subscription::book::Level;
+use crate::subscription::book::OrderBookL1;
+use crate::Identifier;
 
 pub type DeribitOrderBookL1 = DeribitSingleDataMessage<DeribitOrderBookL1Inner>;
 
@@ -24,7 +34,6 @@ pub type DeribitOrderBookL1 = DeribitSingleDataMessage<DeribitOrderBookL1Inner>;
 //     "jsonrpc" : "2.0"
 //   }
 
-
 #[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
 pub struct DeribitOrderBookL1Inner {
     pub instrument_name: String,
@@ -41,10 +50,15 @@ pub struct DeribitOrderBookL1Inner {
 
 impl Identifier<Option<SubscriptionId>> for DeribitOrderBookL1 {
     fn id(&self) -> Option<SubscriptionId> {
-        Some(ExchangeSub::from((DeribitChannel::ORDER_BOOK_L1, &self.params.data.instrument_name)).id())
+        Some(
+            ExchangeSub::from((
+                DeribitChannel::ORDER_BOOK_L1,
+                &self.params.data.instrument_name,
+            ))
+            .id(),
+        )
     }
 }
-
 
 impl From<(ExchangeId, Instrument, DeribitOrderBookL1)> for MarketIter<OrderBookL1> {
     fn from((exchange_id, instrument, book): (ExchangeId, Instrument, DeribitOrderBookL1)) -> Self {
@@ -54,9 +68,15 @@ impl From<(ExchangeId, Instrument, DeribitOrderBookL1)> for MarketIter<OrderBook
             exchange: Exchange::from(exchange_id),
             instrument,
             kind: OrderBookL1 {
-                last_update_time: book.params.data.time, 
-                best_bid: Level::new(book.params.data.best_bid_price, book.params.data.best_bid_amount),
-                best_ask: Level::new(book.params.data.best_ask_price, book.params.data.best_ask_amount),
+                last_update_time: book.params.data.time,
+                best_bid: Level::new(
+                    book.params.data.best_bid_price,
+                    book.params.data.best_bid_amount,
+                ),
+                best_ask: Level::new(
+                    book.params.data.best_ask_price,
+                    book.params.data.best_ask_amount,
+                ),
             },
         })])
     }

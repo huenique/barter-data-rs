@@ -1,5 +1,7 @@
-use barter_integration::{Validator, error::SocketError};
-use serde::{Deserialize, Serialize};
+use barter_integration::error::SocketError;
+use barter_integration::Validator;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// [`Aevo`](super::Aevo) WebSocket subscription response.
 ///
@@ -35,9 +37,10 @@ impl Validator for AevoSubResponse {
             (Some(e), _) => Err(SocketError::Subscribe(format!(
                 "Received failure subscription response with message: {e}"
             ))),
-            (_, 0) => Err(SocketError::Subscribe("Received empty subscription response".to_string())),
+            (_, 0) => Err(SocketError::Subscribe(
+                "Received empty subscription response".to_string(),
+            )),
             _ => Ok(self),
         }
     }
-
 }

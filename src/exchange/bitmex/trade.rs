@@ -1,11 +1,15 @@
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::{bitmex::message::BitmexMessage, ExchangeId},
-    subscription::trade::PublicTrade,
-};
-use barter_integration::model::{instrument::Instrument, Exchange, Side};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::bitmex::message::BitmexMessage;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Terse type alias for an [`BitmexTrade`](BitmexTradeInner) real-time trades WebSocket message.
 pub type BitmexTrade = BitmexMessage<BitmexTradeInner>;
@@ -81,7 +85,8 @@ mod tests {
     mod de {
         use super::*;
         use barter_integration::error::SocketError;
-        use chrono::{Duration, TimeZone};
+        use chrono::Duration;
+        use chrono::TimeZone;
 
         #[test]
         fn test_bitmex_trade() {

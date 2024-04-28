@@ -1,13 +1,18 @@
 use super::CoinbaseChannel;
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::{ExchangeId, ExchangeSub},
-    subscription::trade::PublicTrade,
-    Identifier,
-};
-use barter_integration::model::{instrument::Instrument, Exchange, Side, SubscriptionId};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Coinbase real-time trade WebSocket message.
 ///
@@ -115,7 +120,7 @@ mod tests {
                     price: 400.23,
                     amount: 5.23512,
                     side: Side::Sell,
-                    time: DateTime::from_utc(
+                    time: DateTime::from_naive_utc_and_offset(
                         NaiveDateTime::from_str("2014-11-07T08:19:27.028459").unwrap(),
                         Utc,
                     ),

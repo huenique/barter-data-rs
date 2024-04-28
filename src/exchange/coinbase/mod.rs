@@ -1,16 +1,20 @@
-use self::{
-    channel::CoinbaseChannel, market::CoinbaseMarket, subscription::CoinbaseSubResponse,
-    trade::CoinbaseTrade,
-};
-use crate::{
-    exchange::{Connector, ExchangeId, ExchangeSub, StreamSelector},
-    subscriber::{validator::WebSocketSubValidator, WebSocketSubscriber},
-    subscription::trade::PublicTrades,
-    transformer::stateless::StatelessTransformer,
-    ExchangeWsStream,
-};
-use barter_integration::{error::SocketError, protocol::websocket::WsMessage};
-use barter_macro::{DeExchange, SerExchange};
+use self::channel::CoinbaseChannel;
+use self::market::CoinbaseMarket;
+use self::subscription::CoinbaseSubResponse;
+use self::trade::CoinbaseTrade;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::exchange::StreamSelector;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::trade::PublicTrades;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
 use serde_json::json;
 use url::Url;
 

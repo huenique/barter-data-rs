@@ -1,21 +1,22 @@
-use self::{
-    mapper::{SubscriptionMapper, WebSocketSubMapper},
-    validator::SubscriptionValidator,
-};
-use crate::{
-    exchange::Connector,
-    subscription::{Map, SubKind, Subscription, SubscriptionMeta},
-    Identifier,
-};
+use self::mapper::SubscriptionMapper;
+use self::mapper::WebSocketSubMapper;
+use self::validator::SubscriptionValidator;
+use crate::exchange::Connector;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
+use crate::subscription::Subscription;
+use crate::subscription::SubscriptionMeta;
+use crate::Identifier;
 use async_trait::async_trait;
-use barter_integration::{
-    error::SocketError,
-    model::instrument::Instrument,
-    protocol::websocket::{connect, WebSocket},
-};
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::connect;
+use barter_integration::protocol::websocket::WebSocket;
 use futures::SinkExt;
-use serde::{Deserialize, Serialize};
-use tracing::{debug, info};
+use serde::Deserialize;
+use serde::Serialize;
+use tracing::debug;
+use tracing::info;
 
 /// [`SubscriptionMapper`](mapper::SubscriptionMapper) implementations defining how to map a
 /// collection of Barter [`Subscription`]s into exchange specific [`SubscriptionMeta`].

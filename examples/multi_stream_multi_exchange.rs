@@ -1,16 +1,13 @@
-use barter_data::{
-    event::{DataKind, MarketEvent},
-    exchange::{
-        binance::{futures::BinanceFuturesUsd, spot::BinanceSpot},
-        kraken::Kraken,
-        okx::Okx,
-    },
-    streams::Streams,
-    subscription::{
-        book::{OrderBooksL1, OrderBooksL2},
-        trade::PublicTrades,
-    },
-};
+use barter_data::event::DataKind;
+use barter_data::event::MarketEvent;
+use barter_data::exchange::binance::futures::BinanceFuturesUsd;
+use barter_data::exchange::binance::spot::BinanceSpot;
+use barter_data::exchange::kraken::Kraken;
+use barter_data::exchange::okx::Okx;
+use barter_data::streams::Streams;
+use barter_data::subscription::book::OrderBooksL1;
+use barter_data::subscription::book::OrderBooksL2;
+use barter_data::subscription::trade::PublicTrades;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use tokio_stream::StreamExt;
 use tracing::info;

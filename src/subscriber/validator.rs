@@ -1,19 +1,16 @@
-use crate::{
-    exchange::Connector,
-    subscription::{Map, SubKind},
-};
+use crate::exchange::Connector;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
 use async_trait::async_trait;
-use barter_integration::{
-    error::SocketError,
-    model::instrument::Instrument,
-    protocol::{
-        websocket::{WebSocket, WebSocketParser},
-        StreamParser,
-    },
-    Validator,
-};
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WebSocket;
+use barter_integration::protocol::websocket::WebSocketParser;
+use barter_integration::protocol::StreamParser;
+use barter_integration::Validator;
 use futures::StreamExt;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde::Serialize;
 use tracing::debug;
 
 /// Defines how to validate that actioned market data

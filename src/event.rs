@@ -1,15 +1,15 @@
-use crate::{
-    error::DataError,
-    subscription::{
-        book::{OrderBook, OrderBookL1},
-        candle::Candle,
-        liquidation::Liquidation,
-        trade::PublicTrade,
-    },
-};
-use barter_integration::model::{instrument::Instrument, Exchange};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::error::DataError;
+use crate::subscription::book::OrderBook;
+use crate::subscription::book::OrderBookL1;
+use crate::subscription::candle::Candle;
+use crate::subscription::liquidation::Liquidation;
+use crate::subscription::trade::PublicTrade;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Convenient new type containing a collection of [`MarketEvent<T>`](MarketEvent)s.
 #[derive(Debug)]

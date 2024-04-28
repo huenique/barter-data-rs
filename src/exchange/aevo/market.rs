@@ -1,14 +1,15 @@
-use crate::{Identifier, subscription::Subscription};
-use barter_integration::model::instrument::{
-    kind::{InstrumentKind, OptionKind},
-    Instrument,
-};
-use chrono::{
-    format::{DelayedFormat, StrftimeItems},
-    DateTime, Utc,
-};
+use crate::subscription::Subscription;
+use crate::Identifier;
+use barter_integration::model::instrument::kind::InstrumentKind;
+use barter_integration::model::instrument::kind::OptionKind;
+use barter_integration::model::instrument::Instrument;
+use chrono::format::DelayedFormat;
+use chrono::format::StrftimeItems;
+use chrono::DateTime;
+use chrono::Utc;
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde::Serialize;
 
 use super::Aevo;
 
@@ -19,17 +20,15 @@ use super::Aevo;
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
 pub struct AevoMarket(pub String);
 
-impl <Kind> Identifier<AevoMarket> for Subscription<Aevo, Kind> {
+impl<Kind> Identifier<AevoMarket> for Subscription<Aevo, Kind> {
     fn id(&self) -> AevoMarket {
         use InstrumentKind::*;
 
-        let Instrument { base, quote, kind} = &self.instrument;
-        
+        let Instrument { base, quote, kind } = &self.instrument;
+
         AevoMarket(match kind {
             Spot => format!("{base}_{quote}").to_uppercase(),
-            Future(future) => {
-                format!("{base}-{}", format_expiry(future.expiry)).to_uppercase()
-            },
+            Future(future) => format!("{base}-{}", format_expiry(future.expiry)).to_uppercase(),
             Perpetual => format!("{base}-PERPETUAL").to_uppercase(),
             Option(option) => format!(
                 "{base}-{}-{}-{}",
@@ -41,7 +40,6 @@ impl <Kind> Identifier<AevoMarket> for Subscription<Aevo, Kind> {
                 },
             )
             .to_uppercase(),
-            
         })
     }
 }

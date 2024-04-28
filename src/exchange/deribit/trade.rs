@@ -1,13 +1,20 @@
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::{ExchangeId, subscription::ExchangeSub},
-    subscription::trade::PublicTrade, Identifier
-};
-use barter_integration::model::{instrument::Instrument, Exchange, Side, SubscriptionId};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
-use super::{message::{DeribitMultipleDataMessage}, channel::DeribitChannel};
+use super::channel::DeribitChannel;
+use super::message::DeribitMultipleDataMessage;
 
 /// Terse type alias for an [`Deribit`](super::Deribit) real-time trades WebSocket message.
 pub type DeribitTrades = DeribitMultipleDataMessage<DeribitTrade>;
@@ -34,7 +41,6 @@ pub type DeribitTrades = DeribitMultipleDataMessage<DeribitTrade>;
 //     "jsonrpc" : "2.0"
 //   }
 
-
 /// [`Deribit`](super::Deribit) real-time trade WebSocket message.
 ///
 /// See [`DeribitMessage`] for full raw payload examples.
@@ -44,9 +50,9 @@ pub type DeribitTrades = DeribitMultipleDataMessage<DeribitTrade>;
 pub struct DeribitTrade {
     #[serde(rename = "trade_id")]
     pub id: String,
-    
+
     pub price: f64,
-    
+
     pub amount: f64,
 
     #[serde(rename = "direction")]
@@ -61,31 +67,36 @@ pub struct DeribitTrade {
     pub time: DateTime<Utc>,
 }
 
-
 impl Identifier<Option<SubscriptionId>> for DeribitTrades {
     fn id(&self) -> Option<SubscriptionId> {
-        Some(ExchangeSub::from((DeribitChannel::TRADES_RAW, &self.params.data[0].instrument_name)).id())
+        Some(
+            ExchangeSub::from((
+                DeribitChannel::TRADES_RAW,
+                &self.params.data[0].instrument_name,
+            ))
+            .id(),
+        )
     }
 }
-
 
 impl From<(ExchangeId, Instrument, DeribitTrades)> for MarketIter<PublicTrade> {
     fn from((exchange_id, instrument, trades): (ExchangeId, Instrument, DeribitTrades)) -> Self {
         trades
-            .params.data
+            .params
+            .data
             .into_iter()
             .map(|trade| {
-                Ok(MarketEvent { 
-                    exchange_time: trade.time, 
-                    received_time: Utc::now(), 
-                    exchange: Exchange::from(exchange_id), 
-                    instrument: instrument.clone(), 
-                    kind: PublicTrade { 
-                        id: trade.id, 
-                        price: trade.price, 
-                        amount: trade.amount, 
-                        side: trade.side 
-                    } 
+                Ok(MarketEvent {
+                    exchange_time: trade.time,
+                    received_time: Utc::now(),
+                    exchange: Exchange::from(exchange_id),
+                    instrument: instrument.clone(),
+                    kind: PublicTrade {
+                        id: trade.id,
+                        price: trade.price,
+                        amount: trade.amount,
+                        side: trade.side,
+                    },
                 })
             })
             .collect()

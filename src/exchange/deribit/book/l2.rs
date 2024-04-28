@@ -1,15 +1,22 @@
-use barter_integration::{
-    model::{instrument::Instrument, Side, SubscriptionId},
-    protocol::websocket::WsMessage,
-};
-use chrono::{Utc};
-use tokio::sync::mpsc;
-use serde::{Deserialize, Serialize};
-use async_trait::async_trait;
-use crate::{subscription::book::OrderBookSide, exchange::{deribit::{message::DeribitSingleDataMessage, channel::DeribitChannel}, subscription::ExchangeSub}, Identifier};
-use crate::{transformer::book::OrderBookUpdater, error::DataError, subscription::book::OrderBook};
-use crate::transformer::book::InstrumentOrderBook;
 use super::DeribitLevel;
+use crate::error::DataError;
+use crate::exchange::deribit::channel::DeribitChannel;
+use crate::exchange::deribit::message::DeribitSingleDataMessage;
+use crate::exchange::subscription::ExchangeSub;
+use crate::subscription::book::OrderBook;
+use crate::subscription::book::OrderBookSide;
+use crate::transformer::book::InstrumentOrderBook;
+use crate::transformer::book::OrderBookUpdater;
+use crate::Identifier;
+use async_trait::async_trait;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use barter_integration::protocol::websocket::WsMessage;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
+use tokio::sync::mpsc;
 
 /// Terse type alias for an [`Deribit`](super::Deribit) real-time trades WebSocket message.
 pub type DeribitOrderBookL2 = DeribitSingleDataMessage<DeribitOrderBookL2Delta>;
@@ -20,12 +27,18 @@ pub struct DeribitOrderBookL2Delta {
     pub change_id: u64,
     pub prev_change_id: Option<u64>,
     pub bids: Vec<DeribitLevel>,
-    pub asks: Vec<DeribitLevel>
+    pub asks: Vec<DeribitLevel>,
 }
 
 impl Identifier<Option<SubscriptionId>> for DeribitOrderBookL2 {
     fn id(&self) -> Option<SubscriptionId> {
-        Some(ExchangeSub::from((DeribitChannel::ORDER_BOOK_L2, &self.params.data.instrument_name)).id())
+        Some(
+            ExchangeSub::from((
+                DeribitChannel::ORDER_BOOK_L2,
+                &self.params.data.instrument_name,
+            ))
+            .id(),
+        )
     }
 }
 
@@ -39,15 +52,14 @@ impl From<DeribitOrderBookL2Delta> for OrderBook {
     }
 }
 
-
 // The first notification will contain the whole book (bid and ask amounts for all prices).
 // After that there will only be information about changes to individual price levels.
 
-// The first notification will contain the amounts for all price levels (list of ['new', price, amount] tuples). 
-// All following notifications will contain a list of tuples with action, price level and new amount ([action, price, amount]). 
+// The first notification will contain the amounts for all price levels (list of ['new', price, amount] tuples).
+// All following notifications will contain a list of tuples with action, price level and new amount ([action, price, amount]).
 // Action can be either new, change or delete.
 
-// Each notification will contain a change_id field, and each message except for the first one will contain a field prev_change_id. 
+// Each notification will contain a change_id field, and each message except for the first one will contain a field prev_change_id.
 // If prev_change_id is equal to the change_id of the previous message, this means that no messages have been missed.
 
 // The amount for perpetual and futures is in USD units, for options it is in corresponding cryptocurrency contracts, e.g., BTC or ETH.
@@ -70,7 +82,7 @@ impl DeribitBookUpdater {
 }
 
 #[async_trait]
-impl OrderBookUpdater for DeribitBookUpdater{
+impl OrderBookUpdater for DeribitBookUpdater {
     type OrderBook = OrderBook;
     type Update = DeribitOrderBookL2;
 
@@ -102,7 +114,6 @@ impl OrderBookUpdater for DeribitBookUpdater{
         book: &mut Self::OrderBook,
         update: Self::Update,
     ) -> Result<Option<Self::OrderBook>, DataError> {
-
         // If prev_change_id is equal to the change_id of the previous message, this means that no messages have been missed.
         match update.params.data.prev_change_id {
             Some(prev_change_id) if prev_change_id != self.change_id => {
@@ -135,7 +146,9 @@ mod tests {
     use super::*;
 
     mod de {
-        use crate::exchange::{deribit::{message::{SubscriptionMethod, SingleData}, book::Delta}, aevo::channel};
+        use crate::exchange::deribit::book::Delta;
+        use crate::exchange::deribit::message::SingleData;
+        use crate::exchange::deribit::message::SubscriptionMethod;
 
         use super::*;
 
@@ -184,20 +197,20 @@ mod tests {
                 DeribitOrderBookL2 {
                     jsonrpc: "2.0".to_string(),
                     method: SubscriptionMethod::Subscription,
-                    params: SingleData { 
+                    params: SingleData {
                         data: DeribitOrderBookL2Delta {
                             instrument_name: "BTC-PERPETUAL".to_string(),
                             change_id: 297217,
                             prev_change_id: None,
                             bids: vec![
-                                DeribitLevel (Delta::New, 5042.34, 30.0),
-                                DeribitLevel (Delta::New, 5041.94, 20.0),    
+                                DeribitLevel(Delta::New, 5042.34, 30.0),
+                                DeribitLevel(Delta::New, 5041.94, 20.0),
                             ],
                             asks: vec![
-                                DeribitLevel (Delta::New, 5042.64, 40.0),
-                                DeribitLevel (Delta::New, 5043.3, 40.0),  
-                            ], 
-                            },
+                                DeribitLevel(Delta::New, 5042.64, 40.0),
+                                DeribitLevel(Delta::New, 5043.3, 40.0),
+                            ],
+                        },
                         channel: "book.BTC-PERPETUAL.raw".to_string(),
                     }
                 }
@@ -205,15 +218,13 @@ mod tests {
         }
     }
 
-
     mod deribit_book_updater {
-        use super::*;
-        use crate::subscription::book::{Level, OrderBookSide};
-        use barter_integration::model::Side;
+        // use super::*;
+        // use crate::subscription::book::{Level, OrderBookSide};
+        // use barter_integration::model::Side;
 
         #[test]
         fn test_is_first_update() {}
-
 
         #[test]
         fn test_validate_next_update() {}

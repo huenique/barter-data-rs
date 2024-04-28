@@ -1,16 +1,20 @@
 use super::super::KrakenMessage;
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::{kraken::channel::KrakenChannel, subscription::ExchangeSub, ExchangeId},
-    subscription::book::{Level, OrderBookL1},
-    Identifier,
-};
-use barter_integration::{
-    de::extract_next,
-    model::{instrument::Instrument, Exchange, SubscriptionId},
-};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::kraken::channel::KrakenChannel;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::ExchangeId;
+use crate::subscription::book::Level;
+use crate::subscription::book::OrderBookL1;
+use crate::Identifier;
+use barter_integration::de::extract_next;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Terse type alias for an [`Kraken`](super::super::Kraken) real-time OrderBook Level1
 /// (top of book) WebSocket message.
@@ -132,9 +136,9 @@ mod tests {
 
     mod de {
         use super::*;
-        use barter_integration::{
-            de::datetime_utc_from_epoch_duration, error::SocketError, model::SubscriptionId,
-        };
+        use barter_integration::de::datetime_utc_from_epoch_duration;
+        use barter_integration::error::SocketError;
+        use barter_integration::model::SubscriptionId;
 
         #[test]
         fn test_kraken_message_order_book_l1() {

@@ -1,11 +1,11 @@
 use self::l2::BinanceSpotBookUpdater;
-use super::{Binance, ExchangeServer};
-use crate::{
-    exchange::{ExchangeId, StreamSelector},
-    subscription::book::OrderBooksL2,
-    transformer::book::MultiBookTransformer,
-    ExchangeWsStream,
-};
+use super::Binance;
+use super::ExchangeServer;
+use crate::exchange::ExchangeId;
+use crate::exchange::StreamSelector;
+use crate::subscription::book::OrderBooksL2;
+use crate::transformer::book::MultiBookTransformer;
+use crate::ExchangeWsStream;
 
 /// Level 2 OrderBook types (top of book) and spot
 /// [`OrderBookUpdater`](crate::transformer::book::OrderBookUpdater) implementation.

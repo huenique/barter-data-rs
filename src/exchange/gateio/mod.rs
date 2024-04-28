@@ -1,11 +1,17 @@
-use self::{channel::GateioChannel, market::GateioMarket, subscription::GateioSubResponse};
-use crate::{
-    exchange::{subscription::ExchangeSub, Connector, ExchangeId, ExchangeServer},
-    subscriber::{validator::WebSocketSubValidator, WebSocketSubscriber},
-};
-use barter_integration::{error::SocketError, protocol::websocket::WsMessage};
+use self::channel::GateioChannel;
+use self::market::GateioMarket;
+use self::subscription::GateioSubResponse;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeServer;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
 use serde_json::json;
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
+use std::marker::PhantomData;
 use url::Url;
 
 /// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)

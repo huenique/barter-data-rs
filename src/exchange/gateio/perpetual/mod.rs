@@ -1,11 +1,11 @@
 use self::trade::GateioFuturesTrades;
 use super::Gateio;
-use crate::{
-    exchange::{ExchangeId, ExchangeServer, StreamSelector},
-    subscription::trade::PublicTrades,
-    transformer::stateless::StatelessTransformer,
-    ExchangeWsStream,
-};
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeServer;
+use crate::exchange::StreamSelector;
+use crate::subscription::trade::PublicTrades;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
 
 /// Public trades types.
 pub mod trade;

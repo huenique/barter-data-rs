@@ -1,6 +1,8 @@
 use serde::Serialize;
 
-use crate::{Identifier, subscription::{Subscription, book::{OrderBooksL2}}};
+use crate::subscription::book::OrderBooksL2;
+use crate::subscription::Subscription;
+use crate::Identifier;
 
 use super::Aevo;
 

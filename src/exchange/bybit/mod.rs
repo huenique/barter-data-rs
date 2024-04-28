@@ -1,22 +1,27 @@
-use crate::{
-    exchange::{
-        bybit::{
-            channel::BybitChannel, market::BybitMarket, message::BybitMessage,
-            subscription::BybitResponse,
-        },
-        subscription::ExchangeSub,
-        Connector, ExchangeId, ExchangeServer, PingInterval, StreamSelector,
-    },
-    subscriber::{validator::WebSocketSubValidator, WebSocketSubscriber},
-    subscription::{trade::PublicTrades, Map},
-    transformer::stateless::StatelessTransformer,
-    ExchangeWsStream,
-};
-use barter_integration::{
-    error::SocketError, model::instrument::Instrument, protocol::websocket::WsMessage,
-};
-use serde::de::{Error, Unexpected};
-use std::{fmt::Debug, marker::PhantomData, time::Duration};
+use crate::exchange::bybit::channel::BybitChannel;
+use crate::exchange::bybit::market::BybitMarket;
+use crate::exchange::bybit::message::BybitMessage;
+use crate::exchange::bybit::subscription::BybitResponse;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeServer;
+use crate::exchange::PingInterval;
+use crate::exchange::StreamSelector;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::trade::PublicTrades;
+use crate::subscription::Map;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WsMessage;
+use serde::de::Error;
+use serde::de::Unexpected;
+use std::fmt::Debug;
+use std::marker::PhantomData;
+use std::time::Duration;
 use tokio::time;
 use url::Url;
 

@@ -1,7 +1,6 @@
-use crate::{
-    subscription::{trade::PublicTrades, Subscription},
-    Identifier,
-};
+use crate::subscription::trade::PublicTrades;
+use crate::subscription::Subscription;
+use crate::Identifier;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use serde::Serialize;
 

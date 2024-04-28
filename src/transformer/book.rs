@@ -1,18 +1,19 @@
-use crate::{
-    error::DataError,
-    event::{MarketEvent, MarketIter},
-    exchange::Connector,
-    subscription::{book::OrderBook, Map, SubKind},
-    transformer::ExchangeTransformer,
-    Identifier,
-};
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::Connector;
+use crate::subscription::book::OrderBook;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
+use crate::transformer::ExchangeTransformer;
+use crate::Identifier;
 use async_trait::async_trait;
-use barter_integration::{
-    model::{instrument::Instrument, SubscriptionId},
-    protocol::websocket::WsMessage,
-    Transformer,
-};
-use serde::{Deserialize, Serialize};
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::SubscriptionId;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_integration::Transformer;
+use serde::Deserialize;
+use serde::Serialize;
 use std::marker::PhantomData;
 use tokio::sync::mpsc;
 

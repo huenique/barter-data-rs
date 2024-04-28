@@ -1,4 +1,5 @@
-use super::{Bybit, ExchangeServer};
+use super::Bybit;
+use super::ExchangeServer;
 use crate::exchange::ExchangeId;
 
 /// [`BybitSpot`] WebSocket server base url.

@@ -1,20 +1,20 @@
 use self::subscription::ExchangeSub;
-use crate::{
-    subscriber::{validator::SubscriptionValidator, Subscriber},
-    subscription::{Map, SubKind},
-    MarketStream,
-};
-use barter_integration::{
-    error::SocketError,
-    model::instrument::{kind::InstrumentKind, Instrument},
-    protocol::websocket::WsMessage,
-    Validator,
-};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use std::{
-    fmt::{Debug, Display},
-    time::Duration,
-};
+use crate::subscriber::validator::SubscriptionValidator;
+use crate::subscriber::Subscriber;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
+use crate::MarketStream;
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::kind::InstrumentKind;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_integration::Validator;
+use serde::de::DeserializeOwned;
+use serde::Deserialize;
+use serde::Serialize;
+use std::fmt::Debug;
+use std::fmt::Display;
+use std::time::Duration;
 use url::Url;
 
 /// `BinanceSpot` & `BinanceFuturesUsd` [`Connector`] and [`StreamSelector`] implementations.
@@ -46,6 +46,7 @@ pub mod deribit;
 
 pub mod aevo;
 
+pub mod hyperliquid;
 /// Defines the generic [`ExchangeSub`] containing a market and channel combination used by an
 /// exchange [`Connector`] to build [`WsMessage`] subscription payloads.
 pub mod subscription;
@@ -174,23 +175,24 @@ pub struct PingInterval {
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
 #[serde(rename = "exchange", rename_all = "snake_case")]
 pub enum ExchangeId {
+    Aevo,
     BinanceFuturesUsd,
     BinanceSpot,
     Bitfinex,
     Bitmex,
-    BybitSpot,
     BybitPerpetualsUsd,
+    BybitSpot,
     Coinbase,
-    GateioSpot,
-    GateioFuturesUsd,
+    Deribit,
     GateioFuturesBtc,
+    GateioFuturesUsd,
+    GateioOptions,
     GateioPerpetualsBtc,
     GateioPerpetualsUsd,
-    GateioOptions,
+    GateioSpot,
+    Hyperliquid,
     Kraken,
     Okx,
-    Deribit,
-    Aevo
 }
 
 impl From<ExchangeId> for barter_integration::model::Exchange {
@@ -209,23 +211,24 @@ impl ExchangeId {
     /// Return the &str representation of this [`ExchangeId`]
     pub fn as_str(&self) -> &'static str {
         match self {
-            ExchangeId::BinanceSpot => "binance_spot",
+            ExchangeId::Aevo => "aevo",
             ExchangeId::BinanceFuturesUsd => "binance_futures_usd",
+            ExchangeId::BinanceSpot => "binance_spot",
             ExchangeId::Bitfinex => "bitfinex",
             ExchangeId::Bitmex => "bitmex",
-            ExchangeId::BybitSpot => "bybit_spot",
             ExchangeId::BybitPerpetualsUsd => "bybit_perpetuals_usd",
+            ExchangeId::BybitSpot => "bybit_spot",
             ExchangeId::Coinbase => "coinbase",
-            ExchangeId::GateioSpot => "gateio_spot",
-            ExchangeId::GateioFuturesUsd => "gateio_futures_usd",
+            ExchangeId::Deribit => "deribit",
             ExchangeId::GateioFuturesBtc => "gateio_futures_btc",
-            ExchangeId::GateioPerpetualsUsd => "gateio_perpetuals_usd",
-            ExchangeId::GateioPerpetualsBtc => "gateio_perpetuals_btc",
+            ExchangeId::GateioFuturesUsd => "gateio_futures_usd",
             ExchangeId::GateioOptions => "gateio_options",
+            ExchangeId::GateioPerpetualsBtc => "gateio_perpetuals_btc",
+            ExchangeId::GateioPerpetualsUsd => "gateio_perpetuals_usd",
+            ExchangeId::GateioSpot => "gateio_spot",
+            ExchangeId::Hyperliquid => "hyperliquid",
             ExchangeId::Kraken => "kraken",
             ExchangeId::Okx => "okx",
-            ExchangeId::Deribit => "deribit",
-            ExchangeId::Aevo => "aevo",
         }
     }
 
@@ -239,8 +242,8 @@ impl ExchangeId {
         match (self, instrument_kind) {
             // Spot
             (
-                BinanceFuturesUsd | Bitmex | BybitPerpetualsUsd | GateioPerpetualsUsd
-                | GateioPerpetualsBtc | Aevo,
+                Aevo | BinanceFuturesUsd | Bitmex | BybitPerpetualsUsd | GateioPerpetualsUsd
+                | GateioPerpetualsBtc,
                 Spot,
             ) => false,
             (_, Spot) => true,
@@ -251,14 +254,14 @@ impl ExchangeId {
 
             // Future Perpetual Swaps
             (
-                BinanceFuturesUsd | Bitmex | Okx | BybitPerpetualsUsd | GateioPerpetualsUsd
-                | GateioPerpetualsBtc | Deribit,
+                BinanceFuturesUsd | BybitPerpetualsUsd | Deribit | GateioPerpetualsBtc
+                | GateioPerpetualsUsd | Hyperliquid | Okx | Bitmex,
                 Perpetual,
             ) => true,
             (_, Perpetual) => false,
 
             // Option
-            (GateioOptions | Okx | Deribit | Aevo, Option(_)) => true,
+            (Aevo | Deribit | GateioOptions | Okx, Option(_)) => true,
             (_, Option(_)) => false,
         }
     }

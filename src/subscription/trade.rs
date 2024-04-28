@@ -1,7 +1,9 @@
 use super::SubKind;
 use barter_integration::model::Side;
-use barter_macro::{DeSubKind, SerSubKind};
-use serde::{Deserialize, Serialize};
+use barter_macro::DeSubKind;
+use barter_macro::SerSubKind;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields [`PublicTrade`]
 /// [`MarketEvent<T>`](crate::event::MarketEvent) events.

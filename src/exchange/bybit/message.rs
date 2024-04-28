@@ -1,18 +1,18 @@
-use crate::{
-    event::MarketIter,
-    exchange::{
-        bybit::{channel::BybitChannel, subscription::BybitResponse, trade::BybitTrade},
-        ExchangeId,
-    },
-    subscription::trade::PublicTrade,
-    Identifier,
-};
-use barter_integration::model::{instrument::Instrument, SubscriptionId};
-use chrono::{DateTime, Utc};
-use serde::{
-    de::{Error, Unexpected},
-    Deserialize, Serialize,
-};
+use crate::event::MarketIter;
+use crate::exchange::bybit::channel::BybitChannel;
+use crate::exchange::bybit::subscription::BybitResponse;
+use crate::exchange::bybit::trade::BybitTrade;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::de::Error;
+use serde::de::Unexpected;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// [`Bybit`](super::Bybit) websocket message supports both [`BybitTrade`](BybitTrade) and [`BybitResponse`](BybitResponse) .
 #[derive(Debug, Serialize, Deserialize)]

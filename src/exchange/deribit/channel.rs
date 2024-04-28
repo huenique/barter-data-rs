@@ -1,6 +1,10 @@
 use serde::Serialize;
 
-use crate::{Identifier, subscription::{Subscription, trade::PublicTrades, book::{OrderBookL1, OrderBooksL1, OrderBooksL2}}};
+use crate::subscription::book::OrderBooksL1;
+use crate::subscription::book::OrderBooksL2;
+use crate::subscription::trade::PublicTrades;
+use crate::subscription::Subscription;
+use crate::Identifier;
 
 use super::Deribit;
 

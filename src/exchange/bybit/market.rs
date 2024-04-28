@@ -1,5 +1,8 @@
-use crate::{exchange::bybit::Bybit, subscription::Subscription, Identifier};
-use serde::{Deserialize, Serialize};
+use crate::exchange::bybit::Bybit;
+use crate::subscription::Subscription;
+use crate::Identifier;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a [`Bybit`](super::Bybit)
 /// market that can be subscribed to.

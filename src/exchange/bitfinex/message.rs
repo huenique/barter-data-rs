@@ -1,11 +1,11 @@
 use super::trade::BitfinexTrade;
-use crate::{
-    event::MarketIter, exchange::ExchangeId, subscription::trade::PublicTrade, Identifier,
-};
-use barter_integration::{
-    de::extract_next,
-    model::{instrument::Instrument, SubscriptionId},
-};
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+use barter_integration::de::extract_next;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::SubscriptionId;
 use serde::Serialize;
 
 /// [`Bitfinex`](super::Bitfinex) message received over
@@ -132,9 +132,9 @@ impl<'de> serde::Deserialize<'de> for BitfinexMessage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use barter_integration::{
-        de::datetime_utc_from_epoch_duration, error::SocketError, model::Side,
-    };
+    use barter_integration::de::datetime_utc_from_epoch_duration;
+    use barter_integration::error::SocketError;
+    use barter_integration::model::Side;
     use std::time::Duration;
 
     #[test]

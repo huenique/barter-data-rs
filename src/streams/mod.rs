@@ -1,8 +1,11 @@
-use self::builder::{multi::MultiStreamBuilder, StreamBuilder};
-use crate::{exchange::ExchangeId, subscription::SubKind};
+use self::builder::multi::MultiStreamBuilder;
+use self::builder::StreamBuilder;
+use crate::exchange::ExchangeId;
+use crate::subscription::SubKind;
 use std::collections::HashMap;
 use tokio::sync::mpsc;
-use tokio_stream::{wrappers::UnboundedReceiverStream, StreamMap};
+use tokio_stream::wrappers::UnboundedReceiverStream;
+use tokio_stream::StreamMap;
 
 /// Defines the [`StreamBuilder`](builder::StreamBuilder) and
 /// [`MultiStreamBuilder`](builder::multi::MultiStreamBuilder) APIs for ergonomically initialising

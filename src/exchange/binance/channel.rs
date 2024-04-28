@@ -1,13 +1,11 @@
-use super::{futures::BinanceFuturesUsd, Binance};
-use crate::{
-    subscription::{
-        book::{OrderBooksL1, OrderBooksL2},
-        liquidation::Liquidations,
-        trade::PublicTrades,
-        Subscription,
-    },
-    Identifier,
-};
+use super::futures::BinanceFuturesUsd;
+use super::Binance;
+use crate::subscription::book::OrderBooksL1;
+use crate::subscription::book::OrderBooksL2;
+use crate::subscription::liquidation::Liquidations;
+use crate::subscription::trade::PublicTrades;
+use crate::subscription::Subscription;
+use crate::Identifier;
 use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a [`Binance`](super::Binance)

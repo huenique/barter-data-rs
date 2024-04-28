@@ -1,15 +1,17 @@
 use super::KrakenMessage;
-use crate::{
-    event::{MarketEvent, MarketIter},
-    exchange::ExchangeId,
-    subscription::trade::PublicTrade,
-    Identifier,
-};
-use barter_integration::{
-    de::{datetime_utc_from_epoch_duration, extract_next},
-    model::{instrument::Instrument, Exchange, Side, SubscriptionId},
-};
-use chrono::{DateTime, Utc};
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+use barter_integration::de::datetime_utc_from_epoch_duration;
+use barter_integration::de::extract_next;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
 use serde::Serialize;
 
 /// Terse type alias for an [`Kraken`](super::Kraken) real-time trades WebSocket message.
@@ -50,8 +52,8 @@ impl Identifier<Option<SubscriptionId>> for KrakenTradesInner {
 /// [`KrakenTrade`] model.
 fn custom_kraken_trade_id(trade: &KrakenTrade) -> String {
     format!(
-        "{}_{}_{}_{}",
-        trade.time.timestamp_nanos(),
+        "{:?}_{}_{}_{}",
+        trade.time.timestamp_nanos_opt(),
         trade.side,
         trade.price,
         trade.amount
@@ -208,11 +210,10 @@ mod tests {
 
     mod de {
         use super::*;
-        use barter_integration::{
-            de::datetime_utc_from_epoch_duration,
-            error::SocketError,
-            model::{Side, SubscriptionId},
-        };
+        use barter_integration::de::datetime_utc_from_epoch_duration;
+        use barter_integration::error::SocketError;
+        use barter_integration::model::Side;
+        use barter_integration::model::SubscriptionId;
 
         #[test]
         fn test_kraken_message_trades() {

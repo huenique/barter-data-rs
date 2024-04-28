@@ -1,21 +1,22 @@
-use crate::{
-    exchange::{
-        bitmex::{
-            channel::BitmexChannel, market::BitmexMarket, subscription::BitmexSubResponse,
-            trade::BitmexTrade,
-        },
-        subscription::ExchangeSub,
-        Connector, ExchangeId, StreamSelector,
-    },
-    subscriber::{validator::WebSocketSubValidator, WebSocketSubscriber},
-    subscription::{trade::PublicTrades, Map},
-    transformer::stateless::StatelessTransformer,
-    ExchangeWsStream,
-};
-use barter_integration::{
-    error::SocketError, model::instrument::Instrument, protocol::websocket::WsMessage,
-};
-use serde::de::{Error, Unexpected};
+use crate::exchange::bitmex::channel::BitmexChannel;
+use crate::exchange::bitmex::market::BitmexMarket;
+use crate::exchange::bitmex::subscription::BitmexSubResponse;
+use crate::exchange::bitmex::trade::BitmexTrade;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::StreamSelector;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::trade::PublicTrades;
+use crate::subscription::Map;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WsMessage;
+use serde::de::Error;
+use serde::de::Unexpected;
 use std::fmt::Debug;
 use url::Url;
 

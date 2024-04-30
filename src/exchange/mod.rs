@@ -47,6 +47,9 @@ pub mod deribit;
 pub mod aevo;
 
 pub mod hyperliquid;
+
+pub mod powertrade;
+
 /// Defines the generic [`ExchangeSub`] containing a market and channel combination used by an
 /// exchange [`Connector`] to build [`WsMessage`] subscription payloads.
 pub mod subscription;
@@ -193,6 +196,7 @@ pub enum ExchangeId {
     Hyperliquid,
     Kraken,
     Okx,
+    PowerTrade,
 }
 
 impl From<ExchangeId> for barter_integration::model::Exchange {
@@ -229,6 +233,7 @@ impl ExchangeId {
             ExchangeId::Hyperliquid => "hyperliquid",
             ExchangeId::Kraken => "kraken",
             ExchangeId::Okx => "okx",
+            ExchangeId::PowerTrade => "powertrade",
         }
     }
 
@@ -255,13 +260,13 @@ impl ExchangeId {
             // Future Perpetual Swaps
             (
                 BinanceFuturesUsd | BybitPerpetualsUsd | Deribit | GateioPerpetualsBtc
-                | GateioPerpetualsUsd | Hyperliquid | Okx | Bitmex,
+                | GateioPerpetualsUsd | Hyperliquid | Okx | Bitmex | PowerTrade,
                 Perpetual,
             ) => true,
             (_, Perpetual) => false,
 
             // Option
-            (Aevo | Deribit | GateioOptions | Okx, Option(_)) => true,
+            (Aevo | Deribit | GateioOptions | Okx | PowerTrade, Option(_)) => true,
             (_, Option(_)) => false,
         }
     }

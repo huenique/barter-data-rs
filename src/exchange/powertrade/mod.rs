@@ -1,0 +1,83 @@
+pub mod book;
+pub mod channel;
+pub mod future;
+pub mod market;
+pub mod message;
+pub mod subscription;
+
+use std::time::Duration;
+
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use url::Url;
+
+use crate::exchange::Connector;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::book::OrderBooksL3;
+use crate::subscription::Map;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
+
+use self::book::l3::PowerTradeOrderBookL3;
+use self::channel::PowerTradeChannel;
+use self::market::PowerTradeMarket;
+use self::subscription::PowerTradeSubResponse;
+
+use super::subscription::ExchangeSub;
+use super::ExchangeId;
+use super::PingInterval;
+use super::StreamSelector;
+
+pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data";
+
+#[derive(
+    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+)]
+pub struct PowerTrade;
+
+impl Connector for PowerTrade {
+    const ID: ExchangeId = ExchangeId::PowerTrade;
+    type Channel = PowerTradeChannel;
+    type Market = PowerTradeMarket;
+    type Subscriber = WebSocketSubscriber;
+    type SubValidator = WebSocketSubValidator;
+    type SubResponse = PowerTradeSubResponse;
+
+    fn url() -> Result<Url, SocketError> {
+        Url::parse(BASE_URL_POWERTRADE).map_err(SocketError::UrlParse)
+    }
+
+    fn requests(exchange_subs: Vec<ExchangeSub<Self::Channel, Self::Market>>) -> Vec<WsMessage> {
+        exchange_subs
+            .into_iter()
+            .map(|sub| {
+                let subscribe = serde_json::json!({
+                    "subscribe": {
+                        "symbol": sub.market.as_ref(),
+                    },
+                });
+                WsMessage::Text(subscribe.to_string())
+            })
+            .collect()
+    }
+
+    fn ping_interval() -> Option<PingInterval> {
+        None
+    }
+
+    fn expected_responses(map: &Map<Instrument>) -> usize {
+        map.0.len()
+    }
+
+    fn subscription_timeout() -> Duration {
+        super::DEFAULT_SUBSCRIPTION_TIMEOUT
+    }
+}
+
+impl StreamSelector<OrderBooksL3> for PowerTrade {
+    type Stream = ExchangeWsStream<StatelessTransformer<Self, OrderBooksL3, PowerTradeOrderBookL3>>;
+}

@@ -14,7 +14,7 @@ async fn main() {
     // '--> each call to StreamBuilder::subscribe() creates a separate WebSocket connection
     let mut streams = Streams::<OrderBooksL2>::builder()
         .subscribe([
-            (Hyperliquid::default(), "BTC", "", InstrumentKind::Spot, OrderBooksL2),
+            (Hyperliquid::default(), "btc", "", InstrumentKind::Spot, OrderBooksL2),
         ])
 
         .init()

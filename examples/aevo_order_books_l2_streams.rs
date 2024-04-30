@@ -46,7 +46,7 @@ fn init_logging() {
         // Filter messages based on the INFO
         .with_env_filter(
             tracing_subscriber::filter::EnvFilter::builder()
-                .with_default_directive(tracing_subscriber::filter::LevelFilter::DEBUG.into())
+                .with_default_directive(tracing_subscriber::filter::LevelFilter::INFO.into())
                 .from_env_lossy(),
         )
         // Disable colours on release builds
@@ -61,7 +61,7 @@ fn call_contract() -> OptionContract {
     OptionContract {
         kind: OptionKind::Call,
         exercise: OptionExercise::American,
-        expiry: Utc.timestamp_millis_opt(1688108400000).unwrap(),
-        strike: rust_decimal_macros::dec!(1900),
+        expiry: Utc.timestamp_millis_opt(1715324400000).unwrap(),
+        strike: rust_decimal_macros::dec!(3200),
     }
 }

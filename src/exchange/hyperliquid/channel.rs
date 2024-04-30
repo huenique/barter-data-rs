@@ -11,14 +11,7 @@ use serde::Serialize;
 pub struct HyperliquidChannel(pub &'static str);
 
 impl HyperliquidChannel {
-    /// Channel for receiving trade data updates for a specific coin.
-    pub const TRADES: Self = Self("trades");
-
-    /// Channel for receiving level 2 order book updates for a specific coin.
     pub const ORDER_BOOK_L2: Self = Self("l2Book");
-
-    /// Channel for receiving candle data for a specific coin and interval.
-    pub const CANDLE: Self = Self("candle");
 }
 
 impl AsRef<str> for HyperliquidChannel {

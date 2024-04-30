@@ -3,6 +3,7 @@ pub mod channel;
 pub mod market;
 pub mod message;
 pub mod subscription;
+pub mod validator;
 
 use self::book::l2::HyperliquidOrderBookUpdater;
 use self::channel::HyperliquidChannel;
@@ -48,7 +49,7 @@ impl Connector for Hyperliquid {
 
     fn ping_interval() -> Option<PingInterval> {
         Some(PingInterval {
-            interval: time::interval(Duration::from_millis(5_000)),
+            interval: time::interval(Duration::from_millis(30_000)),
             ping: || WsMessage::Text(serde_json::json!({ "method": "ping" }).to_string()),
         })
     }

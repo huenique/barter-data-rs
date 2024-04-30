@@ -1,5 +1,4 @@
 use super::Hyperliquid;
-use crate::subscription::book::OrderBooksL2;
 use crate::subscription::Subscription;
 use crate::Identifier;
 use serde::Deserialize;
@@ -8,11 +7,9 @@ use serde::Serialize;
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
 pub struct HyperliquidMarket(pub String);
 
-impl Identifier<HyperliquidMarket> for Subscription<Hyperliquid, OrderBooksL2> {
+impl<Kind> Identifier<HyperliquidMarket> for Subscription<Hyperliquid, Kind> {
     fn id(&self) -> HyperliquidMarket {
-        HyperliquidMarket(
-            format!("{}{}", self.instrument.base, self.instrument.quote).to_uppercase(),
-        )
+        HyperliquidMarket(format!("{}", self.instrument.base).to_uppercase())
     }
 }
 

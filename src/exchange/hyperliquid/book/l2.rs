@@ -21,28 +21,16 @@ pub type HyperliquidOrderBookL2Snapshot = HyperliquidMessage<WsBook>;
 
 impl Identifier<Option<SubscriptionId>> for HyperliquidOrderBookL2Snapshot {
     fn id(&self) -> Option<SubscriptionId> {
-        Some(
-            ExchangeSub::from((&self.channel, &self.data.coin))
-                .id()
-                .into(),
-        )
+        Some(ExchangeSub::from((&self.channel, &self.data.coin)).id())
     }
 }
 
 // Order book snapshot for L2 as per the WsBook interface
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct WsBook {
     pub coin: String,
     pub levels: (Vec<WsLevel>, Vec<WsLevel>), // tuple of bids and asks
     pub time: u64,
-}
-
-// Level detail for order books as per the WsLevel interface
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
-pub struct WsLevel {
-    pub px: String, // price
-    pub sz: String, // size
-    pub n: u32,     // number of orders
 }
 
 impl WsBook {
@@ -56,7 +44,15 @@ impl WsBook {
     }
 }
 
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+// Level detail for order books as per the WsLevel interface
+#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+pub struct WsLevel {
+    pub px: String, // price
+    pub sz: String, // size
+    pub n: u32,     // number of orders
+}
+
+#[derive(Copy, Clone, Debug, Default, Deserialize, Serialize)]
 pub struct HyperliquidOrderBookUpdater {}
 
 #[async_trait]

@@ -14,7 +14,7 @@ async fn main() {
     // '--> each call to StreamBuilder::subscribe() creates a separate WebSocket connection
     let mut streams = Streams::<OrderBooksL2>::builder()
         .subscribe([
-            (Hyperliquid::default(), "btc", "", InstrumentKind::Spot, OrderBooksL2),
+            (Hyperliquid::default(), "btc", "usd", InstrumentKind::Spot, OrderBooksL2),
         ])
 
         .init()
@@ -46,7 +46,7 @@ fn init_logging() {
         // Disable colours on release builds
         .with_ansi(cfg!(debug_assertions))
         // Enable Json formatting
-        .json()
+        .pretty()
         // Install this Tracing subscriber as global default
         .init();
 }

@@ -26,7 +26,6 @@ pub struct SubscriptionDetails {
 impl Validator for HyperliquidSubResponse {
     fn validate(self) -> Result<Self, SocketError> {
         if self.channel == "subscriptionResponse" {
-            // TODO: Add additional checks as necessary
             Ok(self)
         } else {
             Err(SocketError::Subscribe(format!(

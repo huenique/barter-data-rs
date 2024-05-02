@@ -3,6 +3,11 @@ use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::book::OrderBooksL3;
 use barter_integration::model::instrument::kind::InstrumentKind;
+use barter_integration::model::instrument::kind::OptionContract;
+use barter_integration::model::instrument::kind::OptionExercise;
+use barter_integration::model::instrument::kind::OptionKind;
+use chrono::TimeZone;
+use chrono::Utc;
 use tracing::info;
 
 #[rustfmt::skip]
@@ -14,6 +19,10 @@ async fn main() {
         .subscribe([
             (PowerTrade::default(), "btc", "usd", InstrumentKind::Perpetual, OrderBooksL3),
         ])
+        .subscribe([
+            (PowerTrade::default(), "btc", "usd", InstrumentKind::Option(call_contract()), OrderBooksL3),
+        ])
+
         .init()
         .await
         .unwrap();
@@ -33,7 +42,7 @@ fn init_logging() {
         // Filter messages based on the INFO
         .with_env_filter(
             tracing_subscriber::filter::EnvFilter::builder()
-                .with_default_directive(tracing_subscriber::filter::LevelFilter::DEBUG.into())
+                .with_default_directive(tracing_subscriber::filter::LevelFilter::INFO.into())
                 .from_env_lossy(),
         )
         // Disable colours on release builds
@@ -42,4 +51,13 @@ fn init_logging() {
         .pretty()
         // Install this Tracing subscriber as global default
         .init();
+}
+
+fn call_contract() -> OptionContract {
+    OptionContract {
+        kind: OptionKind::Call,
+        exercise: OptionExercise::American,
+        expiry: Utc.timestamp_millis_opt(1715324400000).unwrap(),
+        strike: rust_decimal_macros::dec!(60_000),
+    }
 }

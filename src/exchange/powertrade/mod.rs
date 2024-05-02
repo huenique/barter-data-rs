@@ -1,6 +1,5 @@
 pub mod book;
 pub mod channel;
-pub mod future;
 pub mod market;
 pub mod message;
 pub mod subscription;
@@ -25,19 +24,20 @@ use crate::ExchangeWsStream;
 use self::book::l3::PowerTradeOrderBookL3;
 use self::channel::PowerTradeChannel;
 use self::market::PowerTradeMarket;
-use self::subscription::PowerTradeSubResponse;
+use self::subscription::PowerTradePlatformEvent;
 
 use super::subscription::ExchangeSub;
 use super::ExchangeId;
 use super::PingInterval;
 use super::StreamSelector;
 
-pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data";
+/// <https://power-trade.github.io/api-docs-source/ws_feeds.html#Market_Feeds_Connection_Parameters>
+pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data?mbo_period=1&snapshot_depth=100";
 
-#[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
-)]
-pub struct PowerTrade;
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange)]
+pub struct PowerTrade {
+    pub connection_params: Vec<(&'static str, &'static str)>,
+}
 
 impl Connector for PowerTrade {
     const ID: ExchangeId = ExchangeId::PowerTrade;
@@ -45,7 +45,7 @@ impl Connector for PowerTrade {
     type Market = PowerTradeMarket;
     type Subscriber = WebSocketSubscriber;
     type SubValidator = WebSocketSubValidator;
-    type SubResponse = PowerTradeSubResponse;
+    type SubResponse = PowerTradePlatformEvent;
 
     fn url() -> Result<Url, SocketError> {
         Url::parse(BASE_URL_POWERTRADE).map_err(SocketError::UrlParse)

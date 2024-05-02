@@ -5,33 +5,33 @@ use serde::Serialize;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DisplayOrderAdded {
     pub timestamp: String,
-    pub tradeable_entity_id: u64,
-    pub market_id: u64,
+    pub tradeable_entity_id: String,
+    pub market_id: String,
     pub side: Side,
     pub display_order_id: String,
     pub display_price: String,
     pub display_quantity: String,
 }
 
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct DisplayOrderDeleted {
-    pub timestamp: u64,
-    pub tradeable_entity_id: u64,
-    pub market_id: u32,
+    pub timestamp: String,
+    pub tradeable_entity_id: String,
+    pub market_id: String,
     pub side: Side,
-    pub display_order: u64,
+    pub display_order: String,
 }
 
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct DisplayOrderUpdated {
-    pub timestamp: u64,
-    pub tradeable_entity_id: u64,
-    pub market_id: u32,
+    pub timestamp: String,
+    pub tradeable_entity_id: String,
+    pub market_id: String,
     pub side: Side,
-    pub old_display_order_id: u64,
-    pub new_display_order_id: u64,
-    pub display_price: i64,
-    pub display_quantity: u64,
+    pub old_display_order_id: String,
+    pub new_display_order_id: String,
+    pub display_price: String,
+    pub display_quantity: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -42,7 +42,7 @@ pub enum SubscriptionResult {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Subscribed {
-    pub tradeable_entity_id: u64,
+    pub tradeable_entity_id: String,
     pub symbol: String,
 }
 
@@ -53,10 +53,10 @@ pub struct SubscribeError {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Deliverable<AliasedDeliverable> {
-    pub deliverable_id: u64,
+    pub deliverable_id: String,
     pub symbol: String,
     pub tags: Vec<String>,
-    pub decimal_places: u32,
+    pub decimal_places: String,
     pub listing_status: ListingStatus,
     pub details: AliasedDeliverable,
 }
@@ -69,15 +69,15 @@ pub enum ListingStatus {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TradeableEntity {
-    pub tradeable_entity_id: u64,
+    pub tradeable_entity_id: String,
     pub symbol: String,
     pub tags: Vec<String>,
-    pub price_deliverable_id: u64,
-    pub price_decimal_places: u32,
-    pub quantity_deliverable_id: u64,
-    pub quantity_decimal_places: u32,
-    pub buy_trading_limit_deliverable_id: u64,
-    pub sell_trading_limit_deliverable_id: u64,
+    pub price_deliverable_id: String,
+    pub price_decimal_places: String,
+    pub quantity_deliverable_id: String,
+    pub quantity_decimal_places: String,
+    pub buy_trading_limit_deliverable_id: String,
+    pub sell_trading_limit_deliverable_id: String,
     pub tradeability: Tradeability,
     pub details: TradeableEntityDetails,
 }
@@ -94,11 +94,11 @@ pub enum Tradeability {
 #[derive(Debug, Serialize, Deserialize)]
 pub enum TradeableEntityDetails {
     SimpleMarket {
-        market_id: u32,
+        market_id: String,
         settlement_event: ZonedDatetime,
     },
     MultiMarket {
-        market_ids: Vec<u32>,
+        market_ids: Vec<String>,
     },
 }
 
@@ -108,34 +108,34 @@ pub struct ZonedDatetime {
     pub timezone: String,
 }
 
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Datetime {
     date: Date,
     time: TimeOfDay,
 }
 
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Date {
-    year: u16,
-    month: u32,
-    day: u32,
+    year: String,
+    month: String,
+    day: String,
 }
 
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TimeOfDay {
-    hours: u32,
-    minutes: u32,
-    seconds: u32,
-    nanoseconds: u64,
+    hours: String,
+    minutes: String,
+    seconds: String,
+    nanoseconds: String,
 }
 
-#[derive(Copy, Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct TopOfBook {
-    pub timestamp: u64,
-    pub tradeable_entity_id: u64,
-    pub market_id: u32,
-    pub buy_price: i64,
-    pub buy_quantity: u64,
-    pub sell_price: i64,
-    pub sell_quantity: u64,
+    pub timestamp: String,
+    pub tradeable_entity_id: String,
+    pub market_id: String,
+    pub buy_price: String,
+    pub buy_quantity: String,
+    pub sell_price: String,
+    pub sell_quantity: String,
 }

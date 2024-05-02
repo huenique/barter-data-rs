@@ -28,6 +28,13 @@ impl DataError {
             _ => false,
         }
     }
+
+    /// TODO: Implement [`SubscriptionValidator`] for exchanges that require it.
+    /// Remove this method, which was intended to handle `SocketError::Unidentifiable` errors
+    /// caused by using `#[serde(default)]` on fields to purposely ignore unknown message formats.
+    pub fn is_unidentified(&self) -> bool {
+        matches!(self, DataError::Socket(SocketError::Unidentifiable(_)))
+    }
 }
 
 #[cfg(test)]

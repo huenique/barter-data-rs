@@ -95,6 +95,14 @@ where
                     break;
                 }
 
+                // Continue processing in case of an 'is_unidentified' DataError.
+                // This scenario occurs when the exchange server returns an unidentifiable message
+                // that cannot be processed by the MarketStream. The loop continues to await and
+                // process the next message.
+                Err(error) if error.is_unidentified() => {
+                    continue;
+                }
+
                 // If non-terminal DataError: log & continue
                 Err(error) => {
                     warn!(

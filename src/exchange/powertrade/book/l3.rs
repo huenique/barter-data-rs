@@ -21,11 +21,11 @@ use crate::subscription::book::OrderBook;
 use crate::subscription::book::OrderBookSide;
 use crate::Identifier;
 
-/// See: <https://power-trade.github.io/api-docs-source/ws_feeds.html#ob_snapshot>
+/// See: <https://power-trade.github.io/api-docs-source/ws_feeds.html#pb_snapshot>
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct PowerTradeOrderBookL3 {
     #[serde(default)]
-    pub ob_snapshot: PowerTradeOrderBook,
+    pub pb_snapshot: PowerTradeOrderBook,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -42,12 +42,12 @@ pub struct PowerTradeOrderBook {
 pub struct OrderData {
     n_levels: String,
     n_orders: String,
-    levels: Vec<Vec<Vec<String>>>,
+    levels: Vec<Vec<String>>,
 }
 
 impl Identifier<Option<SubscriptionId>> for PowerTradeOrderBookL3 {
     fn id(&self) -> Option<SubscriptionId> {
-        Some(ExchangeSub::from((PowerTradeChannel::ORDER_BOOK_L3, &self.ob_snapshot.symbol)).id())
+        Some(ExchangeSub::from((PowerTradeChannel::ORDER_BOOK_L3, &self.pb_snapshot.symbol)).id())
     }
 }
 
@@ -55,7 +55,7 @@ impl From<(ExchangeId, Instrument, PowerTradeOrderBookL3)> for MarketIter<OrderB
     fn from(
         (exchange_id, instrument, book): (ExchangeId, Instrument, PowerTradeOrderBookL3),
     ) -> Self {
-        let timestamp = DateTime::parse_from_rfc3339(&book.ob_snapshot.timestamp)
+        let timestamp = DateTime::parse_from_rfc3339(&book.pb_snapshot.timestamp)
             .unwrap_or_else(|_| Utc::now().into())
             .with_timezone(&Utc);
 
@@ -66,8 +66,8 @@ impl From<(ExchangeId, Instrument, PowerTradeOrderBookL3)> for MarketIter<OrderB
             instrument,
             kind: OrderBook {
                 last_update_time: timestamp,
-                bids: parse_order_data(Side::Buy, &book.ob_snapshot.bids),
-                asks: parse_order_data(Side::Sell, &book.ob_snapshot.asks),
+                bids: parse_order_data(Side::Buy, &book.pb_snapshot.bids),
+                asks: parse_order_data(Side::Sell, &book.pb_snapshot.asks),
             },
         })])
     }
@@ -78,17 +78,15 @@ fn parse_order_data(side: Side, data: &OrderData) -> OrderBookSide {
         side,
         data.levels
             .iter()
-            .flat_map(|level_group| {
-                level_group.iter().map(|level| {
-                    let price =
-                        BigDecimal::from_str(&level[0]).unwrap_or_else(|_| BigDecimal::from(0));
-                    let amount =
-                        BigDecimal::from_str(&level[1]).unwrap_or_else(|_| BigDecimal::from(0));
-                    Level {
-                        price: bigdecimal_to_f64(price),
-                        amount: bigdecimal_to_f64(amount),
-                    }
-                })
+            .map(|level_group| {
+                let price =
+                    BigDecimal::from_str(&level_group[0]).unwrap_or_else(|_| BigDecimal::from(0));
+                let amount =
+                    BigDecimal::from_str(&level_group[1]).unwrap_or_else(|_| BigDecimal::from(0));
+                Level {
+                    price: bigdecimal_to_f64(price),
+                    amount: bigdecimal_to_f64(amount),
+                }
             })
             .collect::<Vec<Level>>(),
     )

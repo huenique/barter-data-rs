@@ -32,7 +32,7 @@ use super::PingInterval;
 use super::StreamSelector;
 
 /// <https://power-trade.github.io/api-docs-source/ws_feeds.html#Market_Feeds_Connection_Parameters>
-pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data?mbo_period=1&snapshot_depth=100";
+pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data?mbp_period=1&mbo_period=0&snapshot_depth=100";
 
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange)]
 pub struct PowerTrade {

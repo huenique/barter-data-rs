@@ -1,5 +1,17 @@
 use std::str::FromStr;
 
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::powertrade::channel::PowerTradeChannel;
+use crate::exchange::powertrade::message::FundingRateUpdate;
+use crate::exchange::powertrade::message::SubscriptionStatus;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::ExchangeId;
+use crate::subscription::book::Level;
+use crate::subscription::book::OrderBook;
+use crate::subscription::book::OrderBookSide;
+use crate::Identifier;
+
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
@@ -11,25 +23,22 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::powertrade::channel::PowerTradeChannel;
-use crate::exchange::subscription::ExchangeSub;
-use crate::exchange::ExchangeId;
-use crate::subscription::book::Level;
-use crate::subscription::book::OrderBook;
-use crate::subscription::book::OrderBookSide;
-use crate::Identifier;
-
-/// See: <https://power-trade.github.io/api-docs-source/ws_feeds.html#pb_snapshot>
-#[derive(Debug, Default, Serialize, Deserialize)]
-pub struct PowerTradeOrderBookL3 {
-    #[serde(default)]
-    pub pb_snapshot: PowerTradeOrderBook,
+/// The channel sends many messages, but we only care about "pb_snapshot," so we don't have to build
+/// and maintain a local order book. See:
+/// - <https://power-trade.github.io/api-docs-source/ws_feeds.html#Feeds_Introduction>
+/// - <https://power-trade.github.io/api-docs-source/ws_feeds.html#pb_snapshot>
+#[derive(Debug, Serialize, Deserialize)]
+pub enum PowerTradeOrderBookL3 {
+    #[serde(rename = "pb_snapshot")]
+    OrderBookL3(PriceBookSnapshot),
+    #[serde(rename = "funding_rate")]
+    FundingRate(FundingRateUpdate),
+    #[serde(rename = "subscriptions_status")]
+    SubscriptionStatus(SubscriptionStatus),
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
-pub struct PowerTradeOrderBook {
+pub struct PriceBookSnapshot {
     timestamp: String,
     tradeable_entity_id: String,
     market_id: String,
@@ -47,7 +56,12 @@ pub struct OrderData {
 
 impl Identifier<Option<SubscriptionId>> for PowerTradeOrderBookL3 {
     fn id(&self) -> Option<SubscriptionId> {
-        Some(ExchangeSub::from((PowerTradeChannel::ORDER_BOOK_L3, &self.pb_snapshot.symbol)).id())
+        match self {
+            PowerTradeOrderBookL3::OrderBookL3(book) => {
+                Some(ExchangeSub::from((PowerTradeChannel::ORDER_BOOK_L3, &book.symbol)).id())
+            }
+            _ => None,
+        }
     }
 }
 
@@ -55,21 +69,26 @@ impl From<(ExchangeId, Instrument, PowerTradeOrderBookL3)> for MarketIter<OrderB
     fn from(
         (exchange_id, instrument, book): (ExchangeId, Instrument, PowerTradeOrderBookL3),
     ) -> Self {
-        let timestamp = DateTime::parse_from_rfc3339(&book.pb_snapshot.timestamp)
-            .unwrap_or_else(|_| Utc::now().into())
-            .with_timezone(&Utc);
+        match book {
+            PowerTradeOrderBookL3::OrderBookL3(book) => {
+                let timestamp = DateTime::parse_from_rfc3339(&book.timestamp)
+                    .unwrap_or_else(|_| Utc::now().into())
+                    .with_timezone(&Utc);
 
-        Self(vec![Ok(MarketEvent {
-            exchange_time: timestamp,
-            received_time: Utc::now(),
-            exchange: Exchange::from(exchange_id),
-            instrument,
-            kind: OrderBook {
-                last_update_time: timestamp,
-                bids: parse_order_data(Side::Buy, &book.pb_snapshot.bids),
-                asks: parse_order_data(Side::Sell, &book.pb_snapshot.asks),
-            },
-        })])
+                Self(vec![Ok(MarketEvent {
+                    exchange_time: timestamp,
+                    received_time: Utc::now(),
+                    exchange: Exchange::from(exchange_id),
+                    instrument,
+                    kind: OrderBook {
+                        last_update_time: timestamp,
+                        bids: parse_order_data(Side::Buy, &book.bids),
+                        asks: parse_order_data(Side::Sell, &book.asks),
+                    },
+                })])
+            }
+            _ => Self(vec![]),
+        }
     }
 }
 

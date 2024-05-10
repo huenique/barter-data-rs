@@ -4,7 +4,7 @@ use serde::Deserialize;
 use serde::Serialize;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum PowerTradePlatformEvent {
+pub enum PowerTradeSubResponse {
     #[serde(rename = "subscribed")]
     Subscribed(Subscribed),
     #[serde(rename = "subscribe_error")]
@@ -24,18 +24,18 @@ pub struct SubscribeError {
     pub message: String,
 }
 
-impl Validator for PowerTradePlatformEvent {
+impl Validator for PowerTradeSubResponse {
     fn validate(self) -> Result<Self, SocketError>
     where
         Self: Sized,
     {
         match self {
-            PowerTradePlatformEvent::Subscribed(_) => Ok(self),
-            PowerTradePlatformEvent::Error(failure) => Err(SocketError::Subscribe(format!(
+            PowerTradeSubResponse::Subscribed(_) => Ok(self),
+            PowerTradeSubResponse::Error(failure) => Err(SocketError::Subscribe(format!(
                 "received failure subscription response with message: {}",
                 failure.message,
             ))),
-            PowerTradePlatformEvent::Unknown => Ok(self),
+            PowerTradeSubResponse::Unknown => Ok(self),
         }
     }
 }

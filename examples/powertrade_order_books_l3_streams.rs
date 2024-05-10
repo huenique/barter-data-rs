@@ -17,10 +17,10 @@ async fn main() {
 
     let mut streams = Streams::<OrderBooksL3>::builder()
         .subscribe([
-            (PowerTrade::default(), "btc", "usd", InstrumentKind::Perpetual, OrderBooksL3),
+            (PowerTrade::default(), "eth", "usd", InstrumentKind::Perpetual, OrderBooksL3),
         ])
         .subscribe([
-            (PowerTrade::default(), "btc", "usd", InstrumentKind::Option(call_contract()), OrderBooksL3),
+            (PowerTrade::default(), "eth", "usd", InstrumentKind::Option(call_contract()), OrderBooksL3),
         ])
 
         .init()
@@ -42,7 +42,7 @@ fn init_logging() {
         // Filter messages based on the INFO
         .with_env_filter(
             tracing_subscriber::filter::EnvFilter::builder()
-                .with_default_directive(tracing_subscriber::filter::LevelFilter::INFO.into())
+                .with_default_directive(tracing_subscriber::filter::LevelFilter::DEBUG.into())
                 .from_env_lossy(),
         )
         // Disable colours on release builds

@@ -1,80 +1,66 @@
 pub mod book;
 pub mod channel;
 pub mod market;
+pub mod message;
 pub mod subscription;
-use self::market::DydxMarket;
-use self::subscription::DydxResponse;
-use super::ExchangeServer;
+
+use crate::exchange::dydx::book::l3::DydxOrderBookUpdater;
 use crate::exchange::dydx::channel::DydxChannel;
+use crate::exchange::dydx::market::DydxMarket;
+use crate::exchange::dydx::subscription::DydxSubResponse;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
+use crate::exchange::StreamSelector;
 use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::book::OrderBooksL3;
+use crate::transformer::book::MultiBookTransformer;
+use crate::ExchangeWsStream;
+
 use barter_integration::error::SocketError;
 use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
 use std::fmt::Debug;
-use std::marker::PhantomData;
 use url::Url;
 
-const DYDX_URL: &str = "wss://indexer.dydx.trade/v4/ws";
+const BASE_URL_DYDX: &str = "wss://indexer.dydx.trade/v4/ws";
 
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
-pub struct Dydx<Server> {
-    server: PhantomData<Server>,
-}
+#[derive(
+    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+)]
+pub struct Dydx;
 
-impl<Server> Connector for Dydx<Server>
-where
-    Server: ExchangeServer,
-{
-    const ID: ExchangeId = Server::ID;
+impl Connector for Dydx {
+    const ID: ExchangeId = ExchangeId::Dydx;
     type Channel = DydxChannel;
     type Market = DydxMarket;
     type Subscriber = WebSocketSubscriber;
     type SubValidator = WebSocketSubValidator;
-    type SubResponse = DydxResponse;
+    type SubResponse = DydxSubResponse;
 
     fn url() -> Result<Url, SocketError> {
-        Url::parse(Server::websocket_url()).map_err(|e| SocketError::UrlParse)
+        Url::parse(BASE_URL_DYDX).map_err(SocketError::UrlParse)
     }
 
     fn requests(exchange_subs: Vec<ExchangeSub<Self::Channel, Self::Market>>) -> Vec<WsMessage> {
-        todo!()
+        exchange_subs
+            .into_iter()
+            .map(|sub| {
+                WsMessage::Text(
+                    serde_json::json!({
+                        "type": "subscribe",
+                        "channel": sub.channel.as_ref(),
+                        "id": sub.market.as_ref(),
+                    })
+                    .to_string(),
+                )
+            })
+            .collect()
     }
 }
 
-impl<'de, Server> serde::Deserialize<'de> for Dydx<Server>
-where
-    Server: ExchangeServer,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::de::Deserializer<'de>,
-    {
-        let input = <String as serde::Deserialize>::deserialize(deserializer)?;
-        let expected = Self::ID.as_str();
-
-        if input.as_str() == Self::ID.as_str() {
-            Ok(Self::default())
-        } else {
-            Err(serde::de::Error::invalid_value(
-                serde::de::Unexpected::Str(input.as_str()),
-                &expected,
-            ))
-        }
-    }
-}
-
-impl<Server> serde::Serialize for Dydx<Server>
-where
-    Server: ExchangeServer,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::ser::Serializer,
-    {
-        let exchange_id = Self::ID.as_str();
-        serializer.serialize_str(exchange_id)
-    }
+impl StreamSelector<OrderBooksL3> for Dydx {
+    type Stream = ExchangeWsStream<MultiBookTransformer<Self, OrderBooksL3, DydxOrderBookUpdater>>;
 }

@@ -1,9 +1,10 @@
-use self::subscription::ExchangeSub;
+use crate::exchange::subscription::ExchangeSub;
 use crate::subscriber::validator::SubscriptionValidator;
 use crate::subscriber::Subscriber;
 use crate::subscription::Map;
 use crate::subscription::SubKind;
 use crate::MarketStream;
+
 use barter_integration::error::SocketError;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::Instrument;
@@ -42,13 +43,20 @@ pub mod kraken;
 /// `Okx` [`Connector`] and [`StreamSelector`] implementations.
 pub mod okx;
 
+/// `Deribit` [`Connector`] and [`StreamSelector`] implementations.
 pub mod deribit;
 
+/// `Aevo` [`Connector`] and [`StreamSelector`] implementations.
 pub mod aevo;
 
+/// `Hyperliquid` [`Connector`] and [`StreamSelector`] implementations.
 pub mod hyperliquid;
 
+/// `PowerTrade` [`Connector`] and [`StreamSelector`] implementations.
 pub mod powertrade;
+
+/// `Dydx` [`Connector`] and [`StreamSelector`] implementations.
+pub mod dydx;
 
 /// Defines the generic [`ExchangeSub`] containing a market and channel combination used by an
 /// exchange [`Connector`] to build [`WsMessage`] subscription payloads.
@@ -187,6 +195,7 @@ pub enum ExchangeId {
     BybitSpot,
     Coinbase,
     Deribit,
+    Dydx,
     GateioFuturesBtc,
     GateioFuturesUsd,
     GateioOptions,
@@ -224,6 +233,7 @@ impl ExchangeId {
             ExchangeId::BybitSpot => "bybit_spot",
             ExchangeId::Coinbase => "coinbase",
             ExchangeId::Deribit => "deribit",
+            ExchangeId::Dydx => "dydx",
             ExchangeId::GateioFuturesBtc => "gateio_futures_btc",
             ExchangeId::GateioFuturesUsd => "gateio_futures_usd",
             ExchangeId::GateioOptions => "gateio_options",
@@ -259,7 +269,7 @@ impl ExchangeId {
 
             // Future Perpetual Swaps
             (
-                BinanceFuturesUsd | BybitPerpetualsUsd | Deribit | GateioPerpetualsBtc
+                BinanceFuturesUsd | BybitPerpetualsUsd | Deribit | Dydx | GateioPerpetualsBtc
                 | GateioPerpetualsUsd | Hyperliquid | Okx | Bitmex | PowerTrade,
                 Perpetual,
             ) => true,

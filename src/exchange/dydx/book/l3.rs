@@ -157,8 +157,7 @@ impl OrderBookUpdater for DydxOrderBookUpdater {
             }) => {
                 check_message_id(message_id, self)?;
                 book.last_update_time = Utc::now();
-                // The first message contains the full order book.
-                // We can safely overwrite the existing book.
+                // We can safely overwrite the existing book since this is a snapshot.
                 book.bids = OrderBookSide::new(Side::Buy, contents.bids);
                 book.asks = OrderBookSide::new(Side::Sell, contents.asks);
             }

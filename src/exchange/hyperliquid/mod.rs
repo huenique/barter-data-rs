@@ -3,7 +3,6 @@ pub mod channel;
 pub mod market;
 pub mod message;
 pub mod subscription;
-pub mod validator;
 
 use self::book::l2::HyperliquidOrderBookUpdater;
 use self::channel::HyperliquidChannel;

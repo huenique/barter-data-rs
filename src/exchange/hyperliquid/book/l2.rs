@@ -45,11 +45,13 @@ impl WsBook {
 }
 
 // Level detail for order books as per the WsLevel interface
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
 pub struct WsLevel {
-    pub px: String, // price
-    pub sz: String, // size
-    pub n: u32,     // number of orders
+    #[serde(deserialize_with = "barter_integration::de::de_str")]
+    pub px: f64, // price
+    #[serde(deserialize_with = "barter_integration::de::de_str")]
+    pub sz: f64, // size
+    pub n: u32, // number of orders
 }
 
 #[derive(Copy, Clone, Debug, Default, Deserialize, Serialize)]
@@ -84,10 +86,10 @@ impl OrderBookUpdater for HyperliquidOrderBookUpdater {
         update: Self::Update,
     ) -> Result<Option<OrderBook>, DataError> {
         book.last_update_time = Utc::now();
-        book.bids.upsert(update.data.levels.0);
-        book.asks.upsert(update.data.levels.1);
-
-        Ok(Some(book.clone()))
+        // We can replace the entire order book since Hyperliquid sends full snapshots with each update.
+        book.bids = OrderBookSide::new(Side::Buy, update.data.levels.0);
+        book.asks = OrderBookSide::new(Side::Sell, update.data.levels.1);
+        Ok(Some(book.snapshot()))
     }
 }
 

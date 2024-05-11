@@ -33,7 +33,7 @@ impl Validator for DydxSubResponse {
             DydxSubResponse::Connected(_) => Ok(self),
             DydxSubResponse::Subscribed(_) | DydxSubResponse::ChannelData(_) => Ok(self),
             DydxSubResponse::Error(e) => Err(SocketError::Subscribe(format!(
-                "Subscription error: {}",
+                "received failure subscription response message: {}",
                 e.message
             ))),
         }

@@ -16,14 +16,8 @@ pub struct BitLevel {
 impl From<BitLevel> for Level {
     fn from(level: BitLevel) -> Self {
         Self {
-            price: level
-                .price
-                .to_f64()
-                .expect("Failed to convert BigDecimal to f64"),
-            amount: level
-                .size
-                .to_f64()
-                .expect("Failed to convert BigDecimal to f64"),
+            price: level.price.to_f64().unwrap(),
+            amount: level.size.to_f64().unwrap(),
         }
     }
 }

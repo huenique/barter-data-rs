@@ -58,6 +58,7 @@ pub mod powertrade;
 /// `Dydx` [`Connector`] and [`StreamSelector`] implementations.
 pub mod dydx;
 
+/// `Bit` [`Connector`] and [`StreamSelector`] implementations.
 pub mod bit;
 /// Defines the generic [`ExchangeSub`] containing a market and channel combination used by an
 /// exchange [`Connector`] to build [`WsMessage`] subscription payloads.

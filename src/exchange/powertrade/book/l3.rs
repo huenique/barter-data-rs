@@ -98,19 +98,13 @@ fn parse_order_data(side: Side, data: &OrderData) -> OrderBookSide {
         data.levels
             .iter()
             .map(|level_group| {
-                let price =
-                    BigDecimal::from_str(&level_group[0]).unwrap_or_else(|_| BigDecimal::from(0));
-                let amount =
-                    BigDecimal::from_str(&level_group[1]).unwrap_or_else(|_| BigDecimal::from(0));
+                let price = BigDecimal::from_str(&level_group[0]).unwrap();
+                let amount = BigDecimal::from_str(&level_group[1]).unwrap();
                 Level {
-                    price: bigdecimal_to_f64(price),
-                    amount: bigdecimal_to_f64(amount),
+                    price: price.to_f64().unwrap(),
+                    amount: amount.to_f64().unwrap(),
                 }
             })
             .collect::<Vec<Level>>(),
     )
-}
-
-fn bigdecimal_to_f64(value: BigDecimal) -> f64 {
-    value.to_f64().unwrap_or_default()
 }

@@ -58,6 +58,7 @@ pub mod powertrade;
 /// `Dydx` [`Connector`] and [`StreamSelector`] implementations.
 pub mod dydx;
 
+pub mod bit;
 /// Defines the generic [`ExchangeSub`] containing a market and channel combination used by an
 /// exchange [`Connector`] to build [`WsMessage`] subscription payloads.
 pub mod subscription;
@@ -189,6 +190,7 @@ pub enum ExchangeId {
     Aevo,
     BinanceFuturesUsd,
     BinanceSpot,
+    Bit,
     Bitfinex,
     Bitmex,
     BybitPerpetualsUsd,
@@ -227,6 +229,7 @@ impl ExchangeId {
             ExchangeId::Aevo => "aevo",
             ExchangeId::BinanceFuturesUsd => "binance_futures_usd",
             ExchangeId::BinanceSpot => "binance_spot",
+            ExchangeId::Bit => "bit",
             ExchangeId::Bitfinex => "bitfinex",
             ExchangeId::Bitmex => "bitmex",
             ExchangeId::BybitPerpetualsUsd => "bybit_perpetuals_usd",
@@ -269,14 +272,14 @@ impl ExchangeId {
 
             // Future Perpetual Swaps
             (
-                BinanceFuturesUsd | BybitPerpetualsUsd | Deribit | Dydx | GateioPerpetualsBtc
+                BinanceFuturesUsd | Bit | BybitPerpetualsUsd | Deribit | Dydx | GateioPerpetualsBtc
                 | GateioPerpetualsUsd | Hyperliquid | Okx | Bitmex | PowerTrade,
                 Perpetual,
             ) => true,
             (_, Perpetual) => false,
 
             // Option
-            (Aevo | Deribit | GateioOptions | Okx | PowerTrade, Option(_)) => true,
+            (Aevo | Bit | Deribit | GateioOptions | Okx | PowerTrade, Option(_)) => true,
             (_, Option(_)) => false,
         }
     }

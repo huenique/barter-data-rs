@@ -29,7 +29,7 @@ impl<Kind> Identifier<AevoMarket> for Subscription<Aevo, Kind> {
         AevoMarket(match kind {
             Spot => format!("{base}_{quote}").to_uppercase(),
             Future(future) => format!("{base}-{}", format_expiry(future.expiry)).to_uppercase(),
-            Perpetual => format!("{base}-PERPETUAL").to_uppercase(),
+            Perpetual => format!("{base}-PERP").to_uppercase(),
             Option(option) => format!(
                 "{base}-{}-{}-{}",
                 format_expiry(option.expiry),

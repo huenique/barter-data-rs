@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use crate::event::MarketEvent;
 use crate::event::MarketIter;
 use crate::exchange::powertrade::channel::PowerTradeChannel;
@@ -16,8 +14,6 @@ use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
 use barter_integration::model::SubscriptionId;
-use bigdecimal::BigDecimal;
-use bigdecimal::ToPrimitive;
 use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
@@ -98,11 +94,11 @@ fn parse_order_data(side: Side, data: &OrderData) -> OrderBookSide {
         data.levels
             .iter()
             .map(|level_group| {
-                let price = BigDecimal::from_str(&level_group[0]).unwrap();
-                let amount = BigDecimal::from_str(&level_group[1]).unwrap();
+                let price = &level_group[0];
+                let amount = &level_group[1];
                 Level {
-                    price: price.to_f64().unwrap(),
-                    amount: amount.to_f64().unwrap(),
+                    price: price.parse::<f64>().unwrap(),
+                    amount: amount.parse::<f64>().unwrap(),
                 }
             })
             .collect::<Vec<Level>>(),

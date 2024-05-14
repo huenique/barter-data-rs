@@ -19,17 +19,17 @@ impl DeribitChannel {
     /// [`Deribit`] real-time trades channel.
     ///
     /// See docs: <https://docs.deribit.com/#trades-instrument_name-interval>
-    pub const TRADES_RAW: Self = Self("trades.{}.raw");
+    pub const TRADES_RAW: Self = Self("trades.{}.100ms");
 
     /// [`Deribit`](super::Deribit) real-time OrderBook Level1 (top of book) channel name.
     ///
     /// See docs:<https://docs.deribit.com/#quote-instrument_name>
     pub const ORDER_BOOK_L1: Self = Self("quote.{}");
 
-    /// [`Deribit`](super::Deribit) OrderBook Level2 channel name (raw updates).
+    /// [`Deribit`](super::Deribit) OrderBook Level2 channel name.
     ///
     /// See docs: <https://docs.deribit.com/#book-instrument_name-interval>
-    pub const ORDER_BOOK_L2: Self = Self("book.{}.raw");
+    pub const ORDER_BOOK_L2: Self = Self("book.{}.100ms");
 }
 
 impl Identifier<DeribitChannel> for Subscription<Deribit, PublicTrades> {

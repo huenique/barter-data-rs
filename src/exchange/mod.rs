@@ -273,8 +273,9 @@ impl ExchangeId {
 
             // Future Perpetual Swaps
             (
-                BinanceFuturesUsd | Bit | BybitPerpetualsUsd | Deribit | Dydx | GateioPerpetualsBtc
-                | GateioPerpetualsUsd | Hyperliquid | Okx | Bitmex | PowerTrade,
+                Aevo | BinanceFuturesUsd | Bit | BybitPerpetualsUsd | Deribit | Dydx
+                | GateioPerpetualsBtc | GateioPerpetualsUsd | Hyperliquid | Okx | Bitmex
+                | PowerTrade,
                 Perpetual,
             ) => true,
             (_, Perpetual) => false,

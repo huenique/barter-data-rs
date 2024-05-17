@@ -16,6 +16,8 @@ tracing-subscriber = { version = "0.3.16", features = ["env-filter", "json"] }
 rust_decimal = "1.29.1"
 rust_decimal_macros = "1.29.1"
 tabled = "0.15.0"
+clap = "4.5.4"
+headless_chrome = "1.0.10"
 
 [dependencies]
 # Barter Ecosystem

@@ -2,6 +2,8 @@ use serde::Serialize;
 
 use crate::subscription::book::OrderBooksL1;
 use crate::subscription::book::OrderBooksL2;
+use crate::subscription::index::Indices;
+use crate::subscription::ticker::Tickers;
 use crate::subscription::trade::PublicTrades;
 use crate::subscription::Subscription;
 use crate::Identifier;
@@ -30,6 +32,16 @@ impl DeribitChannel {
     ///
     /// See docs: <https://docs.deribit.com/#book-instrument_name-interval>
     pub const ORDER_BOOK_L2: Self = Self("book.{}.100ms");
+
+    /// [`Deribit`](super::Deribit) real-time Ticker channel.
+    ///
+    /// See docs: <https://docs.deribit.com/#ticker-instrument_name-interval>
+    pub const TICKER: Self = Self("ticker.{}.100ms");
+
+    /// [`Deribit`](super::Deribit) real-time Index channel.
+    ///
+    /// See docs: <https://docs.deribit.com/#deribit_price_index-currency>
+    pub const INDEX: Self = Self("deribit_price_index.{}");
 }
 
 impl Identifier<DeribitChannel> for Subscription<Deribit, PublicTrades> {
@@ -47,6 +59,18 @@ impl Identifier<DeribitChannel> for Subscription<Deribit, OrderBooksL1> {
 impl Identifier<DeribitChannel> for Subscription<Deribit, OrderBooksL2> {
     fn id(&self) -> DeribitChannel {
         DeribitChannel::ORDER_BOOK_L2
+    }
+}
+
+impl Identifier<DeribitChannel> for Subscription<Deribit, Tickers> {
+    fn id(&self) -> DeribitChannel {
+        DeribitChannel::TICKER
+    }
+}
+
+impl Identifier<DeribitChannel> for Subscription<Deribit, Indices> {
+    fn id(&self) -> DeribitChannel {
+        DeribitChannel::INDEX
     }
 }
 

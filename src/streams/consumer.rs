@@ -95,6 +95,7 @@ where
                     break;
                 }
 
+                // * See barter_data::error::DataError.is_unidentified() for more information.
                 // Continue processing in case of an 'is_unidentified' DataError.
                 // This scenario occurs when the exchange server returns an unidentifiable message
                 // that cannot be processed by the MarketStream. The loop continues to await and
@@ -105,6 +106,15 @@ where
 
                 // If non-terminal DataError: log & continue
                 Err(error) => {
+                    let payload = error.to_string();
+
+                    // Skip logging and processing for "pong" messages
+                    if payload.contains("pong") {
+                        // * NOTE: This logic is here to ignore "pong" messages which are not valid JSON.
+                        // TODO: TRemove this check once 'pong' messages are handled upstream.
+                        continue;
+                    }
+
                     warn!(
                         %exchange,
                         %error,

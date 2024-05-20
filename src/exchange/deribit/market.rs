@@ -1,6 +1,7 @@
-use super::Deribit;
+use crate::exchange::deribit::Deribit;
 use crate::subscription::Subscription;
 use crate::Identifier;
+
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::kind::OptionKind;
 use barter_integration::model::instrument::Instrument;
@@ -26,7 +27,7 @@ impl<Kind> Identifier<DeribitMarket> for Subscription<Deribit, Kind> {
         let Instrument { base, quote, kind } = &self.instrument;
 
         DeribitMarket(match kind {
-            Spot => format!("{base}_{quote}").to_uppercase(),
+            Spot => format!("{base}_{quote}"),
             Future(future) => format!("{base}-{}", format_expiry(future.expiry)).to_uppercase(),
             Perpetual => format!("{base}-PERPETUAL").to_uppercase(),
             Option(option) => format!(

@@ -49,8 +49,6 @@ pub struct DeribitError {
     pub message: String,
 }
 
-// TODO: Need to handle pong messages
-
 impl Validator for DeribitSubResponse {
     fn validate(self) -> Result<Self, SocketError>
     where

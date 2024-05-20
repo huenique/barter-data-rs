@@ -1,11 +1,11 @@
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use serde_json::json;
-use std::time::Duration;
-use url::Url;
-
+use crate::exchange::deribit::book::l1::DeribitOrderBookL1;
+use crate::exchange::deribit::book::l2::DeribitBookUpdater;
+use crate::exchange::deribit::channel::DeribitChannel;
+use crate::exchange::deribit::index::DeribitIndex;
+use crate::exchange::deribit::market::DeribitMarket;
+use crate::exchange::deribit::subscription::DeribitSubResponse;
+use crate::exchange::deribit::ticker::DeribitTicker;
+use crate::exchange::deribit::trade::DeribitTrades;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
@@ -15,17 +15,20 @@ use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::book::OrderBooksL1;
 use crate::subscription::book::OrderBooksL2;
+use crate::subscription::index::Indices;
+use crate::subscription::ticker::Tickers;
 use crate::subscription::trade::PublicTrades;
 use crate::transformer::book::MultiBookTransformer;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
 
-use self::book::l1::DeribitOrderBookL1;
-use self::book::l2::DeribitBookUpdater;
-use self::channel::DeribitChannel;
-use self::market::DeribitMarket;
-use self::subscription::DeribitSubResponse;
-use self::trade::DeribitTrades;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use serde_json::json;
+use std::time::Duration;
+use url::Url;
 
 pub mod channel;
 
@@ -39,11 +42,15 @@ pub mod trade;
 
 pub mod book;
 
+pub mod index;
+
+pub mod ticker;
+
 /// [`Deribit`] server base url.
 ///
 /// See docs: <https://docs.deribit.com/#json-rpc-over-websocket>
-pub const BASE_URL_DERIBIT: &str = "wss://streams.deribit.com/ws/api/v2";
-// pub const BASE_URL_DERIBIT: &str = "wss://www.deribit.com/ws/api/v2";
+// pub const BASE_URL_DERIBIT: &str = "wss://streams.deribit.com/ws/api/v2";
+pub const BASE_URL_DERIBIT: &str = "wss://www.deribit.com/ws/api/v2";
 
 /// [`Deribit`] server [`PingInterval`] duration.
 ///
@@ -111,4 +118,12 @@ impl StreamSelector<OrderBooksL1> for Deribit {
 
 impl StreamSelector<OrderBooksL2> for Deribit {
     type Stream = ExchangeWsStream<MultiBookTransformer<Self, OrderBooksL2, DeribitBookUpdater>>;
+}
+
+impl StreamSelector<Tickers> for Deribit {
+    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, DeribitTicker>>;
+}
+
+impl StreamSelector<Indices> for Deribit {
+    type Stream = ExchangeWsStream<StatelessTransformer<Self, Indices, DeribitIndex>>;
 }

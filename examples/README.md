@@ -24,3 +24,12 @@ Options:
 - `deribit_options_ob_l2_streams`
 - `dydx_options_ob_l2_streams`
 - `powertrade_options_ob_l3_streams`
+- `ex_ob_validate` (deribit options l1 orderbook)
+
+For `ex_ob_validate`, you have to pass the following arguments:
+
+> Ensure the option instrument has not expired.
+
+```bash
+cargo run --package barter-data --example ex_ob_validate -- --expiry 2024-05-21 --currency btc
+```

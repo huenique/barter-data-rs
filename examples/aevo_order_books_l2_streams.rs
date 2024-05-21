@@ -27,15 +27,11 @@ async fn main() {
         .await
         .unwrap();
 
-    // Select the ExchangeId::Deribit stream
-    // Notes:
-    //  - Use `streams.select(ExchangeId)` to interact with the individual exchange streams!
-    //  - Use `streams.join()` to join all exchange streams into a single mpsc::UnboundedReceiver!
-    let mut binance_stream = streams
+    let mut aevo_stream = streams
         .select(ExchangeId::Aevo)
         .unwrap();
 
-    while let Some(order_book_l2) = binance_stream.recv().await {
+    while let Some(order_book_l2) = aevo_stream.recv().await {
         info!("MarketEvent<OrderBook>: {order_book_l2:?}");
     }
 }

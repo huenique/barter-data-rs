@@ -3,6 +3,11 @@ use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::book::OrderBooksL2;
 use barter_integration::model::instrument::kind::InstrumentKind;
+use barter_integration::model::instrument::kind::OptionContract;
+use barter_integration::model::instrument::kind::OptionExercise;
+use barter_integration::model::instrument::kind::OptionKind;
+use chrono::TimeZone;
+use chrono::Utc;
 use tabled::Table;
 use tabled::Tabled;
 
@@ -27,7 +32,7 @@ async fn main() {
             Deribit::default(),
             "btc",
             "usdc",
-            InstrumentKind::Perpetual,
+            InstrumentKind::Option(call_contract()),
             OrderBooksL2,
         )])
         .init()
@@ -99,4 +104,13 @@ fn init_logging() {
         .pretty()
         // Install this Tracing subscriber as global default
         .init()
+}
+
+fn call_contract() -> OptionContract {
+    OptionContract {
+        kind: OptionKind::Call,
+        exercise: OptionExercise::American,
+        expiry: Utc.timestamp_millis_opt(1719561600000).unwrap(),
+        strike: rust_decimal_macros::dec!(65000),
+    }
 }

@@ -8,8 +8,8 @@ use barter_integration::model::instrument::kind::OptionExercise;
 use barter_integration::model::instrument::kind::OptionKind;
 use chrono::TimeZone;
 use chrono::Utc;
-use futures::StreamExt;
 use tokio::spawn;
+use tokio_stream::StreamExt;
 use tracing::info;
 use tracing_subscriber;
 

@@ -1,7 +1,5 @@
 use crate::SubKind;
 
-use chrono::DateTime;
-use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -13,7 +11,6 @@ impl SubKind for Tickers {
     type Event = Ticker;
 }
 
-/// Normalized Barter [`Ticker`] model.
 #[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
 pub struct Ticker {
     pub instrument_name: String,
@@ -22,20 +19,27 @@ pub struct Ticker {
     pub best_bid_amount: f64,
     pub best_ask_amount: f64,
     pub mark_price: f64,
-    pub last_price: Option<f64>,
-    pub volume_24h: Option<f64>,
-    pub high_24h: Option<f64>,
-    pub low_24h: Option<f64>,
-    pub open_interest: Option<f64>,
+    pub last_price: f64,
+    pub open_interest: f64,
+    pub state: String,
+    pub timestamp: u64,
     pub greeks: Option<Greeks>,
-    pub timestamp: DateTime<Utc>,
+    pub interest_rate: Option<f64>,   // Option specific
+    pub mark_iv: Option<f64>,         // Option specific
+    pub delivery_price: Option<f64>,  // Settlement price when state is closed
+    pub current_funding: Option<f64>, // Perpetual specific
+    pub interest_value: Option<f64>,  // Perpetual specific
+    pub ask_iv: f64,
+    pub bid_iv: f64,
+    pub index_price: f64,
 }
 
+/// Greeks data for options.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
 pub struct Greeks {
-    pub delta: f64,
-    pub gamma: f64,
-    pub theta: f64,
-    pub vega: f64,
-    pub rho: f64,
+    pub delta: Option<f64>,
+    pub gamma: Option<f64>,
+    pub theta: Option<f64>,
+    pub vega: Option<f64>,
+    pub rho: Option<f64>,
 }

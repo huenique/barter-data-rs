@@ -46,24 +46,25 @@ impl From<DeribitTickerData> for Ticker {
             best_bid_amount: data.best_bid_amount,
             best_ask_amount: data.best_ask_amount,
             mark_price: data.mark_price,
-            last_price: data.last_price,
-            volume_24h: data.volume,
-            high_24h: data.high,
-            low_24h: data.low,
-            open_interest: data.open_interest,
+            last_price: data.last_price.unwrap_or(0.0),
+            open_interest: data.open_interest.unwrap_or(0.0),
+            state: data.state,
+            timestamp: data.timestamp,
             greeks: data.greeks.map(|g| Greeks {
-                delta: g.delta,
-                gamma: g.gamma,
-                theta: g.theta,
-                vega: g.vega,
-                rho: g.rho,
+                delta: Some(g.delta),
+                gamma: Some(g.gamma),
+                theta: Some(g.theta),
+                vega: Some(g.vega),
+                rho: Some(g.rho),
             }),
-            timestamp: DateTime::<Utc>::from_naive_utc_and_offset(
-                DateTime::from_timestamp(data.timestamp as i64, 0)
-                    .unwrap()
-                    .naive_utc(),
-                Utc,
-            ),
+            interest_rate: data.interest_rate,
+            mark_iv: data.mark_iv,
+            delivery_price: data.estimated_delivery_price,
+            current_funding: None,
+            interest_value: None,
+            ask_iv: data.ask_iv,
+            bid_iv: data.bid_iv,
+            index_price: data.index_price,
         }
     }
 }
@@ -77,13 +78,16 @@ pub struct DeribitTickerData {
     pub best_ask_amount: f64,
     pub mark_price: f64,
     pub last_price: Option<f64>,
-    pub volume_usd: Option<f64>,
-    pub volume: Option<f64>,
-    pub high: Option<f64>,
-    pub low: Option<f64>,
     pub open_interest: Option<f64>,
     pub greeks: Option<DeribitGreeks>,
     pub timestamp: u64,
+    pub interest_rate: Option<f64>,
+    pub mark_iv: Option<f64>,
+    pub estimated_delivery_price: Option<f64>,
+    pub ask_iv: f64,
+    pub bid_iv: f64,
+    pub index_price: f64,
+    pub state: String,
 }
 
 #[derive(Copy, Clone, Debug, Deserialize, Serialize)]

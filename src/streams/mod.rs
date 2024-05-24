@@ -64,7 +64,10 @@ impl<T> Streams<T> {
     }
 
     /// Join all exchange [`mpsc::UnboundedReceiver`] streams into a unified [`StreamMap`].
-    pub async fn join_map(self) -> StreamMap<ExchangeId, UnboundedReceiverStream<T>> {
+    pub async fn join_map(self) -> StreamMap<ExchangeId, UnboundedReceiverStream<T>>
+    where
+        T: Send + 'static,
+    {
         self.streams
             .into_iter()
             .fold(StreamMap::new(), |mut map, (exchange, rx)| {

@@ -1,10 +1,10 @@
 use barter_data::exchange::powertrade::PowerTrade;
-use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::book::OrderBooksL3;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use tabled::Table;
 use tabled::Tabled;
+use tokio::task::LocalSet;
 
 #[derive(Tabled)]
 struct TabledOrderBook {
@@ -18,7 +18,9 @@ struct TabledOrderBook {
 async fn main() {
     init_logging();
 
-    let mut streams = Streams::<OrderBooksL3>::builder()
+    let local_set = LocalSet::new();
+
+    let mut stream = Streams::<OrderBooksL3>::builder()
         .subscribe([(
             PowerTrade::default(),
             "btc",
@@ -26,11 +28,11 @@ async fn main() {
             InstrumentKind::Perpetual,
             OrderBooksL3,
         )])
-        .init()
+        .init_local(&local_set)
         .await
         .unwrap();
 
-    let mut stream = streams.select(ExchangeId::PowerTrade).unwrap();
+    // let mut stream = streams.select(ExchangeId::PowerTrade).unwrap();
 
     loop {
         // Clear the console

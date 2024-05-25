@@ -1,18 +1,20 @@
-use super::consumer::consume;
-use super::Streams;
-use crate::error::DataError;
-use crate::event::MarketEvent;
-use crate::exchange::ExchangeId;
-use crate::exchange::StreamSelector;
-use crate::subscription::SubKind;
-use crate::subscription::Subscription;
-use crate::Identifier;
-use barter_integration::error::SocketError;
-use barter_integration::Validator;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::future::Future;
 use std::pin::Pin;
+
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::exchange::ExchangeId;
+use crate::exchange::StreamSelector;
+use crate::streams::consumer::consume;
+use crate::streams::Streams;
+use crate::subscription::SubKind;
+use crate::subscription::Subscription;
+use crate::Identifier;
+
+use barter_integration::error::SocketError;
+use barter_integration::Validator;
 use tokio::sync::mpsc;
 use tokio::task::LocalSet;
 
@@ -119,30 +121,60 @@ where
         })
     }
 
-    pub async fn init_with_local_set(
+    /// Initializes the [`StreamBuilder`] using `tokio::task::LocalSet` and returns an `UnboundedReceiver`.
+    ///
+    /// This method is different from `init` as it uses `LocalSet` to spawn tasks that are not `Send` and
+    /// should run on the current thread.
+    ///
+    /// # Arguments
+    ///
+    /// * `local_set` - A reference to a `LocalSet` where the tasks will be spawned.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<mpsc::UnboundedReceiver<MarketEvent<Kind::Event>>, DataError>` - Returns an `UnboundedReceiver` for receiving `MarketEvent` messages or a `DataError` if initialization fails.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let local_set = LocalSet::new();
+    /// let receiver = stream_builder.init_with_local_set(&local_set).await.unwrap();
+    /// ```
+    pub async fn init_local(
         self,
         local_set: &LocalSet,
     ) -> Result<mpsc::UnboundedReceiver<MarketEvent<Kind::Event>>, DataError> {
+        // Create a vector to hold the initialization futures.
         let mut init_futures = Vec::new();
 
+        // For each future in the StreamBuilder, create a task in the LocalSet to run the future.
         for future in self.futures {
-            let init_future = local_set.run_until(async { future.await });
+            // Run the future within the LocalSet context.
+            let init_future = local_set.run_until(async {
+                // Await the future and return its result.
+                future.await
+            });
+            // Push the created task into the vector of initialization futures.
             init_futures.push(init_future);
         }
 
+        // Wait for all initialization futures to complete and ensure success.
         futures::future::try_join_all(init_futures).await?;
 
+        // Collect all the receivers from the channels into a vector.
         let receivers = self
             .channels
             .into_iter()
             .map(|(_, channel)| channel.rx)
             .collect::<Vec<_>>();
+        // Ensure there is only one receiver as this method currently supports a single receiver.
         if receivers.len() != 1 {
             return Err(DataError::Socket(SocketError::Subscribe(
                 "Multiple receivers not supported".to_owned(),
             )));
         }
 
+        // Return the single receiver.
         Ok(receivers.into_iter().next().unwrap())
     }
 }

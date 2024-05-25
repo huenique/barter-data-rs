@@ -14,6 +14,7 @@ use std::fmt::Debug;
 use std::future::Future;
 use std::pin::Pin;
 use tokio::sync::mpsc;
+use tokio::task::LocalSet;
 
 /// Defines the [`MultiStreamBuilder`](multi::MultiStreamBuilder) API for ergonomically
 /// initialising a common [`Streams<Output>`](Streams) from multiple
@@ -116,6 +117,33 @@ where
                 .map(|(exchange, channel)| (exchange, channel.rx))
                 .collect(),
         })
+    }
+
+    pub async fn init_with_local_set(
+        self,
+        local_set: &LocalSet,
+    ) -> Result<mpsc::UnboundedReceiver<MarketEvent<Kind::Event>>, DataError> {
+        let mut init_futures = Vec::new();
+
+        for future in self.futures {
+            let init_future = local_set.run_until(async { future.await });
+            init_futures.push(init_future);
+        }
+
+        futures::future::try_join_all(init_futures).await?;
+
+        let receivers = self
+            .channels
+            .into_iter()
+            .map(|(_, channel)| channel.rx)
+            .collect::<Vec<_>>();
+        if receivers.len() != 1 {
+            return Err(DataError::Socket(SocketError::Subscribe(
+                "Multiple receivers not supported".to_owned(),
+            )));
+        }
+
+        Ok(receivers.into_iter().next().unwrap())
     }
 }
 

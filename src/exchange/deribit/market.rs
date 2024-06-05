@@ -50,11 +50,6 @@ impl AsRef<str> for DeribitMarket {
     }
 }
 
-/// Format the expiry DateTime<Utc> to be Okx API compatible.
-///
-/// eg/ "230526" (26th of May 2023)
-///
-/// See docs: <https://www.okx.com/docs-v5/en/#rest-api-public-data-get-instruments>
 fn format_expiry<'a>(expiry: DateTime<Utc>) -> DelayedFormat<StrftimeItems<'a>> {
     expiry.date_naive().format("%-d%b%y")
 }

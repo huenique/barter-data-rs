@@ -84,8 +84,8 @@ pub struct DeribitTickerData {
     pub interest_rate: Option<f64>,
     pub mark_iv: Option<f64>,
     pub estimated_delivery_price: Option<f64>,
-    pub ask_iv: f64,
-    pub bid_iv: f64,
+    pub ask_iv: Option<f64>,
+    pub bid_iv: Option<f64>,
     pub index_price: f64,
     pub state: String,
 }

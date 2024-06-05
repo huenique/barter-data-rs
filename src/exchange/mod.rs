@@ -268,7 +268,7 @@ impl ExchangeId {
             (_, Spot) => true,
 
             // Future
-            (GateioFuturesUsd | GateioFuturesBtc | Okx, Future(_)) => true,
+            (Deribit | GateioFuturesUsd | GateioFuturesBtc | Okx, Future(_)) => true,
             (_, Future(_)) => false,
 
             // Future Perpetual Swaps

@@ -150,10 +150,7 @@ where
         // For each future in the StreamBuilder, create a task in the LocalSet to run the future.
         for future in self.futures {
             // Run the future within the LocalSet context.
-            let init_future = local_set.run_until(async {
-                // Await the future and return its result.
-                future.await
-            });
+            let init_future = local_set.run_until(future);
             // Push the created task into the vector of initialization futures.
             init_futures.push(init_future);
         }
@@ -162,11 +159,7 @@ where
         futures::future::try_join_all(init_futures).await?;
 
         // Collect all the receivers from the channels into a vector.
-        let receivers = self
-            .channels
-            .into_iter()
-            .map(|(_, channel)| channel.rx)
-            .collect::<Vec<_>>();
+        let receivers = self.channels.into_values().map(|channel| channel.rx);
         // Ensure there is only one receiver as this method currently supports a single receiver.
         if receivers.len() != 1 {
             return Err(DataError::Socket(SocketError::Subscribe(

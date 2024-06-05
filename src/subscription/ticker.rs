@@ -29,8 +29,8 @@ pub struct Ticker {
     pub delivery_price: Option<f64>,  // Settlement price when state is closed
     pub current_funding: Option<f64>, // Perpetual specific
     pub interest_value: Option<f64>,  // Perpetual specific
-    pub ask_iv: f64,
-    pub bid_iv: f64,
+    pub ask_iv: Option<f64>,
+    pub bid_iv: Option<f64>,
     pub index_price: f64,
 }
 

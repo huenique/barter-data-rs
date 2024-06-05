@@ -66,7 +66,7 @@ impl AevoBookUpdater {
         }
     }
 
-    pub fn checksum(&self, bids: &Vec<Level>, asks: &Vec<Level>) -> u32 {
+    pub fn checksum(&self, bids: &[Level], asks: &[Level]) -> u32 {
         let mut preimage = String::new();
         let iterations = bids.len().max(asks.len());
 
@@ -86,7 +86,7 @@ impl AevoBookUpdater {
         hasher.finalize()
     }
 
-    pub fn checksum2(&self, bids: &Vec<AevoLevel>, asks: &Vec<AevoLevel>) -> u32 {
+    pub fn checksum2(&self, bids: &[AevoLevel], asks: &[AevoLevel]) -> u32 {
         let mut preimage = String::new();
         let iterations = bids.len().max(asks.len());
 

@@ -42,7 +42,7 @@ where
     ) -> Result<Self, DataError> {
         Ok(Self {
             instrument_map,
-            phantom: PhantomData::default(),
+            phantom: PhantomData,
         })
     }
 }

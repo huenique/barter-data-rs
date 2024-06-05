@@ -67,7 +67,7 @@ impl From<DydxOrderBookL3> for OrderBook {
     }
 }
 
-fn parse_order_data(side: Side, data: &Vec<DydxLevel>) -> OrderBookSide {
+fn parse_order_data(side: Side, data: &[DydxLevel]) -> OrderBookSide {
     OrderBookSide::new(
         side,
         data.iter()

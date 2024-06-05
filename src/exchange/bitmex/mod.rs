@@ -91,7 +91,7 @@ impl<'de> serde::Deserialize<'de> for Bitmex {
         let expected = Self::ID.as_str();
 
         if input == Self::ID.as_str() {
-            Ok(Self::default())
+            Ok(Self)
         } else {
             Err(Error::invalid_value(Unexpected::Str(input), &expected))
         }

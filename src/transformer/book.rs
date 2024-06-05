@@ -101,7 +101,7 @@ where
 
         Ok(Self {
             book_map,
-            phantom: PhantomData::default(),
+            phantom: PhantomData,
         })
     }
 }

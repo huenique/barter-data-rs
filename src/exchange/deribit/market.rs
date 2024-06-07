@@ -29,7 +29,7 @@ impl<Kind> Identifier<DeribitMarket> for Subscription<Deribit, Kind> {
         DeribitMarket(match kind {
             Spot => format!("{base}_{quote}"),
             Future(future) => format!("{base}-{}", format_expiry(future.expiry)).to_uppercase(),
-            Perpetual => format!("{base}-PERPETUAL").to_uppercase(),
+            Perpetual => format!("{base}_{quote}-PERPETUAL").to_uppercase(),
             Option(option) => format!(
                 "{base}-{}-{}-{}",
                 format_expiry(option.expiry),

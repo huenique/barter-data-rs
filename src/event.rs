@@ -3,6 +3,7 @@ use crate::subscription::book::OrderBook;
 use crate::subscription::book::OrderBookL1;
 use crate::subscription::candle::Candle;
 use crate::subscription::liquidation::Liquidation;
+use crate::subscription::ticker::Ticker;
 use crate::subscription::trade::PublicTrade;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
@@ -60,6 +61,7 @@ pub enum DataKind {
     OrderBook(OrderBook),
     Candle(Candle),
     Liquidation(Liquidation),
+    Ticker(Ticker),
 }
 
 impl From<MarketEvent<PublicTrade>> for MarketEvent<DataKind> {
@@ -118,6 +120,18 @@ impl From<MarketEvent<Liquidation>> for MarketEvent<DataKind> {
             exchange: event.exchange,
             instrument: event.instrument,
             kind: DataKind::Liquidation(event.kind),
+        }
+    }
+}
+
+impl From<MarketEvent<Ticker>> for MarketEvent<DataKind> {
+    fn from(event: MarketEvent<Ticker>) -> Self {
+        Self {
+            exchange_time: event.exchange_time,
+            received_time: event.received_time,
+            exchange: event.exchange,
+            instrument: event.instrument,
+            kind: DataKind::Ticker(event.kind),
         }
     }
 }

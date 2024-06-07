@@ -25,7 +25,7 @@ pub mod multi;
 
 /// Communicative type alias representing the [`Future`] result of a [`Subscription`] [`validate`]
 /// call generated whilst executing [`StreamBuilder::subscribe`].
-pub type SubscribeFuture = Pin<Box<dyn Future<Output = Result<(), DataError>> + Send>>;
+pub type SubscribeFuture = Pin<Box<dyn Future<Output = Result<(), DataError>> + Send + Sync>>;
 
 /// Builder to configure and initialise a [`Streams<MarketEvent<SubKind::Event>`](Streams) instance
 /// for a specific [`SubKind`].

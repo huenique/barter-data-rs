@@ -59,9 +59,6 @@ impl Validator for DeribitSubResponse {
                 "Received failure subscription response code: {} with message: {}",
                 e.code, e.message,
             ))),
-            (_, Some(0)) | (None, None) => Err(SocketError::Subscribe(
-                "Received empty subscription response".to_string(),
-            )),
             _ => Ok(self),
         }
     }

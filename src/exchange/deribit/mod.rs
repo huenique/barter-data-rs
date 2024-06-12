@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::exchange::deribit::book::l1::DeribitOrderBookL1;
 use crate::exchange::deribit::book::l2::DeribitBookUpdater;
 use crate::exchange::deribit::channel::DeribitChannel;
@@ -27,7 +29,6 @@ use barter_integration::protocol::websocket::WsMessage;
 use barter_macro::DeExchange;
 use barter_macro::SerExchange;
 use serde_json::json;
-use std::time::Duration;
 use url::Url;
 
 pub mod channel;

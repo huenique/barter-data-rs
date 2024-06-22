@@ -61,7 +61,7 @@ pub enum DataKind {
     OrderBook(OrderBook),
     Candle(Candle),
     Liquidation(Liquidation),
-    Ticker(Ticker),
+    Ticker(Box<Ticker>),
 }
 
 impl From<MarketEvent<PublicTrade>> for MarketEvent<DataKind> {
@@ -131,7 +131,7 @@ impl From<MarketEvent<Ticker>> for MarketEvent<DataKind> {
             received_time: event.received_time,
             exchange: event.exchange,
             instrument: event.instrument,
-            kind: DataKind::Ticker(event.kind),
+            kind: DataKind::Ticker(Box::new(event.kind)),
         }
     }
 }

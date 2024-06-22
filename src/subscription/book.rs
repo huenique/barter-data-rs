@@ -233,10 +233,7 @@ impl Ord for Level {
 
 impl PartialOrd for Level {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match self.price.partial_cmp(&other.price)? {
-            Ordering::Equal => self.amount.partial_cmp(&other.amount),
-            non_equal => Some(non_equal),
-        }
+        Some(self.cmp(other))
     }
 }
 

@@ -60,8 +60,8 @@ impl From<DeribitTickerData> for Ticker {
             interest_rate: data.interest_rate,
             mark_iv: data.mark_iv,
             delivery_price: data.estimated_delivery_price,
-            current_funding: None,
-            interest_value: None,
+            current_funding: data.current_funding,
+            interest_value: data.interest_value,
             ask_iv: data.ask_iv,
             bid_iv: data.bid_iv,
             index_price: data.index_price,
@@ -88,6 +88,9 @@ pub struct DeribitTickerData {
     pub bid_iv: Option<f64>,
     pub index_price: f64,
     pub state: String,
+    pub funding_8h: Option<f64>,
+    pub current_funding: Option<f64>,
+    pub interest_value: Option<f64>,
 }
 
 #[derive(Copy, Clone, Debug, Deserialize, Serialize)]

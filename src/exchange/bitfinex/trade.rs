@@ -32,7 +32,7 @@ use serde::Serialize;
 ///
 /// ## Notes:
 /// - [`Bitfinex`](super::Bitfinex) trades subscriptions results in receiving tag="te" & tag="tu"
-/// trades, both of which are identical.
+///     trades, both of which are identical.
 /// - "te" trades arrive marginally faster.
 /// - Therefore, tag="tu" trades are filtered out and considered only as additional Heartbeats.
 ///

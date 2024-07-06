@@ -12,12 +12,13 @@ keywords = ["trading", "backtesting", "crypto", "stocks", "investment"]
 categories = ["accessibility", "simulation"]
 
 [dev-dependencies]
-tracing-subscriber = { version = "0.3.16", features = ["env-filter", "json"] }
+clap = "4.5.4"
+criterion = "0.5.1"
+rand = "0.8"
 rust_decimal = "1.29.1"
 rust_decimal_macros = "1.29.1"
 tabled = "0.15.0"
-clap = "4.5.4"
-headless_chrome = "1.0.10"
+tracing-subscriber = { version = "0.3.16", features = ["env-filter", "json"] }
 
 [dependencies]
 # Barter Ecosystem
@@ -53,3 +54,7 @@ crc32fast = "1.3.2"
 
 [toolchain]
 channel = "nightly"
+
+[[bench]]
+name = "sorting"
+harness = false

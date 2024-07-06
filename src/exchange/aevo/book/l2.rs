@@ -142,15 +142,15 @@ impl OrderBookUpdater for AevoBookUpdater {
         book: &mut Self::OrderBook,
         update: Self::Update,
     ) -> Result<Option<Self::OrderBook>, DataError> {
-        // If the checksum is the same as the previous message, ignore the message. No changes have occurred.
-        // Aevo subsequently sends a snapshot message with the full order book for now. But will change to incremental updates in the future.
+        // If the checksum matches the previous message, ignore it. Aevo currently sends a snapshot
+        // message with the full order book, but will switch to incremental updates in the future.
         if self.last_checksum == update.data.checksum && update.data.r#type == "snapshot" {
             return Ok(None);
         }
 
-        // Update OrderBook metadata & Levels:
-        // 7. The data in each event is the absolute quantity for a price level.
-        // 8. If the quantity is 0, remove the price level.
+        // When updating OrderBook metadata and levels, it's important to note that each event's
+        // data shows the exact quantity for a price level. If the quantity is 0, then the price
+        // level should be removed.
         book.last_update_time = Utc::now();
         book.bids.upsert(update.data.bids);
         book.asks.upsert(update.data.asks);

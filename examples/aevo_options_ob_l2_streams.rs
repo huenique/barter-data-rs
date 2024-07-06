@@ -110,7 +110,7 @@ fn call_contract() -> OptionContract {
     OptionContract {
         kind: OptionKind::Call,
         exercise: OptionExercise::American,
-        expiry: Utc.timestamp_millis_opt(1715940000000).unwrap(),
+        expiry: Utc.timestamp_millis_opt(1721347200000).unwrap(),
         strike: rust_decimal_macros::dec!(62000),
     }
 }

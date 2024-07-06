@@ -1,7 +1,8 @@
-use super::SubKind;
 use crate::event::MarketEvent;
 use crate::event::MarketIter;
 use crate::exchange::ExchangeId;
+use crate::subscription::SubKind;
+
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
@@ -199,13 +200,86 @@ impl OrderBookSide {
     /// Sort this [`OrderBookSide`] (bids are reversed).
     pub fn sort(&mut self) {
         // Sort Levels
-        self.levels.sort_unstable();
+        quicksort_iterative(&mut self.levels);
 
         // Reverse Bids
         if let Side::Buy = self.side {
             self.levels.reverse();
         }
     }
+}
+
+/// An iterative version of QuickSort that avoids recursion by using a manually managed stack,
+/// ensuring it doesn't exhaust the call stack. This makes it suitable for sorting large arrays
+/// without causing stack overflows.
+///
+/// # Arguments
+///
+/// * `arr` - A mutable slice of `Level` structs to be sorted.
+///
+/// # Example
+///
+/// ```
+/// let mut levels = vec![
+///     Level { price: 56762.1, amount: 0.003 },
+///     Level { price: 56757.8, amount: 0.156 },
+///     Level { price: 56751.3, amount: 0.194 },
+/// ];
+/// quicksort_iterative(&mut levels);
+/// ```
+fn quicksort_iterative(arr: &mut [Level]) {
+    let len = arr.len();
+    let mut stack = Vec::with_capacity(len);
+
+    stack.push((0, len as isize - 1));
+
+    while let Some((low, high)) = stack.pop() {
+        if low < high {
+            let p = partition(arr, low, high);
+            stack.push((low, p - 1));
+            stack.push((p + 1, high));
+        }
+    }
+}
+
+/// Partitions the array around a pivot element chosen as the last element in the range.
+/// Elements less than or equal to the pivot are moved to the left of the pivot,
+/// and elements greater than the pivot are moved to the right. Returns the index of the pivot element
+/// after partitioning.
+///
+/// # Arguments
+///
+/// * `arr` - A mutable slice of `Level` structs to be partitioned.
+/// * `low` - The starting index of the range to be partitioned.
+/// * `high` - The ending index of the range to be partitioned.
+///
+/// # Returns
+///
+/// The index of the pivot element after partitioning.
+///
+/// # Example
+///
+/// ```
+/// let mut levels = vec![
+///     Level { price: 56762.1, amount: 0.003 },
+///     Level { price: 56757.8, amount: 0.156 },
+///     Level { price: 56751.3, amount: 0.194 },
+/// ];
+/// let pivot_index = partition(&mut levels, 0, levels.len() as isize - 1);
+/// ```
+fn partition(arr: &mut [Level], low: isize, high: isize) -> isize {
+    let pivot = arr[high as usize];
+    let mut i = low - 1;
+
+    for j in low..high {
+        if arr[j as usize].price <= pivot.price {
+            i += 1;
+            arr.swap(i as usize, j as usize);
+        }
+    }
+
+    arr.swap((i + 1) as usize, high as usize);
+    i + 1
 }
 
 /// Normalised Barter OrderBook [`Level`].

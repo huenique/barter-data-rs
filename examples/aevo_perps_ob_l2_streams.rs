@@ -1,5 +1,4 @@
 use barter_data::exchange::aevo::Aevo;
-use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::book::OrderBooksL2;
 use barter_integration::model::instrument::kind::InstrumentKind;
@@ -21,7 +20,7 @@ async fn main() {
 
     // Initialise OrderBooksL2 Streams for Deribit only
     // '--> each call to StreamBuilder::subscribe() creates a separate WebSocket connection
-    let mut streams = Streams::<OrderBooksL2>::builder()
+    let streams = Streams::<OrderBooksL2>::builder()
         .subscribe([(
             Aevo::default(),
             "btc",
@@ -33,7 +32,7 @@ async fn main() {
         .await
         .unwrap();
 
-    let mut stream = streams.select(ExchangeId::Aevo).unwrap();
+    let mut stream = streams.join().await;
 
     loop {
         // Clear the console

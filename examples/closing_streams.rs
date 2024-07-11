@@ -3,10 +3,9 @@ use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::ticker::Tickers;
 use barter_integration::model::instrument::kind::InstrumentKind;
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    Arc,
-};
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+use std::sync::Arc;
 use tracing::info;
 use tracing_subscriber;
 

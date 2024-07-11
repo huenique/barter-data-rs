@@ -1,8 +1,8 @@
 use crate::event::MarketEvent;
 use crate::event::MarketIter;
 use crate::exchange::powertrade::channel::PowerTradeChannel;
-use crate::exchange::powertrade::message::FundingRateUpdate;
-use crate::exchange::powertrade::message::SubscriptionStatus;
+use crate::exchange::powertrade::message::pb_snapshot::OrderData;
+use crate::exchange::powertrade::message::pb_snapshot::PriceBookSnapshot;
 use crate::exchange::subscription::ExchangeSub;
 use crate::exchange::ExchangeId;
 use crate::subscription::book::Level;
@@ -17,37 +17,34 @@ use barter_integration::model::SubscriptionId;
 use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
+use serde::Deserializer;
 use serde::Serialize;
+use serde_json::Value;
 
-/// The channel sends many messages, but we only care about "pb_snapshot," so we don't have to build
-/// and maintain a local order book. See:
+/// The channel sends many messages, but we only care about "pb_snapshot". See:
 /// - <https://power-trade.github.io/api-docs-source/ws_feeds.html#Feeds_Introduction>
 /// - <https://power-trade.github.io/api-docs-source/ws_feeds.html#pb_snapshot>
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
 pub enum PowerTradeOrderBookL3 {
-    #[serde(rename = "pb_snapshot")]
-    OrderBookL3(PriceBookSnapshot),
-    #[serde(rename = "funding_rate")]
-    FundingRate(FundingRateUpdate),
-    #[serde(rename = "subscriptions_status")]
-    SubscriptionStatus(SubscriptionStatus),
+    OrderBookL3(Box<PriceBookSnapshot>),
+    Ignored,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
-pub struct PriceBookSnapshot {
-    timestamp: String,
-    tradeable_entity_id: String,
-    market_id: String,
-    symbol: String,
-    bids: OrderData,
-    asks: OrderData,
-}
-
-#[derive(Debug, Default, Serialize, Deserialize)]
-pub struct OrderData {
-    n_levels: String,
-    n_orders: String,
-    levels: Vec<Vec<String>>,
+impl<'de> Deserialize<'de> for PowerTradeOrderBookL3 {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value: Value = Deserialize::deserialize(deserializer)?;
+        if let Some(snapshot) = value.get("pb_snapshot") {
+            let parsed: Result<PriceBookSnapshot, _> = serde_json::from_value(snapshot.clone());
+            if let Ok(snapshot) = parsed {
+                return Ok(PowerTradeOrderBookL3::OrderBookL3(Box::new(snapshot)));
+            }
+        }
+        Ok(PowerTradeOrderBookL3::Ignored)
+    }
 }
 
 impl Identifier<Option<SubscriptionId>> for PowerTradeOrderBookL3 {

@@ -60,6 +60,10 @@ pub mod dydx;
 
 /// `Bit` [`Connector`] and [`StreamSelector`] implementations.
 pub mod bit;
+
+/// `Lyra` [`Connector`] and [`StreamSelector`] implementations.
+pub mod lyra;
+
 /// Defines the generic [`ExchangeSub`] containing a market and channel combination used by an
 /// exchange [`Connector`] to build [`WsMessage`] subscription payloads.
 pub mod subscription;
@@ -207,6 +211,7 @@ pub enum ExchangeId {
     GateioSpot,
     Hyperliquid,
     Kraken,
+    Lyra,
     Okx,
     PowerTrade,
 }
@@ -246,6 +251,7 @@ impl ExchangeId {
             ExchangeId::GateioSpot => "gateio_spot",
             ExchangeId::Hyperliquid => "hyperliquid",
             ExchangeId::Kraken => "kraken",
+            ExchangeId::Lyra => "lyra",
             ExchangeId::Okx => "okx",
             ExchangeId::PowerTrade => "powertrade",
         }
@@ -281,7 +287,7 @@ impl ExchangeId {
             (_, Perpetual) => false,
 
             // Option
-            (Aevo | Bit | Deribit | GateioOptions | Okx | PowerTrade, Option(_)) => true,
+            (Aevo | Bit | Deribit | GateioOptions | Lyra | Okx | PowerTrade, Option(_)) => true,
             (_, Option(_)) => false,
         }
     }

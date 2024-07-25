@@ -81,7 +81,7 @@ impl Connector for Deribit {
     fn ping_interval() -> Option<super::PingInterval> {
         Some(PingInterval {
             interval: tokio::time::interval(PING_INTERVAL_DERIBIT),
-            ping: || WsMessage::text("ping"),
+            ping: || WsMessage::Ping("ping".as_bytes().to_vec()),
         })
     }
 

@@ -44,31 +44,31 @@ impl DeribitChannel {
     pub const INDEX: Self = Self("deribit_price_index.{}");
 }
 
-impl Identifier<DeribitChannel> for Subscription<Deribit, PublicTrades> {
+impl<Server> Identifier<DeribitChannel> for Subscription<Deribit<Server>, PublicTrades> {
     fn id(&self) -> DeribitChannel {
         DeribitChannel::TRADES_RAW
     }
 }
 
-impl Identifier<DeribitChannel> for Subscription<Deribit, OrderBooksL1> {
+impl<Server> Identifier<DeribitChannel> for Subscription<Deribit<Server>, OrderBooksL1> {
     fn id(&self) -> DeribitChannel {
         DeribitChannel::ORDER_BOOK_L1
     }
 }
 
-impl Identifier<DeribitChannel> for Subscription<Deribit, OrderBooksL2> {
+impl<Server> Identifier<DeribitChannel> for Subscription<Deribit<Server>, OrderBooksL2> {
     fn id(&self) -> DeribitChannel {
         DeribitChannel::ORDER_BOOK_L2
     }
 }
 
-impl Identifier<DeribitChannel> for Subscription<Deribit, Tickers> {
+impl<Server> Identifier<DeribitChannel> for Subscription<Deribit<Server>, Tickers> {
     fn id(&self) -> DeribitChannel {
         DeribitChannel::TICKER
     }
 }
 
-impl Identifier<DeribitChannel> for Subscription<Deribit, Indices> {
+impl<Server> Identifier<DeribitChannel> for Subscription<Deribit<Server>, Indices> {
     fn id(&self) -> DeribitChannel {
         DeribitChannel::INDEX
     }

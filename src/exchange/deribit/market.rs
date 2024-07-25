@@ -20,7 +20,7 @@ use serde::Serialize;
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
 pub struct DeribitMarket(pub String);
 
-impl<Kind> Identifier<DeribitMarket> for Subscription<Deribit, Kind> {
+impl<Server, Kind> Identifier<DeribitMarket> for Subscription<Deribit<Server>, Kind> {
     fn id(&self) -> DeribitMarket {
         use InstrumentKind::*;
 

@@ -1,4 +1,4 @@
-use barter_data::exchange::deribit::Deribit;
+use barter_data::exchange::deribit::DeribitMain;
 use barter_data::streams::Streams;
 use barter_data::subscription::ticker::Tickers;
 use barter_integration::model::instrument::kind::InstrumentKind;
@@ -19,7 +19,7 @@ async fn main() {
     // Initialise Ticker streams for Deribit
     let ticker_streams = Streams::<Tickers>::builder()
         .subscribe([(
-            Deribit,
+            DeribitMain::default(),
             "btc",
             "usd",
             InstrumentKind::Option(OptionContract {

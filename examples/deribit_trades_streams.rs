@@ -1,4 +1,4 @@
-use barter_data::exchange::deribit::Deribit;
+use barter_data::exchange::deribit::DeribitMain;
 use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::trade::PublicTrades;
@@ -15,7 +15,7 @@ async fn main() {
     // '--> each call to StreamBuilder::subscribe() creates a separate WebSocket connection
     let mut streams = Streams::<PublicTrades>::builder()
         .subscribe([
-            (Deribit::default(), "btc", "usdc", InstrumentKind::Spot, PublicTrades),
+            (DeribitMain::default(), "btc", "usdc", InstrumentKind::Spot, PublicTrades),
         ])
         .init()
         .await
@@ -26,7 +26,7 @@ async fn main() {
     //  - Use `streams.select(ExchangeId)` to interact with the individual exchange streams!
     //  - Use `streams.join()` to join all exchange streams into a single mpsc::UnboundedReceiver!
     let mut deribit_stream = streams
-        .select(ExchangeId::Deribit)
+        .select(ExchangeId::DeribitMainnet)
         .unwrap();
 
     while let Some(trade) = deribit_stream.recv().await {

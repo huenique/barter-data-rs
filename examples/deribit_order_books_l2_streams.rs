@@ -1,4 +1,4 @@
-use barter_data::exchange::deribit::Deribit;
+use barter_data::exchange::deribit::DeribitMain;
 use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::book::OrderBooksL2;
@@ -22,10 +22,10 @@ async fn main() {
 
         // Separate WebSocket connection for BTC_USDT stream since it's very high volume
         .subscribe([
-            (Deribit::default(), "btc", "usdc", InstrumentKind::Perpetual, OrderBooksL2),
+            (DeribitMain::default(), "btc", "usdc", InstrumentKind::Perpetual, OrderBooksL2),
         ])
         .subscribe([
-            (Deribit::default(), "btc", "usdc", InstrumentKind::Option(call_contract()), OrderBooksL2),
+            (DeribitMain::default(), "btc", "usdc", InstrumentKind::Option(call_contract()), OrderBooksL2),
         ])
 
         .init()
@@ -37,7 +37,7 @@ async fn main() {
     //  - Use `streams.select(ExchangeId)` to interact with the individual exchange streams!
     //  - Use `streams.join()` to join all exchange streams into a single mpsc::UnboundedReceiver!
     let mut binance_stream = streams
-        .select(ExchangeId::Deribit)
+        .select(ExchangeId::DeribitMainnet)
         .unwrap();
 
     while let Some(order_book_l2) = binance_stream.recv().await {

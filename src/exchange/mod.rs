@@ -43,7 +43,7 @@ pub mod kraken;
 /// `Okx` [`Connector`] and [`StreamSelector`] implementations.
 pub mod okx;
 
-/// `Deribit` [`Connector`] and [`StreamSelector`] implementations.
+/// `DeribitMainnet` [`Connector`] and [`StreamSelector`] implementations.
 pub mod deribit;
 
 /// `Aevo` [`Connector`] and [`StreamSelector`] implementations.
@@ -201,7 +201,8 @@ pub enum ExchangeId {
     BybitPerpetualsUsd,
     BybitSpot,
     Coinbase,
-    Deribit,
+    DeribitMainnet,
+    DeribitTestnet,
     Dydx,
     GateioFuturesBtc,
     GateioFuturesUsd,
@@ -241,7 +242,8 @@ impl ExchangeId {
             ExchangeId::BybitPerpetualsUsd => "bybit_perpetuals_usd",
             ExchangeId::BybitSpot => "bybit_spot",
             ExchangeId::Coinbase => "coinbase",
-            ExchangeId::Deribit => "deribit",
+            ExchangeId::DeribitMainnet => "deribit",
+            ExchangeId::DeribitTestnet => "deribit_testnet",
             ExchangeId::Dydx => "dydx",
             ExchangeId::GateioFuturesBtc => "gateio_futures_btc",
             ExchangeId::GateioFuturesUsd => "gateio_futures_usd",
@@ -274,20 +276,27 @@ impl ExchangeId {
             (_, Spot) => true,
 
             // Future
-            (Deribit | GateioFuturesUsd | GateioFuturesBtc | Okx, Future(_)) => true,
+            (
+                DeribitMainnet | DeribitTestnet | GateioFuturesUsd | GateioFuturesBtc | Okx,
+                Future(_),
+            ) => true,
             (_, Future(_)) => false,
 
             // Future Perpetual Swaps
             (
-                Aevo | BinanceFuturesUsd | Bit | BybitPerpetualsUsd | Deribit | Dydx
-                | GateioPerpetualsBtc | GateioPerpetualsUsd | Hyperliquid | Okx | Bitmex
-                | PowerTrade,
+                Aevo | BinanceFuturesUsd | Bit | BybitPerpetualsUsd | DeribitMainnet
+                | DeribitTestnet | Dydx | GateioPerpetualsBtc | GateioPerpetualsUsd | Hyperliquid
+                | Okx | Bitmex | PowerTrade,
                 Perpetual,
             ) => true,
             (_, Perpetual) => false,
 
             // Option
-            (Aevo | Bit | Deribit | GateioOptions | Lyra | Okx | PowerTrade, Option(_)) => true,
+            (
+                Aevo | Bit | DeribitMainnet | DeribitTestnet | GateioOptions | Lyra | Okx
+                | PowerTrade,
+                Option(_),
+            ) => true,
             (_, Option(_)) => false,
         }
     }

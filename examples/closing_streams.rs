@@ -1,4 +1,4 @@
-use barter_data::exchange::deribit::Deribit;
+use barter_data::exchange::deribit::DeribitMain;
 use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::ticker::Tickers;
@@ -16,7 +16,13 @@ async fn main() {
 
     // Initialise Ticker streams for Deribit
     let mut streams = Streams::<Tickers>::builder()
-        .subscribe([(Deribit, "btc", "usd", InstrumentKind::Perpetual, Tickers)])
+        .subscribe([(
+            DeribitMain::default(),
+            "btc",
+            "usd",
+            InstrumentKind::Perpetual,
+            Tickers,
+        )])
         .init()
         .await
         .unwrap();
@@ -34,7 +40,7 @@ async fn main() {
     });
 
     let mut ticker_streams = streams
-        .select(ExchangeId::Deribit)
+        .select(ExchangeId::DeribitMainnet)
         .expect("Invalid exchange ID");
 
     while let Some(ticker) = ticker_streams.recv().await {

@@ -1,4 +1,4 @@
-use barter_data::exchange::deribit::Deribit;
+use barter_data::exchange::deribit::DeribitMain;
 use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::book::OrderBooksL2;
@@ -24,7 +24,7 @@ async fn main() {
     let mut streams = Streams::<OrderBooksL2>::builder()
         // Separate WebSocket connection for BTC_USDT stream since it's very high volume
         .subscribe([(
-            Deribit::default(),
+            DeribitMain::default(),
             "btc",
             "usdc",
             InstrumentKind::Perpetual,
@@ -34,7 +34,7 @@ async fn main() {
         .await
         .unwrap();
 
-    let mut stream = streams.select(ExchangeId::Deribit).unwrap();
+    let mut stream = streams.select(ExchangeId::DeribitMainnet).unwrap();
 
     loop {
         // Clear the console

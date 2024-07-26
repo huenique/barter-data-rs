@@ -80,7 +80,6 @@ impl ExchangeServer for DeribitTestnetServer {
 pub type DeribitMain = Deribit<DeribitMainnetServer>;
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
-
 pub struct DeribitMainnetServer {}
 
 impl ExchangeServer for DeribitMainnetServer {

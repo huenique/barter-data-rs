@@ -1,5 +1,6 @@
 use barter_data::exchange::deribit::DeribitMain;
 use barter_data::streams::Streams;
+use barter_data::subscription::index::Indices;
 use barter_data::subscription::ticker::Tickers;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::kind::OptionContract;
@@ -7,6 +8,7 @@ use barter_integration::model::instrument::kind::OptionExercise;
 use barter_integration::model::instrument::kind::OptionKind;
 use chrono::TimeZone;
 use chrono::Utc;
+use tokio::spawn;
 use tokio_stream::StreamExt;
 use tracing::info;
 use tracing_subscriber;
@@ -25,7 +27,7 @@ async fn main() {
             InstrumentKind::Option(OptionContract {
                 kind: OptionKind::Call,
                 exercise: OptionExercise::American,
-                expiry: Utc.timestamp_millis_opt(1721952000000).unwrap(),
+                expiry: Utc.timestamp_millis_opt(1721980800000).unwrap(),
                 strike: rust_decimal_macros::dec!(65000),
             }),
             Tickers,
@@ -35,33 +37,35 @@ async fn main() {
         .unwrap();
 
     // Initialise Index streams for Deribit
-    // let index_streams = Streams::<Indices>::builder()
-    //     .subscribe([(
-    //         Deribit::default(),
-    //         "btc",
-    //         "usdc",
-    //         InstrumentKind::Spot,
-    //         Indices,
-    //     )])
-    //     .init()
-    //     .await
-    //     .unwrap();
+    let index_streams = Streams::<Indices>::builder()
+        .subscribe([(
+            DeribitMain::default(),
+            "btc",
+            "usdc",
+            InstrumentKind::Spot,
+            Indices,
+        )])
+        .init()
+        .await
+        .unwrap();
 
     // Join ticker streams
     let mut joined_ticker_stream = ticker_streams.join_map().await;
 
     // Join index streams
-    // let mut joined_index_stream = index_streams.join_map().await;
+    let mut joined_index_stream = index_streams.join_map().await;
 
     // Spawn a task to process Ticker data
-    while let Some((exchange, ticker)) = joined_ticker_stream.next().await {
-        info!("Exchange: {exchange}, TickerData: {ticker:?}");
-    }
+    spawn(async move {
+        while let Some((exchange, ticker)) = joined_ticker_stream.next().await {
+            info!("Exchange: {exchange}, TickerData: {ticker:?}");
+        }
+    });
 
-    // // Process Index data
-    // while let Some((exchange, index)) = joined_index_stream.next().await {
-    //     info!("Exchange: {exchange}, IndexData: {index:?}");
-    // }
+    // Process Index data
+    while let Some((exchange, index)) = joined_index_stream.next().await {
+        info!("Exchange: {exchange}, IndexData: {index:?}");
+    }
 }
 
 // Initialise an INFO `Subscriber` for `Tracing` logs and install it as the global default.

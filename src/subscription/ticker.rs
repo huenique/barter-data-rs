@@ -22,7 +22,7 @@ pub struct Ticker {
     pub last_price: f64,
     pub open_interest: f64,
     pub state: String,
-    pub timestamp: u64,
+    pub timestamp: i64,
     pub greeks: Option<Greeks>,
     pub interest_rate: Option<f64>,   // Option specific
     pub mark_iv: Option<f64>,         // Option specific

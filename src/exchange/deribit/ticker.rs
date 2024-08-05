@@ -80,7 +80,7 @@ pub struct DeribitTickerData {
     pub last_price: Option<f64>,
     pub open_interest: Option<f64>,
     pub greeks: Option<DeribitGreeks>,
-    pub timestamp: u64,
+    pub timestamp: i64,
     pub interest_rate: Option<f64>,
     pub mark_iv: Option<f64>,
     pub estimated_delivery_price: Option<f64>,

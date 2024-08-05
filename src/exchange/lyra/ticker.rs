@@ -58,7 +58,7 @@ impl From<InstrumentTicker> for Ticker {
             } else {
                 "closed".into()
             },
-            timestamp: data.timestamp as u64,
+            timestamp: data.timestamp,
             greeks: Some(Greeks {
                 delta: Some(data.option_pricing.delta),
                 gamma: Some(data.option_pricing.gamma),

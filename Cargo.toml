@@ -22,7 +22,7 @@ tracing-subscriber = { version = "0.3.16", features = ["env-filter", "json"] }
 
 [dependencies]
 # Barter Ecosystem
-barter-integration = "0.5.3"
+barter-integration = "0.7.3"
 barter-macro =  "0.1.1"
 
 # Logging
@@ -36,7 +36,7 @@ async-trait = "0.1.57"
 
 # Protocol
 url = "2.3.1"
-reqwest = "0.11.13"
+reqwest = "0.12.5"
 
 # Error
 thiserror = "1.0.32"

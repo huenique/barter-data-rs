@@ -5,10 +5,7 @@ pub mod message;
 pub mod subscription;
 pub mod ticker;
 
-use std::time::Duration;
-
 use barter_integration::error::SocketError;
-use barter_integration::model::instrument::Instrument;
 use barter_integration::protocol::websocket::WsMessage;
 use barter_macro::DeExchange;
 use barter_macro::SerExchange;
@@ -18,15 +15,15 @@ use crate::exchange::powertrade::book::l3::PowerTradeOrderBookL3;
 use crate::exchange::powertrade::channel::PowerTradeChannel;
 use crate::exchange::powertrade::market::PowerTradeMarket;
 use crate::exchange::powertrade::subscription::PowerTradeSubResponse;
+use crate::exchange::powertrade::ticker::PowerTradeTicker;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
-use crate::exchange::PingInterval;
 use crate::exchange::StreamSelector;
 use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::book::OrderBooksL3;
-use crate::subscription::Map;
+use crate::subscription::ticker::Tickers;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
 
@@ -63,20 +60,12 @@ impl Connector for PowerTrade {
             })
             .collect()
     }
-
-    fn ping_interval() -> Option<PingInterval> {
-        None
-    }
-
-    fn expected_responses(map: &Map<Instrument>) -> usize {
-        map.0.len()
-    }
-
-    fn subscription_timeout() -> Duration {
-        super::DEFAULT_SUBSCRIPTION_TIMEOUT
-    }
 }
 
 impl StreamSelector<OrderBooksL3> for PowerTrade {
     type Stream = ExchangeWsStream<StatelessTransformer<Self, OrderBooksL3, PowerTradeOrderBookL3>>;
+}
+
+impl StreamSelector<Tickers> for PowerTrade {
+    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, PowerTradeTicker>>;
 }

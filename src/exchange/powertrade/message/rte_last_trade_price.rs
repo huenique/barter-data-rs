@@ -3,11 +3,11 @@ use serde::Serialize;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Response {
-    pub last_trade_prirce: LastTradePrirce,
+    pub last_trade_prirce: LastTradePrice,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct LastTradePrirce {
+pub struct LastTradePrice {
     pub timestamp: String,
     pub tradeable_entity_id: String,
     pub market_id: String,

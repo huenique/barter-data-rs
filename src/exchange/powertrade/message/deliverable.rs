@@ -1,3 +1,5 @@
+use crate::exchange::powertrade::message::products::option::OptionDetails;
+
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -15,4 +17,18 @@ pub struct Deliverable<Details> {
     pub decimal_places: String,
     pub listing_status: String,
     pub details: Details,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub enum ProductType {
+    #[serde(rename = "spot")]
+    Spot,
+    #[serde(rename = "future")]
+    Future,
+    #[serde(rename = "option")]
+    Option(OptionDetails),
+    #[serde(rename = "perpetual")]
+    Perpetual,
+    #[serde(other)]
+    Unknown,
 }

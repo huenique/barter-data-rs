@@ -132,7 +132,7 @@ impl OrderBookUpdater for DeribitBookUpdater {
         book.bids.upsert(update.params.data.bids);
         book.asks.upsert(update.params.data.asks);
 
-        // // Update OrderBookUpdater metadata
+        // Update OrderBookUpdater metadata
         self.updates_processed += 1;
         self.prev_change_id = self.change_id;
         self.change_id = update.params.data.change_id;

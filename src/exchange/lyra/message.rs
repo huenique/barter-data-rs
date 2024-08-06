@@ -47,7 +47,7 @@ pub struct Stats {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct InstrumentTicker {
+pub struct LyraInstrumentTicker {
     pub instrument_type: String,
     pub instrument_name: String,
     pub scheduled_activation: i64,
@@ -106,7 +106,7 @@ pub struct InstrumentTicker {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Data {
     pub timestamp: i64,
-    pub instrument_ticker: InstrumentTicker,
+    pub instrument_ticker: LyraInstrumentTicker,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

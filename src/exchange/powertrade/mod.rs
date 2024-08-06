@@ -5,12 +5,6 @@ pub mod message;
 pub mod subscription;
 pub mod ticker;
 
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use url::Url;
-
 use crate::exchange::powertrade::book::l3::PowerTradeOrderBookL3;
 use crate::exchange::powertrade::channel::PowerTradeChannel;
 use crate::exchange::powertrade::market::PowerTradeMarket;
@@ -25,7 +19,14 @@ use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::book::OrderBooksL3;
 use crate::subscription::ticker::Tickers;
 use crate::transformer::stateless::StatelessTransformer;
+use crate::transformer::ticker::MultiTickerTransformer;
 use crate::ExchangeWsStream;
+
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use url::Url;
 
 /// <https://power-trade.github.io/api-docs-source/ws_feeds.html#Market_Feeds_Connection_Parameters>
 pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data?type[]=all&mbp_period=1&mbo_period=0&snapshot_depth=100";
@@ -67,5 +68,5 @@ impl StreamSelector<OrderBooksL3> for PowerTrade {
 }
 
 impl StreamSelector<Tickers> for PowerTrade {
-    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, PowerTradeTicker>>;
+    type Stream = ExchangeWsStream<MultiTickerTransformer<Self, Tickers, PowerTradeTicker>>;
 }

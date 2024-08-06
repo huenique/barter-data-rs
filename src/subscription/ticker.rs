@@ -1,5 +1,11 @@
+use crate::event::MarketIter;
+use crate::subscription::Instrument;
+use crate::ExchangeId;
+use crate::MarketEvent;
 use crate::SubKind;
 
+use chrono::TimeZone;
+use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -34,7 +40,6 @@ pub struct Ticker {
     pub index_price: f64,
 }
 
-/// Greeks data for options.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
 pub struct Greeks {
     pub delta: Option<f64>,
@@ -42,4 +47,26 @@ pub struct Greeks {
     pub theta: Option<f64>,
     pub vega: Option<f64>,
     pub rho: Option<f64>,
+}
+
+impl Eq for Ticker {}
+
+impl Ord for Ticker {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.instrument_name
+            .cmp(&other.instrument_name)
+            .then_with(|| self.timestamp.cmp(&other.timestamp))
+    }
+}
+
+impl From<(ExchangeId, Instrument, Ticker)> for MarketIter<Ticker> {
+    fn from((exchange_id, instrument, ticker): (ExchangeId, Instrument, Ticker)) -> Self {
+        Self(vec![Ok(MarketEvent {
+            exchange_time: Utc.timestamp_nanos(ticker.timestamp),
+            received_time: Utc::now(),
+            exchange: exchange_id.into(),
+            instrument,
+            kind: ticker,
+        })])
+    }
 }

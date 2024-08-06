@@ -1,6 +1,6 @@
 use crate::event::MarketIter;
 use crate::exchange::lyra::channel::LyraChannel;
-use crate::exchange::lyra::message::InstrumentTicker;
+use crate::exchange::lyra::message::LyraInstrumentTicker;
 use crate::exchange::lyra::message::Message;
 use crate::exchange::subscription::ExchangeSub;
 use crate::exchange::Instrument;
@@ -42,8 +42,8 @@ impl From<(ExchangeId, Instrument, LyraTicker)> for MarketIter<Ticker> {
     }
 }
 
-impl From<InstrumentTicker> for Ticker {
-    fn from(data: InstrumentTicker) -> Self {
+impl From<LyraInstrumentTicker> for Ticker {
+    fn from(data: LyraInstrumentTicker) -> Self {
         Ticker {
             instrument_name: data.instrument_name,
             best_bid_price: data.best_bid_price,

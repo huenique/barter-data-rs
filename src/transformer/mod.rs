@@ -2,6 +2,7 @@ use crate::error::DataError;
 use crate::event::MarketEvent;
 use crate::subscription::Map;
 use crate::subscription::SubKind;
+
 use async_trait::async_trait;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::protocol::websocket::WsMessage;
@@ -14,6 +15,9 @@ pub mod book;
 /// Generic stateless [`ExchangeTransformer`] often used for transforming
 /// [`PublicTrades`](crate::subscription::trade::PublicTrades) streams.
 pub mod stateless;
+
+/// Generic Ticker [`ExchangeTransformer`]s.
+pub mod ticker;
 
 /// Defines how to construct a [`Transformer`] used by [`MarketStream`](super::MarketStream)s to
 /// translate exchange specific types to normalised Barter types.

@@ -2,15 +2,20 @@ use barter_integration::error::SocketError;
 use barter_integration::Validator;
 use serde::Deserialize;
 use serde::Serialize;
+use serde_json::Value;
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(untagged)]
 pub enum PowerTradeSubResponse {
-    #[serde(rename = "subscribed")]
-    Subscribed(Subscribed),
-    #[serde(rename = "subscribe_error")]
-    Error(SubscribeError),
-    #[serde(other)]
-    Unknown,
+    Subscribed {
+        #[serde(rename = "subscribed")]
+        subscribed: Subscribed,
+    },
+    Error {
+        #[serde(rename = "subscribe_error")]
+        error: SubscribeError,
+    },
+    Unknown(Value),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -30,12 +35,12 @@ impl Validator for PowerTradeSubResponse {
         Self: Sized,
     {
         match self {
-            PowerTradeSubResponse::Subscribed(_) => Ok(self),
-            PowerTradeSubResponse::Error(failure) => Err(SocketError::Subscribe(format!(
+            PowerTradeSubResponse::Subscribed { .. } => Ok(self),
+            PowerTradeSubResponse::Error { error } => Err(SocketError::Subscribe(format!(
                 "received failure subscription response with message: {}",
-                failure.message,
+                error.message,
             ))),
-            PowerTradeSubResponse::Unknown => Ok(self),
+            PowerTradeSubResponse::Unknown(_) => Ok(self),
         }
     }
 }

@@ -25,27 +25,40 @@ use serde::Deserialize;
 use serde::Serialize;
 
 #[derive(Debug, Deserialize, Serialize)]
-#[serde(tag = "type", content = "data")]
+#[serde(untagged)] // Use untagged to handle different structures without requiring a specific tag
 pub enum PowerTradeTicker {
-    #[serde(rename = "deliverable")]
-    DeliverableData(Deliverable<ProductType>),
-    #[serde(rename = "top_of_book")]
-    BestBidAsk(TopOfBook),
-    #[serde(rename = "funding_rate")]
-    MarkPrice(FundingRate),
-    #[serde(rename = "rte_trade")]
-    Trade(RteTrade),
-    #[serde(rename = "rte_last_trade_price")]
-    LastTradePrice(LastTradePrice),
-    #[serde(rename = "risk_snapshot")]
-    Greeks(RiskSnapshot),
+    DeliverableData {
+        #[serde(rename = "deliverable")]
+        deliverable: Deliverable<ProductType>,
+    },
+    BestBidAsk {
+        #[serde(rename = "top_of_book")]
+        best_bid_ask: TopOfBook,
+    },
+    MarkPrice {
+        #[serde(rename = "funding_rate")]
+        mark_price: FundingRate,
+    },
+    Trade {
+        #[serde(rename = "rte_trade")]
+        trade: RteTrade,
+    },
+    LastTradePrice {
+        #[serde(rename = "rte_last_trade_price")]
+        last_trade_price: LastTradePrice,
+    },
+    Greeks {
+        #[serde(rename = "risk_snapshot")]
+        greeks: RiskSnapshot,
+    },
+    Unknown(serde_json::Value),
 }
 
 impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
     fn id(&self) -> Option<SubscriptionId> {
         match self {
-            PowerTradeTicker::DeliverableData(data) => {
-                Some(ExchangeSub::from((PowerTradeChannel::TICKER, &data.symbol)).id())
+            PowerTradeTicker::DeliverableData { deliverable } => {
+                Some(ExchangeSub::from((PowerTradeChannel::TICKER, &deliverable.symbol)).id())
             }
             _ => None,
         }
@@ -57,8 +70,7 @@ impl From<(ExchangeId, Instrument, PowerTradeTicker)> for MarketIter<Ticker> {
         let kind: Ticker = ticker.into();
 
         Self(vec![Ok(MarketEvent {
-            exchange_time: DateTime::from_timestamp_millis(kind.timestamp)
-                .expect("Invalid timestamp"),
+            exchange_time: DateTime::from_timestamp_nanos(kind.timestamp),
             received_time: Utc::now(),
             exchange: exchange_id.into(),
             instrument,
@@ -90,12 +102,25 @@ impl Aggregator {
 
     pub fn process_message(&mut self, message: PowerTradeTicker) {
         match message {
-            PowerTradeTicker::DeliverableData(data) => self.process_deliverable_data(data),
-            PowerTradeTicker::BestBidAsk(data) => self.process_best_bid_ask(data),
-            PowerTradeTicker::MarkPrice(data) => self.process_mark_price(data),
-            PowerTradeTicker::Trade(data) => self.process_trade(data),
-            PowerTradeTicker::LastTradePrice(data) => self.process_last_trade_price(data),
-            PowerTradeTicker::Greeks(data) => self.process_greeks(data),
+            PowerTradeTicker::DeliverableData { deliverable } => {
+                self.process_deliverable_data(deliverable);
+            }
+            PowerTradeTicker::BestBidAsk { best_bid_ask } => {
+                self.process_best_bid_ask(best_bid_ask);
+            }
+            PowerTradeTicker::MarkPrice { mark_price } => {
+                self.process_mark_price(mark_price);
+            }
+            PowerTradeTicker::Trade { trade } => {
+                self.process_trade(trade);
+            }
+            PowerTradeTicker::LastTradePrice { last_trade_price } => {
+                self.process_last_trade_price(last_trade_price);
+            }
+            PowerTradeTicker::Greeks { greeks } => {
+                self.process_greeks(greeks);
+            }
+            PowerTradeTicker::Unknown(_) => {}
         }
     }
 
@@ -144,7 +169,7 @@ impl Aggregator {
             ProductType::Perpetual => {
                 // ticker.instrument_name = data.symbol;
             }
-            ProductType::Unknown => {}
+            _ => {}
         }
 
         ticker.interest_rate = None;

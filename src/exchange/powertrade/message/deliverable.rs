@@ -3,7 +3,6 @@ use crate::exchange::powertrade::message::products::option::OptionDetails;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// https://power-trade.github.io/api-docs-source/ws_feeds.html#deliverable
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Response<Details> {
     pub deliverable: Deliverable<Details>,
@@ -20,6 +19,7 @@ pub struct Deliverable<Details> {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(untagged)]
 pub enum ProductType {
     #[serde(rename = "spot")]
     Spot,
@@ -29,6 +29,5 @@ pub enum ProductType {
     Option(OptionDetails),
     #[serde(rename = "perpetual")]
     Perpetual,
-    #[serde(other)]
-    Unknown,
+    Unknown(serde_json::Value),
 }

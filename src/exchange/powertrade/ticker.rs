@@ -1,6 +1,3 @@
-use std::marker::PhantomData;
-use std::str::FromStr;
-
 use crate::error::DataError;
 use crate::event::MarketEvent;
 use crate::event::MarketIter;
@@ -8,28 +5,24 @@ use crate::exchange::powertrade::channel::PowerTradeChannel;
 use crate::exchange::powertrade::message::deliverable::Deliverable;
 use crate::exchange::powertrade::message::deliverable::ProductType;
 use crate::exchange::powertrade::message::funding_rate::FundingRate;
+use crate::exchange::powertrade::message::last_trade_price::LastTradePrice;
 use crate::exchange::powertrade::message::products::option::RiskSnapshot;
-use crate::exchange::powertrade::message::rte_last_trade_price::LastTradePrice;
+use crate::exchange::powertrade::message::rte_last_trade_price::RteLastTradePrice;
 use crate::exchange::powertrade::message::rte_trade::RteTrade;
 use crate::exchange::powertrade::message::top_of_book::TopOfBook;
-use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
 use crate::exchange::SocketError;
 use crate::subscription::ticker::Greeks;
 use crate::subscription::ticker::Ticker;
-use crate::subscription::Map;
-use crate::subscription::SubKind;
 use crate::transformer::ticker::InstrumentTicker;
 use crate::transformer::ticker::TickerUpdater;
-use crate::transformer::ExchangeTransformer;
 use crate::Identifier;
 
 use async_trait::async_trait;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::SubscriptionId;
 use barter_integration::protocol::websocket::WsMessage;
-use barter_integration::Transformer;
 use chrono::TimeZone;
 use chrono::Utc;
 use serde::de::Error;
@@ -57,8 +50,12 @@ pub enum PowerTradeTicker {
         trade: RteTrade,
     },
     LastTradePrice {
-        #[serde(rename = "rte_last_trade_price")]
+        #[serde(rename = "last_trade_price")]
         last_trade_price: LastTradePrice,
+    },
+    RteLastTradePrice {
+        #[serde(rename = "rte_last_trade_price")]
+        rte_last_trade_price: RteLastTradePrice,
     },
     Greeks {
         #[serde(rename = "risk_snapshot")]
@@ -100,6 +97,11 @@ impl From<PowerTradeTicker> for Ticker {
     }
 }
 
+enum LTPrice {
+    LastTradePrice(LastTradePrice),
+    RteLastTradePrice(RteLastTradePrice),
+}
+
 #[derive(Debug, Default)]
 pub struct PowerTradeTickerAggregator {
     ticker: Ticker,
@@ -127,7 +129,12 @@ impl PowerTradeTickerAggregator {
                 self.process_trade(trade);
             }
             PowerTradeTicker::LastTradePrice { last_trade_price } => {
-                self.process_last_trade_price(last_trade_price);
+                self.process_last_trade_price(LTPrice::LastTradePrice(last_trade_price));
+            }
+            PowerTradeTicker::RteLastTradePrice {
+                rte_last_trade_price,
+            } => {
+                self.process_last_trade_price(LTPrice::RteLastTradePrice(rte_last_trade_price));
             }
             PowerTradeTicker::Greeks { greeks } => {
                 self.process_greeks(greeks);
@@ -138,21 +145,15 @@ impl PowerTradeTickerAggregator {
 
     fn process_deliverable_data(&mut self, data: Deliverable<ProductType>) {
         match data.details {
-            ProductType::Spot => {
-                // ticker.instrument_name = data.symbol;
-            }
-            ProductType::Future => {
-                // ticker.instrument_name = data.symbol;
-            }
+            ProductType::Spot => {}
+            ProductType::Future => {}
             ProductType::Option(option) => {
                 let option = option.option;
                 self.ticker.instrument_name = data.symbol;
                 self.ticker.open_interest = option.contract_size;
                 self.ticker.state = data.listing_status;
             }
-            ProductType::Perpetual => {
-                // ticker.instrument_name = data.symbol;
-            }
+            ProductType::Perpetual => {}
             _ => {}
         }
 
@@ -162,16 +163,22 @@ impl PowerTradeTickerAggregator {
     }
 
     fn process_best_bid_ask(&mut self, data: TopOfBook) {
-        self.ticker.timestamp =
-            i64::from_str(&data.timestamp).expect("Failed to parse timestamp string");
-        self.ticker.best_bid_price = data.buy_price;
-        self.ticker.best_ask_price = data.sell_price;
-        self.ticker.best_bid_amount = data.buy_quantity;
-        self.ticker.best_ask_amount = data.sell_quantity;
+        self.ticker.timestamp = data.timestamp;
+        self.ticker.best_bid_price = data.buy_price.unwrap_or_default();
+        self.ticker.best_ask_price = data.sell_price.unwrap_or_default();
+        self.ticker.best_bid_amount = data.buy_quantity.unwrap_or_default();
+        self.ticker.best_ask_amount = data.sell_quantity.unwrap_or_default();
     }
 
-    fn process_last_trade_price(&mut self, data: LastTradePrice) {
-        self.ticker.last_price = data.price;
+    fn process_last_trade_price(&mut self, data: LTPrice) {
+        match data {
+            LTPrice::LastTradePrice(data) => {
+                self.ticker.last_price = data.price;
+            }
+            LTPrice::RteLastTradePrice(data) => {
+                self.ticker.last_price = data.price;
+            }
+        }
     }
 
     fn process_trade(&mut self, data: RteTrade) {
@@ -262,86 +269,5 @@ impl TickerUpdater for PowerTradeTicker {
         })?;
 
         Ok(Some(ticker.clone()))
-    }
-}
-
-#[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
-pub struct MultiTickerTransformer<Exchange, Kind, Updater> {
-    pub ticker_map: Map<InstrumentTicker<Updater>>,
-    phantom: PhantomData<(Exchange, Kind)>,
-}
-
-#[async_trait]
-impl<Exchange, Kind, Updater> ExchangeTransformer<Exchange, Kind>
-    for MultiTickerTransformer<Exchange, Kind, Updater>
-where
-    Exchange: Connector + Send,
-    Kind: SubKind<Event = Ticker> + Send,
-    Updater: TickerUpdater<Ticker = Kind::Event> + Send,
-    Updater::Update: Identifier<Option<SubscriptionId>> + for<'de> Deserialize<'de>,
-{
-    async fn new(
-        ws_sink_tx: mpsc::UnboundedSender<WsMessage>,
-        map: Map<Instrument>,
-    ) -> Result<Self, DataError> {
-        let (sub_ids, init_ticker_requests): (Vec<_>, Vec<_>) = map
-            .0
-            .into_iter()
-            .map(|(sub_id, instrument)| (sub_id, Updater::init(ws_sink_tx.clone(), instrument)))
-            .unzip();
-
-        let init_tickers = futures::future::join_all(init_ticker_requests)
-            .await
-            .into_iter()
-            .collect::<Result<Vec<InstrumentTicker<Updater>>, DataError>>()?;
-
-        let ticker_map = sub_ids
-            .into_iter()
-            .zip(init_tickers.into_iter())
-            .collect::<Map<InstrumentTicker<Updater>>>();
-
-        Ok(Self {
-            ticker_map,
-            phantom: PhantomData,
-        })
-    }
-}
-
-impl<Exchange, Kind, Updater> Transformer for MultiTickerTransformer<Exchange, Kind, Updater>
-where
-    Exchange: Connector,
-    Kind: SubKind<Event = Ticker>,
-    Updater: TickerUpdater<Ticker = Kind::Event>,
-    Updater::Update: Identifier<Option<SubscriptionId>> + for<'de> Deserialize<'de>,
-{
-    type Error = DataError;
-    type Input = Updater::Update;
-    type Output = MarketEvent<Kind::Event>;
-    type OutputIter = Vec<Result<Self::Output, Self::Error>>;
-
-    fn transform(&mut self, update: Self::Input) -> Self::OutputIter {
-        let subscription_id = match update.id() {
-            Some(subscription_id) => subscription_id,
-            None => return vec![],
-        };
-
-        let ticker = match self.ticker_map.find_mut(&subscription_id) {
-            Ok(ticker) => ticker,
-            Err(unidentifiable) => return vec![Err(DataError::Socket(unidentifiable))],
-        };
-
-        let InstrumentTicker {
-            instrument,
-            ticker,
-            updater,
-        } = ticker;
-
-        match updater.update(ticker, update) {
-            Ok(Some(ticker)) => {
-                MarketIter::<Ticker>::from((Exchange::ID, instrument.clone(), ticker)).0
-            }
-            Ok(None) => vec![],
-            Err(error) => vec![Err(error)],
-        }
     }
 }

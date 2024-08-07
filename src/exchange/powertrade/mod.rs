@@ -29,7 +29,7 @@ use barter_macro::SerExchange;
 use url::Url;
 
 /// <https://power-trade.github.io/api-docs-source/ws_feeds.html#Market_Feeds_Connection_Parameters>
-pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data?type[]=all&mbp_period=1&mbo_period=0&snapshot_depth=100";
+pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data?type[]=all_rte,deliverable,funding_rate,last_trade_price,risk&mbp_period=1&mbo_period=0&snapshot_depth=100";
 
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange)]
 pub struct PowerTrade {
@@ -52,12 +52,14 @@ impl Connector for PowerTrade {
         exchange_subs
             .into_iter()
             .map(|sub| {
-                let subscribe = serde_json::json!({
-                    "subscribe": {
-                        "symbol": sub.market.as_ref(),
-                    },
-                });
-                WsMessage::Text(subscribe.to_string())
+                WsMessage::Text(
+                    serde_json::json!({
+                        "subscribe": {
+                            "symbol": sub.market.as_ref(),
+                        },
+                    })
+                    .to_string(),
+                )
             })
             .collect()
     }

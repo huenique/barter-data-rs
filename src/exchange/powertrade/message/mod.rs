@@ -1,5 +1,6 @@
 pub mod deliverable;
 pub mod funding_rate;
+pub mod last_trade_price;
 pub mod pb_snapshot;
 pub mod products;
 pub mod risk_snapshot;

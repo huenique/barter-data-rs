@@ -57,37 +57,57 @@ pub struct Response {
     pub risk_snapshot: RiskSnapshot,
 }
 
+// Struct definitions
 #[derive(Clone, Default, Serialize, Deserialize, Debug)]
 pub struct RiskSnapshot {
     pub symbol: String,
     pub tradeable_entity_id: String,
     pub market_id: String,
-    pub timestamp: String,
-    pub time_to_expire: String,
+    #[serde(deserialize_with = "de::de_str_to_i64")]
+    pub timestamp: i64,
+    pub time_to_expire: f64,
     pub theoretical: Option<PriceDetail>,
     pub mid: Option<PriceDetail>,
     pub bid: Option<PriceDetail>,
     pub ask: Option<PriceDetail>,
 }
 
-#[derive(Clone, Default, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Default, Serialize, Deserialize, Debug)]
 pub struct PriceDetail {
-    pub price: String,
-    #[serde(deserialize_with = "barter_integration::de::de_str")]
+    pub price: f64,
     pub volatility: f64,
     pub greeks: Greeks,
 }
 
 #[derive(Copy, Clone, Default, Serialize, Deserialize, Debug)]
 pub struct Greeks {
-    #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub delta: f64,
-    #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub vega: f64,
-    #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub theta: f64,
-    #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub rho: f64,
-    #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub gamma: f64,
+}
+
+pub mod de {
+    use serde::Deserialize;
+    use serde::Deserializer;
+    use serde::{self};
+
+    pub fn de_str<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+    where
+        D: Deserializer<'de>,
+        T: std::str::FromStr,
+        T::Err: std::fmt::Display,
+    {
+        let s = String::deserialize(deserializer)?;
+        s.parse::<T>().map_err(serde::de::Error::custom)
+    }
+
+    pub fn de_str_to_i64<'de, D>(deserializer: D) -> Result<i64, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        s.parse::<i64>().map_err(serde::de::Error::custom)
+    }
 }

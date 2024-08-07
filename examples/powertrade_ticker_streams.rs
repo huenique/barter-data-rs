@@ -21,7 +21,7 @@ async fn main() {
             "btc",
             "usd",
             InstrumentKind::Option(OptionContract {
-                kind: OptionKind::Call,
+                kind: OptionKind::Put,
                 exercise: OptionExercise::European,
                 expiry: Utc.timestamp_millis_opt(1724976000000).unwrap(),
                 strike: rust_decimal_macros::dec!(65000),
@@ -46,7 +46,7 @@ fn init_logging() {
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::filter::EnvFilter::builder()
-                .with_default_directive(tracing_subscriber::filter::LevelFilter::INFO.into())
+                .with_default_directive(tracing_subscriber::filter::LevelFilter::DEBUG.into())
                 .from_env_lossy(),
         )
         .with_ansi(cfg!(debug_assertions))

@@ -1,5 +1,5 @@
-use super::AevoLevel;
 use crate::error::DataError;
+use crate::exchange::aevo::book::AevoLevel;
 use crate::exchange::aevo::channel::AevoChannel;
 use crate::exchange::aevo::message::AevoMessage;
 use crate::exchange::subscription::ExchangeSub;
@@ -9,6 +9,7 @@ use crate::subscription::book::OrderBookSide;
 use crate::transformer::book::InstrumentOrderBook;
 use crate::transformer::book::OrderBookUpdater;
 use crate::Identifier;
+
 use async_trait::async_trait;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Side;

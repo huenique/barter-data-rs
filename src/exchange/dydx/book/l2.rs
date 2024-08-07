@@ -24,23 +24,23 @@ use serde::Deserialize;
 use serde::Serialize;
 use tokio::sync::mpsc::UnboundedSender;
 
-pub type DydxOrderBookL3 = DydxMessage;
+pub type DydxOrderBookL2 = DydxMessage;
 
-impl Identifier<Option<SubscriptionId>> for DydxOrderBookL3 {
+impl Identifier<Option<SubscriptionId>> for DydxOrderBookL2 {
     fn id(&self) -> Option<SubscriptionId> {
         match self {
             DydxMessage::Subscribed(SubscribedMessage { id, .. })
             | DydxMessage::ChannelData(ChannelDataMessage { id, .. }) => {
                 let instrument_name = id.clone();
-                Some(ExchangeSub::from((DydxChannel::ORDER_BOOK_L3, &instrument_name)).id())
+                Some(ExchangeSub::from((DydxChannel::ORDER_BOOK_L2, &instrument_name)).id())
             }
             _ => None,
         }
     }
 }
 
-impl From<DydxOrderBookL3> for OrderBook {
-    fn from(snapshot: DydxOrderBookL3) -> Self {
+impl From<DydxOrderBookL2> for OrderBook {
+    fn from(snapshot: DydxOrderBookL2) -> Self {
         match snapshot {
             DydxMessage::ChannelData(ChannelDataMessage {
                 contents: ChannelDataMessageContents { bids, asks },
@@ -98,7 +98,7 @@ impl DydxOrderBookUpdater {
 #[async_trait]
 impl OrderBookUpdater for DydxOrderBookUpdater {
     type OrderBook = OrderBook;
-    type Update = DydxOrderBookL3;
+    type Update = DydxOrderBookL2;
 
     async fn init<Exchange, Kind>(
         _: UnboundedSender<WsMessage>,
@@ -112,7 +112,7 @@ impl OrderBookUpdater for DydxOrderBookUpdater {
         Ok(InstrumentOrderBook {
             instrument,
             updater: Self::new(0),
-            book: OrderBook::from(DydxOrderBookL3::Subscribed(SubscribedMessage {
+            book: OrderBook::from(DydxOrderBookL2::Subscribed(SubscribedMessage {
                 message_type: String::new(),
                 connection_id: String::new(),
                 message_id: 0,

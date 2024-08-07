@@ -4,7 +4,7 @@ pub mod market;
 pub mod message;
 pub mod subscription;
 
-use crate::exchange::dydx::book::l3::DydxOrderBookUpdater;
+use crate::exchange::dydx::book::l2::DydxOrderBookUpdater;
 use crate::exchange::dydx::channel::DydxChannel;
 use crate::exchange::dydx::market::DydxMarket;
 use crate::exchange::dydx::subscription::DydxSubResponse;
@@ -14,7 +14,7 @@ use crate::exchange::ExchangeSub;
 use crate::exchange::StreamSelector;
 use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
-use crate::subscription::book::OrderBooksL3;
+use crate::subscription::book::OrderBooksL2;
 use crate::transformer::book::MultiBookTransformer;
 use crate::ExchangeWsStream;
 
@@ -61,6 +61,6 @@ impl Connector for Dydx {
     }
 }
 
-impl StreamSelector<OrderBooksL3> for Dydx {
-    type Stream = ExchangeWsStream<MultiBookTransformer<Self, OrderBooksL3, DydxOrderBookUpdater>>;
+impl StreamSelector<OrderBooksL2> for Dydx {
+    type Stream = ExchangeWsStream<MultiBookTransformer<Self, OrderBooksL2, DydxOrderBookUpdater>>;
 }

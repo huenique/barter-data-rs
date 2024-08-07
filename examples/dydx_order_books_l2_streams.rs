@@ -1,7 +1,7 @@
 use barter_data::exchange::dydx::Dydx;
 use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
-use barter_data::subscription::book::OrderBooksL3;
+use barter_data::subscription::book::OrderBooksL2;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use tracing::info;
 
@@ -10,9 +10,9 @@ use tracing::info;
 async fn main() {
     init_logging();
 
-    let mut streams = Streams::<OrderBooksL3>::builder()
+    let mut streams = Streams::<OrderBooksL2>::builder()
         .subscribe([
-            (Dydx::default(), "eth", "usd", InstrumentKind::Perpetual, OrderBooksL3),
+            (Dydx::default(), "eth", "usd", InstrumentKind::Perpetual, OrderBooksL2),
         ])
 
         .init()

@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::marker::PhantomData;
 
 use crate::error::DataError;
@@ -39,7 +40,7 @@ where
     ) -> Result<Option<Self::Ticker>, DataError>;
 }
 
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub struct InstrumentTicker<Updater> {
     pub instrument: Instrument,
     pub updater: Updater,
@@ -49,8 +50,14 @@ pub struct InstrumentTicker<Updater> {
 impl<Updater: PartialEq> Eq for InstrumentTicker<Updater> {}
 
 impl<Updater: PartialEq + PartialOrd> Ord for InstrumentTicker<Updater> {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         self.ticker.cmp(&other.ticker)
+    }
+}
+
+impl<Updater: PartialEq + PartialOrd> PartialOrd for InstrumentTicker<Updater> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 

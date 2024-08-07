@@ -26,7 +26,7 @@ pub enum ProductType {
     #[serde(rename = "future")]
     Future,
     #[serde(rename = "option")]
-    Option(OptionDetails),
+    Option(Box<OptionDetails>),
     #[serde(rename = "perpetual")]
     Perpetual,
     Unknown(serde_json::Value),

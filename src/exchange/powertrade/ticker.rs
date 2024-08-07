@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::str::FromStr;
 
@@ -33,6 +32,7 @@ use barter_integration::protocol::websocket::WsMessage;
 use barter_integration::Transformer;
 use chrono::TimeZone;
 use chrono::Utc;
+use serde::de::Error;
 use serde::Deserialize;
 use serde::Serialize;
 use tokio::sync::mpsc;
@@ -94,22 +94,21 @@ impl From<(ExchangeId, Instrument, PowerTradeTicker)> for MarketIter<Ticker> {
 
 impl From<PowerTradeTicker> for Ticker {
     fn from(data: PowerTradeTicker) -> Self {
-        let mut aggregate = Aggregator::new();
+        let mut aggregate = PowerTradeTickerAggregator::new();
         aggregate.process_message(data);
-        let ticker = aggregate.tickers.values().next().unwrap();
-        ticker.clone()
+        aggregate.ticker.clone()
     }
 }
 
 #[derive(Debug, Default)]
-pub struct Aggregator {
-    tickers: HashMap<String, Ticker>,
+pub struct PowerTradeTickerAggregator {
+    ticker: Ticker,
 }
 
-impl Aggregator {
+impl PowerTradeTickerAggregator {
     pub fn new() -> Self {
         Self {
-            tickers: HashMap::new(),
+            ticker: Ticker::default(),
         }
     }
 
@@ -137,35 +136,7 @@ impl Aggregator {
         }
     }
 
-    fn initialize_ticker(&mut self, symbol: String) -> &mut Ticker {
-        self.tickers
-            .entry(symbol.clone())
-            .or_insert_with(|| Ticker {
-                instrument_name: symbol.clone(),
-                best_bid_price: 0.0,
-                best_ask_price: 0.0,
-                best_bid_amount: 0.0,
-                best_ask_amount: 0.0,
-                mark_price: 0.0,
-                last_price: 0.0,
-                open_interest: 0.0,
-                greeks: None,
-                timestamp: Utc::now().timestamp_nanos_opt().unwrap_or_default(),
-                interest_rate: None,
-                mark_iv: None,
-                delivery_price: None,
-                current_funding: None,
-                interest_value: None,
-                ask_iv: None,
-                bid_iv: None,
-                index_price: 0.0,
-                state: String::new(),
-            })
-    }
-
     fn process_deliverable_data(&mut self, data: Deliverable<ProductType>) {
-        let ticker = self.initialize_ticker(data.symbol.clone());
-
         match data.details {
             ProductType::Spot => {
                 // ticker.instrument_name = data.symbol;
@@ -175,9 +146,9 @@ impl Aggregator {
             }
             ProductType::Option(option) => {
                 let option = option.option;
-                ticker.instrument_name = data.symbol;
-                ticker.open_interest = option.contract_size;
-                ticker.state = data.listing_status;
+                self.ticker.instrument_name = data.symbol;
+                self.ticker.open_interest = option.contract_size;
+                self.ticker.state = data.listing_status;
             }
             ProductType::Perpetual => {
                 // ticker.instrument_name = data.symbol;
@@ -185,55 +156,44 @@ impl Aggregator {
             _ => {}
         }
 
-        ticker.interest_rate = None;
-        ticker.mark_iv = None;
-        ticker.interest_value = None;
+        self.ticker.interest_rate = None;
+        self.ticker.mark_iv = None;
+        self.ticker.interest_value = None;
     }
 
     fn process_best_bid_ask(&mut self, data: TopOfBook) {
-        let ticker = self.initialize_ticker(data.tradeable_entity_id.clone());
-
-        ticker.timestamp =
+        self.ticker.timestamp =
             i64::from_str(&data.timestamp).expect("Failed to parse timestamp string");
-        ticker.best_bid_price = data.buy_price;
-        ticker.best_ask_price = data.sell_price;
-        ticker.best_bid_amount = data.buy_quantity;
-        ticker.best_ask_amount = data.sell_quantity;
+        self.ticker.best_bid_price = data.buy_price;
+        self.ticker.best_ask_price = data.sell_price;
+        self.ticker.best_bid_amount = data.buy_quantity;
+        self.ticker.best_ask_amount = data.sell_quantity;
     }
 
     fn process_last_trade_price(&mut self, data: LastTradePrice) {
-        let ticker = self.initialize_ticker(data.tradeable_entity_id.clone());
-        ticker.last_price = data.price;
+        self.ticker.last_price = data.price;
     }
 
     fn process_trade(&mut self, data: RteTrade) {
-        let ticker = self.initialize_ticker(data.tradeable_entity_id.clone());
-        ticker.last_price = data.price;
+        self.ticker.last_price = data.price;
     }
 
     fn process_mark_price(&mut self, data: FundingRate) {
-        let ticker = self.initialize_ticker(data.tradeable_entity_id.clone());
-
-        ticker.mark_price = data.mark_price;
-        ticker.index_price = data.underlying_price;
-        ticker.delivery_price = Some(data.underlying_price);
+        self.ticker.mark_price = data.mark_price;
+        self.ticker.index_price = data.underlying_price;
+        self.ticker.delivery_price = Some(data.underlying_price);
     }
 
     fn process_greeks(&mut self, data: RiskSnapshot) {
         let greeks = data.theoretical.unwrap_or_default().greeks;
-        let ticker = self.initialize_ticker(data.tradeable_entity_id.clone());
 
-        ticker.greeks = Some(Greeks {
+        self.ticker.greeks = Some(Greeks {
             delta: Some(greeks.delta),
             gamma: Some(greeks.gamma),
             theta: Some(greeks.theta),
             vega: Some(greeks.vega),
             rho: Some(greeks.rho),
         });
-    }
-
-    pub fn get_ticker(&self, instrument_name: &str) -> Option<&Ticker> {
-        self.tickers.get(instrument_name)
     }
 }
 
@@ -260,7 +220,7 @@ impl TickerUpdater for PowerTradeTicker {
                 },
             },
             ticker: Ticker {
-                instrument_name: instrument.to_string(),
+                instrument_name: String::new(),
                 best_bid_price: 0.0,
                 best_ask_price: 0.0,
                 best_bid_amount: 0.0,
@@ -288,18 +248,19 @@ impl TickerUpdater for PowerTradeTicker {
         ticker: &mut Self::Ticker,
         update: Self::Update,
     ) -> Result<Option<Self::Ticker>, DataError> {
-        // Use the Aggregator to process the update
-        let mut aggregator = Aggregator::new();
+        let mut aggregator = PowerTradeTickerAggregator::new();
         aggregator.process_message(update);
 
-        let updated_ticker = aggregator
-            .tickers
-            .get(&ticker.instrument_name)
-            .cloned()
-            .ok_or(DataError::Socket(SocketError::Unidentifiable(
-                self.id().unwrap(),
-            )))?;
-        *ticker = updated_ticker;
+        let updated_ticker = aggregator.ticker;
+
+        let mut ticker = ticker.clone();
+        ticker.merge(&updated_ticker).map_err(|e| {
+            DataError::Socket(SocketError::Deserialise {
+                error: serde_json::Error::custom(format!("Failed to merge ticker: {e}")),
+                payload: updated_ticker.to_string(),
+            })
+        })?;
+
         Ok(Some(ticker.clone()))
     }
 }

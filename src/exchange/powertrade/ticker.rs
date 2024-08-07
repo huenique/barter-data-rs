@@ -12,7 +12,6 @@ use crate::exchange::powertrade::message::rte_trade::RteTrade;
 use crate::exchange::powertrade::message::top_of_book::TopOfBook;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
-use crate::exchange::SocketError;
 use crate::subscription::ticker::Greeks;
 use crate::subscription::ticker::Ticker;
 use crate::transformer::ticker::InstrumentTicker;
@@ -25,10 +24,10 @@ use barter_integration::model::SubscriptionId;
 use barter_integration::protocol::websocket::WsMessage;
 use chrono::TimeZone;
 use chrono::Utc;
-use serde::de::Error;
 use serde::Deserialize;
 use serde::Serialize;
 use tokio::sync::mpsc;
+use tracing::info;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
@@ -39,15 +38,15 @@ pub enum PowerTradeTicker {
     },
     BestBidAsk {
         #[serde(rename = "top_of_book")]
-        best_bid_ask: TopOfBook,
+        top_of_book: TopOfBook,
     },
     MarkPrice {
         #[serde(rename = "funding_rate")]
-        mark_price: FundingRate,
+        funding_rate: FundingRate,
     },
     Trade {
         #[serde(rename = "rte_trade")]
-        trade: RteTrade,
+        rte_trade: RteTrade,
     },
     LastTradePrice {
         #[serde(rename = "last_trade_price")]
@@ -59,18 +58,62 @@ pub enum PowerTradeTicker {
     },
     Greeks {
         #[serde(rename = "risk_snapshot")]
-        greeks: RiskSnapshot,
+        risk_snapshot: RiskSnapshot,
     },
     Unknown(serde_json::Value),
 }
 
 impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
     fn id(&self) -> Option<SubscriptionId> {
+        // TODO:
+        // * Since we can't use composite keys rn to use different identifiers for the same
+        // * instrument, we can try fetching the symbol using the tradeable_entity_id or vice
+        // * versa. We'd have to use a local data structure in this module to map the identifier to
+        // * the symbol.
         match self {
-            PowerTradeTicker::DeliverableData { deliverable } => {
-                Some(ExchangeSub::from((PowerTradeChannel::TICKER, &deliverable.symbol)).id())
-            }
-            _ => None,
+            PowerTradeTicker::DeliverableData { deliverable } => Some(
+                ExchangeSub::from((
+                    PowerTradeChannel::TICKER,
+                    match &deliverable.details {
+                        ProductType::Option(_) => deliverable.symbol.clone(),
+                        _ => String::new(),
+                    },
+                ))
+                .id(),
+            ),
+            PowerTradeTicker::BestBidAsk { top_of_book } => Some(
+                ExchangeSub::from((PowerTradeChannel::TICKER, &top_of_book.tradeable_entity_id))
+                    .id(),
+            ),
+            PowerTradeTicker::MarkPrice { funding_rate } => Some(
+                ExchangeSub::from((PowerTradeChannel::TICKER, &funding_rate.tradeable_entity_id))
+                    .id(),
+            ),
+            PowerTradeTicker::Trade { rte_trade } => Some(
+                ExchangeSub::from((PowerTradeChannel::TICKER, &rte_trade.tradeable_entity_id)).id(),
+            ),
+            PowerTradeTicker::LastTradePrice { last_trade_price } => Some(
+                ExchangeSub::from((
+                    PowerTradeChannel::TICKER,
+                    &last_trade_price.tradeable_entity_id,
+                ))
+                .id(),
+            ),
+            PowerTradeTicker::RteLastTradePrice {
+                rte_last_trade_price,
+            } => Some(
+                ExchangeSub::from((
+                    PowerTradeChannel::TICKER,
+                    &rte_last_trade_price.tradeable_entity_id,
+                ))
+                .id(),
+            ),
+            PowerTradeTicker::Greeks {
+                risk_snapshot: greeks,
+            } => Some(
+                ExchangeSub::from((PowerTradeChannel::TICKER, &greeks.tradeable_entity_id)).id(),
+            ),
+            PowerTradeTicker::Unknown(_) => None,
         }
     }
 }
@@ -119,13 +162,17 @@ impl PowerTradeTickerAggregator {
             PowerTradeTicker::DeliverableData { deliverable } => {
                 self.process_deliverable_data(deliverable);
             }
-            PowerTradeTicker::BestBidAsk { best_bid_ask } => {
+            PowerTradeTicker::BestBidAsk {
+                top_of_book: best_bid_ask,
+            } => {
                 self.process_best_bid_ask(best_bid_ask);
             }
-            PowerTradeTicker::MarkPrice { mark_price } => {
+            PowerTradeTicker::MarkPrice {
+                funding_rate: mark_price,
+            } => {
                 self.process_mark_price(mark_price);
             }
-            PowerTradeTicker::Trade { trade } => {
+            PowerTradeTicker::Trade { rte_trade: trade } => {
                 self.process_trade(trade);
             }
             PowerTradeTicker::LastTradePrice { last_trade_price } => {
@@ -136,7 +183,9 @@ impl PowerTradeTickerAggregator {
             } => {
                 self.process_last_trade_price(LTPrice::RteLastTradePrice(rte_last_trade_price));
             }
-            PowerTradeTicker::Greeks { greeks } => {
+            PowerTradeTicker::Greeks {
+                risk_snapshot: greeks,
+            } => {
                 self.process_greeks(greeks);
             }
             PowerTradeTicker::Unknown(_) => {}
@@ -255,18 +304,20 @@ impl TickerUpdater for PowerTradeTicker {
         ticker: &mut Self::Ticker,
         update: Self::Update,
     ) -> Result<Option<Self::Ticker>, DataError> {
-        let mut aggregator = PowerTradeTickerAggregator::new();
-        aggregator.process_message(update);
+        // let mut aggregator = PowerTradeTickerAggregator::new();
+        // aggregator.process_message(update);
 
-        let updated_ticker = aggregator.ticker;
+        info!("Updating ticker with {:?}", update);
 
-        let mut ticker = ticker.clone();
-        ticker.merge(&updated_ticker).map_err(|e| {
-            DataError::Socket(SocketError::Deserialise {
-                error: serde_json::Error::custom(format!("Failed to merge ticker: {e}")),
-                payload: updated_ticker.to_string(),
-            })
-        })?;
+        // let updated_ticker = aggregator.ticker;
+
+        // let mut ticker = ticker.clone();
+        // ticker.merge(&updated_ticker).map_err(|e| {
+        //     DataError::Socket(SocketError::Deserialise {
+        //         error: serde_json::Error::custom(format!("Failed to merge ticker: {e}")),
+        //         payload: updated_ticker.to_string(),
+        //     })
+        // })?;
 
         Ok(Some(ticker.clone()))
     }

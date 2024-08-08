@@ -1,52 +1,58 @@
-use self::channel::GateioChannel;
-use self::market::GateioMarket;
-use self::subscription::GateioSubResponse;
+use std::fmt::Debug;
+use std::marker::PhantomData;
+
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use serde_json::json;
+use url::Url;
+
+use crate::exchange::gateio::channel::GateioChannel;
+use crate::exchange::gateio::market::GateioMarket;
+use crate::exchange::gateio::subscription::GateioSubResponse;
 use crate::exchange::subscription::ExchangeSub;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeServer;
 use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use serde_json::json;
-use std::fmt::Debug;
-use std::marker::PhantomData;
-use url::Url;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific channel used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific channel used for generating [`Connector::requests`].
 pub mod channel;
 
-/// [`ExchangeServer`] and [`StreamSelector`](super::StreamSelector) implementations for
-/// [`GateioSpot`](spot::GateioSpot).
+/// [`ExchangeServer`] and [`StreamSelector`](super::StreamSelector)
+/// implementations for [`GateioSpot`](spot::GateioSpot).
 pub mod spot;
 
-/// [`ExchangeServer`] and [`StreamSelector`](super::StreamSelector) implementations for
-/// [`GateioFutureUsd`](perpetual::GateioFutureUsd) and
+/// [`ExchangeServer`] and [`StreamSelector`](super::StreamSelector)
+/// implementations for [`GateioFutureUsd`](perpetual::GateioFutureUsd) and
 /// [`GateioFutureBtc`](perpetual::GateioFutureBtc).
 pub mod future;
 
-/// [`ExchangeServer`] and [`StreamSelector`](super::StreamSelector) implementations for
-/// [`GateioPerpetualUsdt`](perpetual::GateioPerpetualsUsd) and
-/// [`GateioPerpetualBtc`](perpetual::GateioPerpetualsBtc).
+/// [`ExchangeServer`] and [`StreamSelector`](super::StreamSelector)
+/// implementations for [`GateioPerpetualUsdt`](perpetual::GateioPerpetualsUsd)
+/// and [`GateioPerpetualBtc`](perpetual::GateioPerpetualsBtc).
 pub mod perpetual;
 
-/// [`ExchangeServer`] and [`StreamSelector`](super::StreamSelector) implementations for
-/// [`GateioOptions`](option::GateioOptions)
+/// [`ExchangeServer`] and [`StreamSelector`](super::StreamSelector)
+/// implementations for [`GateioOptions`](option::GateioOptions)
 pub mod option;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific market used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific market used for generating [`Connector::requests`].
 pub mod market;
 
 /// Generic [`GateioMessage<T>`](message::GateioMessage) type common to
-/// [`GateioSpot`](spot::GateioSpot), [`GateioPerpetualUsdt`](perpetual::GateioPerpetualsUsd)
+/// [`GateioSpot`](spot::GateioSpot),
+/// [`GateioPerpetualUsdt`](perpetual::GateioPerpetualsUsd)
 /// and [`GateioPerpetualBtc`](perpetual::GateioPerpetualsBtc).
 pub mod message;
 
-/// [`Subscription`](crate::subscription::Subscription) response type and response
-/// [`Validator`](barter_integration) common to [`GateioSpot`](spot::GateioSpot),
+/// [`Subscription`](crate::subscription::Subscription) response type and
+/// response [`Validator`](barter_integration) common to
+/// [`GateioSpot`](spot::GateioSpot),
 /// [`GateioPerpetualUsdt`](perpetual::GateioPerpetualsUsd) and
 /// [`GateioPerpetualBtc`](perpetual::GateioPerpetualsBtc).
 pub mod subscription;
@@ -54,10 +60,11 @@ pub mod subscription;
 /// Generic [`Gateio<Server>`](Gateio) exchange.
 ///
 /// ### Notes
-/// A `Server` [`ExchangeServer`](super::ExchangeServer) implementations exists for
-/// [`GateioSpot`](spot::GateioSpot), [`GateioPerpetualUsdt`](perpetual::GateioPerpetualsUsd) and
+/// A `Server` [`ExchangeServer`](super::ExchangeServer) implementations exists
+/// for [`GateioSpot`](spot::GateioSpot),
+/// [`GateioPerpetualUsdt`](perpetual::GateioPerpetualsUsd) and
 /// [`GateioPerpetualBtc`](perpetual::GateioPerpetualsBtc).
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Gateio<Server> {
     server: PhantomData<Server>,
 }

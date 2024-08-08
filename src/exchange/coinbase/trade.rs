@@ -1,10 +1,3 @@
-use super::CoinbaseChannel;
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::exchange::ExchangeSub;
-use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
@@ -13,6 +6,14 @@ use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::coinbase::CoinbaseChannel;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
 
 /// Coinbase real-time trade WebSocket message.
 ///
@@ -33,7 +34,7 @@ use serde::Serialize;
 ///     "side": "sell"
 /// }
 /// ```
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct CoinbaseTrade {
     #[serde(alias = "product_id", deserialize_with = "de_trade_subscription_id")]
     pub subscription_id: SubscriptionId,
@@ -70,8 +71,8 @@ impl From<(ExchangeId, Instrument, CoinbaseTrade)> for MarketIter<PublicTrade> {
     }
 }
 
-/// Deserialize a [`CoinbaseTrade`] "product_id" (eg/ "BTC-USD") as the associated [`SubscriptionId`]
-/// (eg/ SubscriptionId("matches|BTC-USD").
+/// Deserialize a [`CoinbaseTrade`] "product_id" (eg/ "BTC-USD") as the
+/// associated [`SubscriptionId`] (eg/ SubscriptionId("matches|BTC-USD").
 pub fn de_trade_subscription_id<'de, D>(deserializer: D) -> Result<SubscriptionId, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -82,11 +83,13 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::str::FromStr;
+
     use barter_integration::error::SocketError;
     use chrono::NaiveDateTime;
     use serde::de::Error;
-    use std::str::FromStr;
+
+    use super::*;
 
     #[test]
     fn test_de_coinbase_trade() {

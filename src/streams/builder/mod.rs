@@ -3,6 +3,11 @@ use std::fmt::Debug;
 use std::future::Future;
 use std::pin::Pin;
 
+use barter_integration::error::SocketError;
+use barter_integration::Validator;
+use tokio::sync::mpsc;
+use tokio::task::LocalSet;
+
 use crate::error::DataError;
 use crate::event::MarketEvent;
 use crate::exchange::ExchangeId;
@@ -13,22 +18,19 @@ use crate::subscription::SubKind;
 use crate::subscription::Subscription;
 use crate::Identifier;
 
-use barter_integration::error::SocketError;
-use barter_integration::Validator;
-use tokio::sync::mpsc;
-use tokio::task::LocalSet;
-
-/// Defines the [`MultiStreamBuilder`](multi::MultiStreamBuilder) API for ergonomically
-/// initialising a common [`Streams<Output>`](Streams) from multiple
-/// [`StreamBuilder<SubKind>`](StreamBuilder)s.
+/// Defines the [`MultiStreamBuilder`](multi::MultiStreamBuilder) API for
+/// ergonomically initialising a common [`Streams<Output>`](Streams) from
+/// multiple [`StreamBuilder<SubKind>`](StreamBuilder)s.
 pub mod multi;
 
-/// Communicative type alias representing the [`Future`] result of a [`Subscription`] [`validate`]
-/// call generated whilst executing [`StreamBuilder::subscribe`].
+/// Communicative type alias representing the [`Future`] result of a
+/// [`Subscription`] [`validate`] call generated whilst executing
+/// [`StreamBuilder::subscribe`].
 pub type SubscribeFuture = Pin<Box<dyn Future<Output = Result<(), DataError>> + Send + Sync>>;
 
-/// Builder to configure and initialise a [`Streams<MarketEvent<SubKind::Event>`](Streams) instance
-/// for a specific [`SubKind`].
+/// Builder to configure and initialise a
+/// [`Streams<MarketEvent<SubKind::Event>`](Streams) instance for a specific
+/// [`SubKind`].
 #[derive(Default)]
 pub struct StreamBuilder<Kind>
 where
@@ -62,8 +64,10 @@ where
         }
     }
 
-    /// Add a collection of [`Subscription`]s to the [`StreamBuilder`] that will be actioned on
-    /// a distinct [`WebSocket`](barter_integration::protocol::websocket::WebSocket) connection.
+    /// Add a collection of [`Subscription`]s to the [`StreamBuilder`] that will
+    /// be actioned on a distinct
+    /// [`WebSocket`](barter_integration::protocol::websocket::WebSocket)
+    /// connection.
     ///
     /// Note that [`Subscription`]s are not actioned until the
     /// [`init()`](StreamBuilder::init()) method is invoked.
@@ -80,10 +84,12 @@ where
         let mut subscriptions = subscriptions.into_iter().map(Sub::into).collect::<Vec<_>>();
 
         // Acquire channel Sender to send Market<Kind::Event> from consumer loop to user
-        // '--> Add ExchangeChannel Entry if this Exchange <--> SubKind combination is new
+        // '--> Add ExchangeChannel Entry if this Exchange <--> SubKind combination is
+        // new
         let exchange_tx = self.channels.entry(Exchange::ID).or_default().tx.clone();
 
-        // Add Future that once awaited will yield the Result<(), SocketError> of subscribing
+        // Add Future that once awaited will yield the Result<(), SocketError> of
+        // subscribing
         self.futures.push(Box::pin(async move {
             // Validate Subscriptions
             validate(&subscriptions)?;
@@ -101,12 +107,13 @@ where
         self
     }
 
-    /// Spawn a [`MarketEvent<SubKind::Event>`](MarketEvent) consumer loop for each collection of
-    /// [`Subscription`]s added to [`StreamBuilder`] via the
-    /// [`subscribe()`](StreamBuilder::subscribe()) method.
+    /// Spawn a [`MarketEvent<SubKind::Event>`](MarketEvent) consumer loop for
+    /// each collection of [`Subscription`]s added to [`StreamBuilder`] via
+    /// the [`subscribe()`](StreamBuilder::subscribe()) method.
     ///
-    /// Each consumer loop distributes consumed [`MarketEvent<SubKind::Event>s`](MarketEvent) to
-    /// the [`Streams`] `HashMap` returned by this method.
+    /// Each consumer loop distributes consumed
+    /// [`MarketEvent<SubKind::Event>s`](MarketEvent) to the [`Streams`]
+    /// `HashMap` returned by this method.
     pub async fn init(self) -> Result<Streams<MarketEvent<Kind::Event>>, DataError> {
         // Await Stream initialisation perpetual and ensure success
         futures::future::try_join_all(self.futures).await?;
@@ -121,18 +128,22 @@ where
         })
     }
 
-    /// Initializes the [`StreamBuilder`] using `tokio::task::LocalSet` and returns an `UnboundedReceiver`.
+    /// Initializes the [`StreamBuilder`] using `tokio::task::LocalSet` and
+    /// returns an `UnboundedReceiver`.
     ///
-    /// This method is different from `init` as it uses `LocalSet` to spawn tasks that are not `Send` and
-    /// should run on the current thread.
+    /// This method is different from `init` as it uses `LocalSet` to spawn
+    /// tasks that are not `Send` and should run on the current thread.
     ///
     /// # Arguments
     ///
-    /// * `local_set` - A reference to a `LocalSet` where the tasks will be spawned.
+    /// * `local_set` - A reference to a `LocalSet` where the tasks will be
+    ///   spawned.
     ///
     /// # Returns
     ///
-    /// * `Result<mpsc::UnboundedReceiver<MarketEvent<Kind::Event>>, DataError>` - Returns an `UnboundedReceiver` for receiving `MarketEvent` messages or a `DataError` if initialization fails.
+    /// * `Result<mpsc::UnboundedReceiver<MarketEvent<Kind::Event>>, DataError>`
+    ///   - Returns an `UnboundedReceiver` for receiving `MarketEvent` messages
+    ///     or a `DataError` if initialization fails.
     ///
     /// # Example
     ///
@@ -147,7 +158,8 @@ where
         // Create a vector to hold the initialization futures.
         let mut init_futures = Vec::new();
 
-        // For each future in the StreamBuilder, create a task in the LocalSet to run the future.
+        // For each future in the StreamBuilder, create a task in the LocalSet to run
+        // the future.
         for future in self.futures {
             // Run the future within the LocalSet context.
             let init_future = local_set.run_until(future);
@@ -160,7 +172,8 @@ where
 
         // Collect all the receivers from the channels into a vector.
         let receivers = self.channels.into_values().map(|channel| channel.rx);
-        // Ensure there is only one receiver as this method currently supports a single receiver.
+        // Ensure there is only one receiver as this method currently supports a single
+        // receiver.
         if receivers.len() != 1 {
             return Err(DataError::Socket(SocketError::Subscribe(
                 "Multiple receivers not supported".to_owned(),
@@ -172,8 +185,8 @@ where
     }
 }
 
-/// Convenient type that holds the [`mpsc::UnboundedSender`] and [`mpsc::UnboundedReceiver`] for a
-/// [`MarketEvent<T>`](MarketEvent) channel.
+/// Convenient type that holds the [`mpsc::UnboundedSender`] and
+/// [`mpsc::UnboundedReceiver`] for a [`MarketEvent<T>`](MarketEvent) channel.
 #[derive(Debug)]
 pub struct ExchangeChannel<T> {
     tx: mpsc::UnboundedSender<T>,
@@ -194,8 +207,9 @@ impl<T> Default for ExchangeChannel<T> {
     }
 }
 
-/// Validate the provided collection of [`Subscription`]s, ensuring that the associated exchange
-/// supports every [`Subscription`] [`InstrumentKind`](barter_integration::model::InstrumentKind).
+/// Validate the provided collection of [`Subscription`]s, ensuring that the
+/// associated exchange supports every [`Subscription`]
+/// [`InstrumentKind`](barter_integration::model::InstrumentKind).
 pub fn validate<Exchange, Kind>(
     subscriptions: &[Subscription<Exchange, Kind>],
 ) -> Result<(), DataError>
@@ -221,10 +235,11 @@ where
 
 #[cfg(test)]
 mod tests {
+    use barter_integration::model::instrument::kind::InstrumentKind;
+
     use super::*;
     use crate::exchange::coinbase::Coinbase;
     use crate::subscription::trade::PublicTrades;
-    use barter_integration::model::instrument::kind::InstrumentKind;
 
     #[test]
     fn test_validate() {

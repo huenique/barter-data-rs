@@ -1,6 +1,7 @@
-use crate::subscription::book::Level;
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::subscription::book::Level;
 
 /// Level 1 OrderBook types (top of book).
 pub mod l1;
@@ -15,7 +16,7 @@ pub mod l2;
 /// ```json
 /// ["4.00000200", "12.00000000"]
 /// ```
-#[derive(Clone, Copy, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct BinanceLevel {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub price: f64,

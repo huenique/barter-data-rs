@@ -1,3 +1,12 @@
+use std::fmt::Debug;
+
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WsMessage;
+use serde::de::Error;
+use serde::de::Unexpected;
+use url::Url;
+
 use crate::exchange::bitmex::channel::BitmexChannel;
 use crate::exchange::bitmex::market::BitmexMarket;
 use crate::exchange::bitmex::subscription::BitmexSubResponse;
@@ -12,27 +21,22 @@ use crate::subscription::trade::PublicTrades;
 use crate::subscription::Map;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-use barter_integration::error::SocketError;
-use barter_integration::model::instrument::Instrument;
-use barter_integration::protocol::websocket::WsMessage;
-use serde::de::Error;
-use serde::de::Unexpected;
-use std::fmt::Debug;
-use url::Url;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific channel used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific channel used for generating [`Connector::requests`].
 pub mod channel;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific market used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific market used for generating [`Connector::requests`].
 pub mod market;
 
 /// Generic [`BitmexMessage<T>`](message::BitmexMessage)
 pub mod message;
 
-/// [`Subscription`](crate::subscription::Subscription) response type and response
-/// [`Validator`](barter_integration::Validator) for [`Bitmex`].
+/// [`Subscription`](crate::subscription::Subscription) response type and
+/// response [`Validator`](barter_integration::Validator) for [`Bitmex`].
 pub mod subscription;
 
 /// Public trade types for [`Bitmex`](Bitmex)
@@ -42,8 +46,7 @@ pub mod trade;
 ///
 /// See docs: <https://www.bitmex.com/app/wsAPI>
 pub const BASE_URL_BITMEX: &str = "wss://ws.bitmex.com/realtime";
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Bitmex;
 
 impl Connector for Bitmex {

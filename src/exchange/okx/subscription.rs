@@ -1,6 +1,3 @@
-use super::channel::OkxChannel;
-use super::market::OkxMarket;
-use crate::exchange::subscription::ExchangeSub;
 use barter_integration::error::SocketError;
 use barter_integration::Validator;
 use serde::ser::SerializeStruct;
@@ -8,7 +5,12 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde::Serializer;
 
-// Implement custom Serialize to assist aesthetics of <Okx as Connector>::requests() function.
+use crate::exchange::okx::channel::OkxChannel;
+use crate::exchange::okx::market::OkxMarket;
+use crate::exchange::subscription::ExchangeSub;
+
+// Implement custom Serialize to assist aesthetics of <Okx as
+// Connector>::requests() function.
 impl Serialize for ExchangeSub<OkxChannel, OkxMarket> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -45,7 +47,7 @@ impl Serialize for ExchangeSub<OkxChannel, OkxMarket> {
 /// ```
 ///
 /// See docs: <https://www.okx.com/docs-v5/en/#websocket-api-subscribe>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(tag = "event", rename_all = "lowercase")]
 pub enum OkxSubResponse {
     #[serde(rename = "subscribe")]

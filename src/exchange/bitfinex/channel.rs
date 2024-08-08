@@ -1,14 +1,15 @@
-use super::Bitfinex;
+use serde::Serialize;
+
+use crate::exchange::bitfinex::Bitfinex;
 use crate::subscription::trade::PublicTrades;
 use crate::subscription::Subscription;
 use crate::Identifier;
-use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Bitfinex`](super::Bitfinex) channel to be subscribed to.
 ///
 /// See docs: <https://docs.bitfinex.com/docs/ws-public>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitfinexChannel(pub &'static str);
 
 impl BitfinexChannel {

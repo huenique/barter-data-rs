@@ -1,6 +1,3 @@
-use crate::exchange::Connector;
-use crate::subscription::Map;
-use crate::subscription::SubKind;
 use async_trait::async_trait;
 use barter_integration::error::SocketError;
 use barter_integration::model::instrument::Instrument;
@@ -13,8 +10,13 @@ use serde::Deserialize;
 use serde::Serialize;
 use tracing::debug;
 
+use crate::exchange::Connector;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
+
 /// Defines how to validate that actioned market data
-/// [`Subscription`](crate::subscription::Subscription)s were accepted by the exchange.
+/// [`Subscription`](crate::subscription::Subscription)s were accepted by the
+/// exchange.
 #[async_trait]
 pub trait SubscriptionValidator {
     type Parser: StreamParser;
@@ -28,8 +30,9 @@ pub trait SubscriptionValidator {
         Kind: SubKind + Send;
 }
 
-/// Standard [`SubscriptionValidator`] for [`WebSocket`]s suitable for most exchanges.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+/// Standard [`SubscriptionValidator`] for [`WebSocket`]s suitable for most
+/// exchanges.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct WebSocketSubValidator;
 
 #[async_trait]

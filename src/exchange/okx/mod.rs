@@ -1,7 +1,16 @@
-use self::channel::OkxChannel;
-use self::market::OkxMarket;
-use self::subscription::OkxSubResponse;
-use self::trade::OkxTrades;
+use std::time::Duration;
+
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use serde_json::json;
+use url::Url;
+
+use crate::exchange::okx::channel::OkxChannel;
+use crate::exchange::okx::market::OkxMarket;
+use crate::exchange::okx::subscription::OkxSubResponse;
+use crate::exchange::okx::trade::OkxTrades;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
@@ -12,24 +21,19 @@ use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::trade::PublicTrades;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use serde_json::json;
-use std::time::Duration;
-use url::Url;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific channel used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific channel used for generating [`Connector::requests`].
 pub mod channel;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific market used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific market used for generating [`Connector::requests`].
 pub mod market;
 
-/// [`Subscription`](crate::subscription::Subscription) response type and response
-/// [`Validator`](barter_integration::Validator) for [`Okx`].
+/// [`Subscription`](crate::subscription::Subscription) response type and
+/// response [`Validator`](barter_integration::Validator) for [`Okx`].
 pub mod subscription;
 
 /// Public trade types for [`Okx`].
@@ -49,7 +53,7 @@ pub const PING_INTERVAL_OKX: Duration = Duration::from_secs(29);
 ///
 /// See docs: <https://www.okx.com/docs-v5/en/#websocket-api>
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct Okx;
 

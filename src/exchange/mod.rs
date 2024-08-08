@@ -1,9 +1,6 @@
-use crate::exchange::subscription::ExchangeSub;
-use crate::subscriber::validator::SubscriptionValidator;
-use crate::subscriber::Subscriber;
-use crate::subscription::Map;
-use crate::subscription::SubKind;
-use crate::MarketStream;
+use std::fmt::Debug;
+use std::fmt::Display;
+use std::time::Duration;
 
 use barter_integration::error::SocketError;
 use barter_integration::model::instrument::kind::InstrumentKind;
@@ -13,12 +10,17 @@ use barter_integration::Validator;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 use serde::Serialize;
-use std::fmt::Debug;
-use std::fmt::Display;
-use std::time::Duration;
 use url::Url;
 
-/// `BinanceSpot` & `BinanceFuturesUsd` [`Connector`] and [`StreamSelector`] implementations.
+use crate::exchange::subscription::ExchangeSub;
+use crate::subscriber::validator::SubscriptionValidator;
+use crate::subscriber::Subscriber;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
+use crate::MarketStream;
+
+/// `BinanceSpot` & `BinanceFuturesUsd` [`Connector`] and [`StreamSelector`]
+/// implementations.
 pub mod binance;
 
 /// `Bitfinex` [`Connector`] and [`StreamSelector`] implementations.
@@ -36,8 +38,8 @@ pub mod coinbase;
 /// `Coincall` [`Connector`] and [`StreamSelector`] implementations.
 pub mod coincall;
 
-/// `GateioSpot`, `GateioFuturesUsd` & `GateioFuturesBtc` [`Connector`] and [`StreamSelector`]
-/// implementations.
+/// `GateioSpot`, `GateioFuturesUsd` & `GateioFuturesBtc` [`Connector`] and
+/// [`StreamSelector`] implementations.
 pub mod gateio;
 
 /// `Kraken` [`Connector`] and [`StreamSelector`] implementations.
@@ -67,16 +69,19 @@ pub mod okx;
 /// `PowerTrade` [`Connector`] and [`StreamSelector`] implementations.
 pub mod powertrade;
 
-/// Defines the generic [`ExchangeSub`] containing a market and channel combination used by an
-/// exchange [`Connector`] to build [`WsMessage`] subscription payloads.
+/// Defines the generic [`ExchangeSub`] containing a market and channel
+/// combination used by an exchange [`Connector`] to build [`WsMessage`]
+/// subscription payloads.
 pub mod subscription;
 
-/// Default [`Duration`] the [`Connector::SubValidator`] will wait to receive all success responses to actioned
+/// Default [`Duration`] the [`Connector::SubValidator`] will wait to receive
+/// all success responses to actioned
 /// [`Subscription`](crate::subscription::Subscription) requests.
 pub const DEFAULT_SUBSCRIPTION_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Defines the [`MarketStream`] kind associated with an exchange
-/// [`Subscription`](crate::subscription::Subscription) [`SubKind`](crate::subscription::SubKind).
+/// [`Subscription`](crate::subscription::Subscription)
+/// [`SubKind`](crate::subscription::SubKind).
 ///
 /// ### Notes
 /// Must be implemented by an exchange [`Connector`] if it supports a specific
@@ -89,8 +94,9 @@ where
     type Stream: MarketStream<Self, Kind>;
 }
 
-/// Primary exchange abstraction. Defines how to translate Barter types into exchange specific
-/// types, as well as connecting, subscribing, and interacting with the exchange server.
+/// Primary exchange abstraction. Defines how to translate Barter types into
+/// exchange specific types, as well as connecting, subscribing, and interacting
+/// with the exchange server.
 ///
 /// ### Notes
 /// This must be implemented for a new exchange integration!
@@ -102,8 +108,8 @@ where
     const ID: ExchangeId;
 
     /// Type that defines how to translate a Barter
-    /// [`Subscription`](crate::subscription::Subscription) into an exchange specific channel
-    /// to be subscribed to.
+    /// [`Subscription`](crate::subscription::Subscription) into an exchange
+    /// specific channel to be subscribed to.
     ///
     /// ### Examples
     /// - [`BinanceChannel("@depth@100ms")`](binance::channel::BinanceChannel)
@@ -111,63 +117,71 @@ where
     type Channel: AsRef<str>;
 
     /// Type that defines how to translate a Barter
-    /// [`Subscription`](crate::subscription::Subscription) into an exchange specific market that
-    /// can be subscribed to.
+    /// [`Subscription`](crate::subscription::Subscription) into an exchange
+    /// specific market that can be subscribed to.
     ///
     /// ### Examples
     /// - [`BinanceMarket("btcusdt")`](binance::market::BinanceMarket)
     /// - [`KrakenMarket("BTC/USDT")`](kraken::market::KrakenMarket)
     type Market: AsRef<str>;
 
-    /// [`Subscriber`] type that establishes a connection with the exchange server, and actions
+    /// [`Subscriber`] type that establishes a connection with the exchange
+    /// server, and actions
     /// [`Subscription`](crate::subscription::Subscription)s over the socket.
     type Subscriber: Subscriber;
 
-    /// [`SubscriptionValidator`] type that listens to responses from the exchange server and
-    /// validates if the actioned [`Subscription`](crate::subscription::Subscription)s were
+    /// [`SubscriptionValidator`] type that listens to responses from the
+    /// exchange server and validates if the actioned
+    /// [`Subscription`](crate::subscription::Subscription)s were
     /// successful.
     type SubValidator: SubscriptionValidator;
 
-    /// Deserialisable type that the [`Self::SubValidator`] expects to receive from the exchange server in
-    /// response to the [`Subscription`](crate::subscription::Subscription) [`Self::requests`]
-    /// sent over the [`WebSocket`](barter_integration::protocol::websocket::WebSocket). Implements
-    /// [`Validator`](barter_integration::Validator) in order to determine if [`Self`]
-    /// communicates a successful [`Subscription`](crate::subscription::Subscription) outcome.
+    /// Deserialisable type that the [`Self::SubValidator`] expects to receive
+    /// from the exchange server in response to the
+    /// [`Subscription`](crate::subscription::Subscription) [`Self::requests`]
+    /// sent over the
+    /// [`WebSocket`](barter_integration::protocol::websocket::WebSocket).
+    /// Implements [`Validator`](barter_integration::Validator) in order to
+    /// determine if [`Self`] communicates a successful
+    /// [`Subscription`](crate::subscription::Subscription) outcome.
     type SubResponse: Validator + Debug + DeserializeOwned;
 
     /// Base [`Url`] of the exchange server being connected with.
     fn url() -> Result<Url, SocketError>;
 
     /// Defines [`PingInterval`] of custom application-level
-    /// [`WebSocket`](barter_integration::protocol::websocket::WebSocket) pings for the exchange
-    /// server being connected with.
+    /// [`WebSocket`](barter_integration::protocol::websocket::WebSocket) pings
+    /// for the exchange server being connected with.
     ///
     /// Defaults to `None`, meaning that no custom pings are sent.
     fn ping_interval() -> Option<PingInterval> {
         None
     }
 
-    /// Defines how to translate a collection of [`ExchangeSub`]s into the [`WsMessage`]
-    /// subscription payloads sent to the exchange server.
+    /// Defines how to translate a collection of [`ExchangeSub`]s into the
+    /// [`WsMessage`] subscription payloads sent to the exchange server.
     fn requests(exchange_subs: Vec<ExchangeSub<Self::Channel, Self::Market>>) -> Vec<WsMessage>;
 
-    /// Number of [`Subscription`](crate::subscription::Subscription) responses expected from the
-    /// exchange server in responses to the requests send. Used to validate all
+    /// Number of [`Subscription`](crate::subscription::Subscription) responses
+    /// expected from the exchange server in responses to the requests send.
+    /// Used to validate all
     /// [`Subscription`](crate::subscription::Subscription)s were accepted.
     fn expected_responses(map: &Map<Instrument>) -> usize {
         map.0.len()
     }
 
-    /// Expected [`Duration`] the [`SubscriptionValidator`] will wait to receive all success
-    /// responses to actioned [`Subscription`](crate::subscription::Subscription) requests.
+    /// Expected [`Duration`] the [`SubscriptionValidator`] will wait to receive
+    /// all success responses to actioned
+    /// [`Subscription`](crate::subscription::Subscription) requests.
     fn subscription_timeout() -> Duration {
         DEFAULT_SUBSCRIPTION_TIMEOUT
     }
 }
 
 /// Used when an exchange has servers different
-/// [`InstrumentKind`](barter_integration::model::InstrumentKind) market data on distinct servers,
-/// allowing all the [`Connector`] logic to be identical apart from what this trait provides.
+/// [`InstrumentKind`](barter_integration::model::InstrumentKind) market data on
+/// distinct servers, allowing all the [`Connector`] logic to be identical apart
+/// from what this trait provides.
 ///
 /// ### Examples
 /// - [`BinanceServerSpot`](binance::spot::BinanceServerSpot)
@@ -178,8 +192,8 @@ pub trait ExchangeServer: Default + Debug + Clone + Send {
 }
 
 /// Defines the frequency and construction function for custom
-/// [`WebSocket`](barter_integration::protocol::websocket::WebSocket) pings - used for exchanges
-/// that require additional application-level pings.
+/// [`WebSocket`](barter_integration::protocol::websocket::WebSocket) pings -
+/// used for exchanges that require additional application-level pings.
 #[derive(Debug)]
 pub struct PingInterval {
     pub interval: tokio::time::Interval,
@@ -189,10 +203,11 @@ pub struct PingInterval {
 /// Unique identifier an exchange server [`Connector`].
 ///
 /// ### Notes
-/// An exchange may server different [`InstrumentKind`](barter_integration::model::InstrumentKind)
-/// market data on distinct servers (eg/ Binance, Gateio). Such exchanges have multiple [`Self`]
-/// variants, and often utilise the [`ExchangeServer`] trait.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+/// An exchange may server different
+/// [`InstrumentKind`](barter_integration::model::InstrumentKind) market data on
+/// distinct servers (eg/ Binance, Gateio). Such exchanges have multiple
+/// [`Self`] variants, and often utilise the [`ExchangeServer`] trait.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(rename = "exchange", rename_all = "snake_case")]
 pub enum ExchangeId {
     Aevo,
@@ -264,8 +279,9 @@ impl ExchangeId {
         }
     }
 
-    /// Determines whether the [`Connector`] associated with this [`ExchangeId`] supports the
-    /// ingestion of market data for the provided [`InstrumentKind`].
+    /// Determines whether the [`Connector`] associated with this [`ExchangeId`]
+    /// supports the ingestion of market data for the provided
+    /// [`InstrumentKind`].
     #[allow(clippy::match_like_matches_macro)]
     pub fn supports(&self, instrument_kind: InstrumentKind) -> bool {
         use ExchangeId::*;

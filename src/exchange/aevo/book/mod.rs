@@ -6,7 +6,7 @@ use crate::subscription::book::Level;
 
 pub mod l2;
 
-#[derive(Clone, Copy, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct AevoLevel {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub price: f64,

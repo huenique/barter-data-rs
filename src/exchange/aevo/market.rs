@@ -1,5 +1,3 @@
-use crate::subscription::Subscription;
-use crate::Identifier;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::kind::OptionKind;
 use barter_integration::model::instrument::Instrument;
@@ -7,17 +5,18 @@ use chrono::format::DelayedFormat;
 use chrono::format::StrftimeItems;
 use chrono::DateTime;
 use chrono::Utc;
-
 use serde::Deserialize;
 use serde::Serialize;
 
-use super::Aevo;
+use crate::exchange::aevo::Aevo;
+use crate::subscription::Subscription;
+use crate::Identifier;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Aevo`](super::Aevo) market that can be subscribed to.
 ///
 /// See docs: <https://docs.aevo.xyz/reference/subscribe>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct AevoMarket(pub String);
 
 impl<Kind> Identifier<AevoMarket> for Subscription<Aevo, Kind> {

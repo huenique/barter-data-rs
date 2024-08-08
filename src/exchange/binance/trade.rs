@@ -1,10 +1,3 @@
-use super::BinanceChannel;
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::exchange::ExchangeSub;
-use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
@@ -14,11 +7,19 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::binance::BinanceChannel;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+
 /// Binance real-time trade message.
 ///
 /// Note:
-/// For [`BinanceFuturesUsd`](super::futures::BinanceFuturesUsd) this real-time stream is
-/// undocumented.
+/// For [`BinanceFuturesUsd`](super::futures::BinanceFuturesUsd) this real-time
+/// stream is undocumented.
 ///
 /// See discord: <https://discord.com/channels/910237311332151317/923160222711812126/975712874582388757>
 ///
@@ -55,7 +56,7 @@ use serde::Serialize;
 ///     "m": true
 /// }
 /// ```
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct BinanceTrade {
     #[serde(alias = "s", deserialize_with = "de_trade_subscription_id")]
     pub subscription_id: SubscriptionId,
@@ -97,8 +98,8 @@ impl From<(ExchangeId, Instrument, BinanceTrade)> for MarketIter<PublicTrade> {
     }
 }
 
-/// Deserialize a [`BinanceTrade`] "s" (eg/ "BTCUSDT") as the associated [`SubscriptionId`]
-/// (eg/ "@trade|BTCUSDT").
+/// Deserialize a [`BinanceTrade`] "s" (eg/ "BTCUSDT") as the associated
+/// [`SubscriptionId`] (eg/ "@trade|BTCUSDT").
 pub fn de_trade_subscription_id<'de, D>(deserializer: D) -> Result<SubscriptionId, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -107,7 +108,8 @@ where
         .map(|market| ExchangeSub::from((BinanceChannel::TRADES, market)).id())
 }
 
-/// Deserialize a [`BinanceTrade`] "buyer_is_maker" boolean field to a Barter [`Side`].
+/// Deserialize a [`BinanceTrade`] "buyer_is_maker" boolean field to a Barter
+/// [`Side`].
 ///
 /// Variants:
 /// buyer_is_maker => Side::Sell
@@ -130,11 +132,13 @@ mod tests {
     use super::*;
 
     mod de {
-        use super::*;
+        use std::time::Duration;
+
         use barter_integration::de::datetime_utc_from_epoch_duration;
         use barter_integration::error::SocketError;
         use serde::de::Error;
-        use std::time::Duration;
+
+        use super::*;
 
         #[test]
         fn test_binance_trade() {

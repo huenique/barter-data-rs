@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct OptionPricing {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub delta: f64,
@@ -24,8 +24,7 @@ pub struct OptionPricing {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub ask_iv: f64,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct OptionDetails {
     pub index: String,
     pub expiry: i64,
@@ -33,8 +32,7 @@ pub struct OptionDetails {
     pub option_type: String,
     pub settlement_price: Option<String>,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Stats {
     pub contract_volume: String,
     pub num_trades: String,
@@ -45,8 +43,7 @@ pub struct Stats {
     pub percent_change: String,
     pub usd_change: String,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LyraInstrumentTicker {
     pub instrument_type: String,
     pub instrument_name: String,
@@ -102,20 +99,17 @@ pub struct LyraInstrumentTicker {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub max_price: f64,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Data {
     pub timestamp: i64,
     pub instrument_ticker: LyraInstrumentTicker,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Params {
     pub channel: String,
     pub data: Data,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Message {
     pub method: String,
     pub params: Params,

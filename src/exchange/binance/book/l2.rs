@@ -1,19 +1,20 @@
-use super::super::channel::BinanceChannel;
-use super::BinanceLevel;
-use crate::exchange::subscription::ExchangeSub;
-use crate::subscription::book::OrderBook;
-use crate::subscription::book::OrderBookSide;
-use crate::Identifier;
 use barter_integration::model::Side;
 use barter_integration::model::SubscriptionId;
 use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::exchange::binance::book::BinanceLevel;
+use crate::exchange::binance::channel::BinanceChannel;
+use crate::exchange::subscription::ExchangeSub;
+use crate::subscription::book::OrderBook;
+use crate::subscription::book::OrderBookSide;
+use crate::Identifier;
+
 /// [`Binance`](super::super::Binance) OrderBook Level2 snapshot HTTP message.
 ///
-/// Used as the starting [`OrderBook`] before OrderBook Level2 delta WebSocket updates are
-/// applied.
+/// Used as the starting [`OrderBook`] before OrderBook Level2 delta WebSocket
+/// updates are applied.
 ///
 /// ### Payload Examples
 /// See docs: <https://binance-docs.github.io/apidocs/spot/en/#order-book>
@@ -45,7 +46,7 @@ use serde::Serialize;
 ///     ]
 /// }
 /// ```
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct BinanceOrderBookL2Snapshot {
     #[serde(rename = "lastUpdateId")]
     pub last_update_id: u64,

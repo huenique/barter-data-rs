@@ -1,21 +1,23 @@
-use super::ExchangeChannel;
-use super::StreamBuilder;
-use super::Streams;
-use crate::error::DataError;
-use crate::event::MarketEvent;
-use crate::exchange::ExchangeId;
-use crate::subscription::SubKind;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::future::Future;
 use std::pin::Pin;
 
-/// Communicative type alias representing the [`Future`] result of a [`StreamBuilder::init`] call
-/// generated whilst executing [`MultiStreamBuilder::add`].
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::exchange::ExchangeId;
+use crate::streams::builder::ExchangeChannel;
+use crate::streams::builder::StreamBuilder;
+use crate::streams::Streams;
+use crate::subscription::SubKind;
+
+/// Communicative type alias representing the [`Future`] result of a
+/// [`StreamBuilder::init`] call generated whilst executing
+/// [`MultiStreamBuilder::add`].
 pub type BuilderInitFuture = Pin<Box<dyn Future<Output = Result<(), DataError>>>>;
 
-/// Builder to configure and initialise a common [`Streams<Output>`](Streams) instance from
-/// multiple [`StreamBuilder<SubKind>`](StreamBuilder)s.
+/// Builder to configure and initialise a common [`Streams<Output>`](Streams)
+/// instance from multiple [`StreamBuilder<SubKind>`](StreamBuilder)s.
 #[derive(Default)]
 pub struct MultiStreamBuilder<Output> {
     pub channels: HashMap<ExchangeId, ExchangeChannel<Output>>,
@@ -43,12 +45,13 @@ impl<Output> MultiStreamBuilder<Output> {
         }
     }
 
-    /// Add a [`StreamBuilder<SubKind>`](StreamBuilder) to the [`MultiStreamBuilder`]. Creates a
-    /// [`Future`] that calls [`StreamBuilder::init`] and maps the [`SubKind::Event`](SubKind)
+    /// Add a [`StreamBuilder<SubKind>`](StreamBuilder) to the
+    /// [`MultiStreamBuilder`]. Creates a [`Future`] that calls
+    /// [`StreamBuilder::init`] and maps the [`SubKind::Event`](SubKind)
     /// into a common `Output`.
     ///
-    /// Note that the created [`Future`] is not awaited until the [`MultiStreamBuilder::init`]
-    /// method is invoked.
+    /// Note that the created [`Future`] is not awaited until the
+    /// [`MultiStreamBuilder::init`] method is invoked.
     #[allow(clippy::should_implement_trait)]
     pub fn add<Kind>(mut self, builder: StreamBuilder<Kind>) -> Self
     where
@@ -56,7 +59,8 @@ impl<Output> MultiStreamBuilder<Output> {
         Kind: SubKind + 'static,
         Kind::Event: Send,
     {
-        // Allocate HashMap to hold the exchange_tx<Output> for each StreamBuilder exchange present
+        // Allocate HashMap to hold the exchange_tx<Output> for each StreamBuilder
+        // exchange present
         let mut exchange_txs = HashMap::with_capacity(builder.channels.len());
 
         // Iterate over each StreamBuilder exchange present
@@ -96,8 +100,9 @@ impl<Output> MultiStreamBuilder<Output> {
         self
     }
 
-    /// Initialise each [`StreamBuilder<SubKind>`](StreamBuilder) that was added to the
-    /// [`MultiStreamBuilder`] and map all [`Streams<SubKind::Event>`](Streams) into a common
+    /// Initialise each [`StreamBuilder<SubKind>`](StreamBuilder) that was added
+    /// to the [`MultiStreamBuilder`] and map all
+    /// [`Streams<SubKind::Event>`](Streams) into a common
     /// [`Streams<Output>`](Streams).
     pub async fn init(self) -> Result<Streams<Output>, DataError> {
         // Await Stream initialisation perpetual and ensure success

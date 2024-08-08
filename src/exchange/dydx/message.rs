@@ -1,8 +1,8 @@
-use crate::exchange::dydx::book::DydxLevel;
-
 use serde::Deserialize;
 use serde::Deserializer;
 use serde::Serialize;
+
+use crate::exchange::dydx::book::DydxLevel;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
@@ -11,7 +11,6 @@ pub enum DydxMessage {
     ChannelData(ChannelDataMessage),
     ErrorMessage(ErrorMessage),
 }
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SubscribedMessage {
     #[serde(rename = "type")]
@@ -22,13 +21,11 @@ pub struct SubscribedMessage {
     pub channel: String,
     pub contents: OrderBookSnapshotContents,
 }
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct OrderBookSnapshotContents {
     pub bids: Vec<DydxLevel>,
     pub asks: Vec<DydxLevel>,
 }
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ChannelDataMessage {
     #[serde(rename = "type")]
@@ -40,7 +37,6 @@ pub struct ChannelDataMessage {
     pub version: String,
     pub contents: ChannelDataMessageContents,
 }
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ErrorMessage {
     #[serde(rename = "type")]
@@ -49,8 +45,7 @@ pub struct ErrorMessage {
     pub message_id: u64,
     pub message: String,
 }
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelDataMessageContents {
     #[serde(default, deserialize_with = "optional_vec_vec_string")]
     pub bids: Option<Vec<DydxLevel>>,

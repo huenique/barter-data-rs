@@ -1,3 +1,12 @@
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use chrono::TimeZone;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::event::MarketEvent;
 use crate::event::MarketIter;
 use crate::exchange::bit::book::BitLevel;
@@ -9,15 +18,6 @@ use crate::exchange::ExchangeId;
 use crate::subscription::book::OrderBook;
 use crate::subscription::book::OrderBookSide;
 use crate::Identifier;
-
-use barter_integration::model::instrument::Instrument;
-use barter_integration::model::Exchange;
-use barter_integration::model::Side;
-use barter_integration::model::SubscriptionId;
-use chrono::TimeZone;
-use chrono::Utc;
-use serde::Deserialize;
-use serde::Serialize;
 
 pub type BitOrderBookL2 = BitWsMessage<BitOrderBookL2Snapshot, BitPong>;
 
@@ -31,16 +31,14 @@ impl Identifier<Option<SubscriptionId>> for BitOrderBookL2 {
         }
     }
 }
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BitOrderBookL2Snapshot {
     pub channel: String,
     pub timestamp: i64,
     pub module: String,
     pub data: OrderBookData,
 }
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct OrderBookData {
     pub asks: Vec<BitLevel>,
     pub bids: Vec<BitLevel>,

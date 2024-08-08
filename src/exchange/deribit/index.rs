@@ -1,3 +1,10 @@
+use barter_integration::model::Exchange;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::event::MarketIter;
 use crate::exchange::deribit::message::DeribitSingleDataMessage;
 use crate::exchange::deribit::DeribitChannel;
@@ -7,13 +14,6 @@ use crate::subscription::index::Index;
 use crate::ExchangeId;
 use crate::Identifier;
 use crate::MarketEvent;
-
-use barter_integration::model::Exchange;
-use barter_integration::model::SubscriptionId;
-use chrono::DateTime;
-use chrono::Utc;
-use serde::Deserialize;
-use serde::Serialize;
 
 pub type DeribitIndex = DeribitSingleDataMessage<DeribitIndexData>;
 
@@ -36,7 +36,6 @@ impl From<(ExchangeId, Instrument, DeribitIndex)> for MarketIter<Index> {
         })])
     }
 }
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DeribitIndexData {
     pub index_name: String,

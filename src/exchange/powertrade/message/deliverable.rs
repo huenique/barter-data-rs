@@ -1,14 +1,12 @@
-use crate::exchange::powertrade::message::products::option::OptionDetails;
-
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Serialize, Deserialize, Debug)]
+use crate::exchange::powertrade::message::products::option::OptionDetails;
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Response<Details> {
     pub deliverable: Deliverable<Details>,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Deliverable<Details> {
     pub deliverable_id: String,
     pub symbol: String,
@@ -17,7 +15,6 @@ pub struct Deliverable<Details> {
     pub listing_status: String,
     pub details: Details,
 }
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum ProductType {

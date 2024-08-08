@@ -1,13 +1,18 @@
-pub mod book;
-pub mod channel;
-pub mod market;
-pub mod message;
-pub mod subscription;
+use std::time::Duration;
 
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use tokio::time;
+use url::Url;
+
+use crate::exchange::bit::book::l2::BitOrderBookL2;
 use crate::exchange::bit::channel::BitChannel;
 use crate::exchange::bit::market::BitMarket;
 use crate::exchange::bit::subscription::BitSubResponse;
 use crate::exchange::Connector;
+use crate::exchange::StreamSelector;
 use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::book::OrderBooksL2;
@@ -16,22 +21,19 @@ use crate::ExchangeId;
 use crate::ExchangeWsStream;
 use crate::PingInterval;
 
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use std::time::Duration;
-use tokio::time;
-use url::Url;
+pub mod book;
 
-use self::book::l2::BitOrderBookL2;
+pub mod channel;
 
-use super::StreamSelector;
+pub mod market;
+
+pub mod message;
+
+pub mod subscription;
 
 const BASE_URL_BIT: &str = "wss://ws.bit.com";
-
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct Bit;
 

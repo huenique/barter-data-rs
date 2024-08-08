@@ -1,12 +1,10 @@
 use serde::Deserialize;
 use serde::Serialize;
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct OptionDetails {
     pub option: MoreOptionDetails,
 }
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MoreOptionDetails {
     pub expiry: Expiry,
     pub strike_price: String,
@@ -24,41 +22,36 @@ pub struct MoreOptionDetails {
     pub margin_spec_id: String,
     pub strikes_spec_id: String,
 }
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Expiry {
     pub datetime: DateTime,
     pub timezone: String,
 }
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DateTime {
     pub date: Date,
     pub time: Time,
 }
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Date {
     pub year: String,
     pub month: String,
     pub day: String,
 }
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Time {
     pub hours: String,
     pub minutes: String,
     pub seconds: String,
     pub nanoseconds: String,
 }
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Response {
     pub risk_snapshot: RiskSnapshot,
 }
 
 // Struct definitions
-#[derive(Clone, Default, Serialize, Deserialize, Debug)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct RiskSnapshot {
     pub symbol: String,
     pub tradeable_entity_id: String,
@@ -71,15 +64,13 @@ pub struct RiskSnapshot {
     pub bid: Option<PriceDetail>,
     pub ask: Option<PriceDetail>,
 }
-
-#[derive(Copy, Clone, Default, Serialize, Deserialize, Debug)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
 pub struct PriceDetail {
     pub price: f64,
     pub volatility: f64,
     pub greeks: Greeks,
 }
-
-#[derive(Copy, Clone, Default, Serialize, Deserialize, Debug)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
 pub struct Greeks {
     pub delta: f64,
     pub vega: f64,
@@ -91,7 +82,9 @@ pub struct Greeks {
 pub mod de {
     use serde::Deserialize;
     use serde::Deserializer;
-    use serde::{self};
+    use serde::{
+        self,
+    };
 
     pub fn de_str<'de, D, T>(deserializer: D) -> Result<T, D::Error>
     where

@@ -1,10 +1,3 @@
-use super::super::message::GateioMessage;
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::exchange::ExchangeSub;
-use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
@@ -14,17 +7,27 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::gateio::message::GateioMessage;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+
 /// Terse type alias for a
 /// [`GateioFuturesUsdt`](super::super::futures::GateioFuturesUsdt),
 /// [`GateioFuturesBtc`](super::super::futures::GateioFuturesBtc),
 /// [`GateioPerpetualUsdt`](super::GateioPerpetualsUsd) and
-/// [`GateioPerpetualBtc`](super::GateioPerpetualsBtc) real-time trades WebSocket message.
+/// [`GateioPerpetualBtc`](super::GateioPerpetualsBtc) real-time trades
+/// WebSocket message.
 pub type GateioFuturesTrades = GateioMessage<Vec<GateioFuturesTradeInner>>;
 
 /// [`GateioFuturesUsdt`](super::super::futures::GateioFuturesUsdt),
 /// [`GateioFuturesBtc`](super::super::futures::GateioFuturesBtc),
 /// [`GateioPerpetualUsdt`](super::GateioPerpetualsUsd) and
-/// [`GateioPerpetualBtc`](super::GateioPerpetualsBtc) real-time trade WebSocket message.
+/// [`GateioPerpetualBtc`](super::GateioPerpetualsBtc) real-time trade WebSocket
+/// message.
 ///
 /// ### Raw Payload Examples
 /// #### Future Sell Trade
@@ -52,7 +55,7 @@ pub type GateioFuturesTrades = GateioMessage<Vec<GateioFuturesTradeInner>>;
 ///   "contract": "BTC_USD"
 /// }
 /// ```
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct GateioFuturesTradeInner {
     #[serde(rename = "contract")]
     pub market: String,

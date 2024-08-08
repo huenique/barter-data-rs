@@ -1,10 +1,3 @@
-use crate::event::MarketIter;
-use crate::exchange::bybit::channel::BybitChannel;
-use crate::exchange::bybit::subscription::BybitResponse;
-use crate::exchange::bybit::trade::BybitTrade;
-use crate::exchange::ExchangeId;
-use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::SubscriptionId;
 use chrono::DateTime;
@@ -14,8 +7,17 @@ use serde::de::Unexpected;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// [`Bybit`](super::Bybit) websocket message supports both [`BybitTrade`](BybitTrade) and [`BybitResponse`](BybitResponse) .
-#[derive(Debug, Serialize, Deserialize)]
+use crate::event::MarketIter;
+use crate::exchange::bybit::channel::BybitChannel;
+use crate::exchange::bybit::subscription::BybitResponse;
+use crate::exchange::bybit::trade::BybitTrade;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+
+/// [`Bybit`](super::Bybit) websocket message supports both
+/// [`BybitTrade`](BybitTrade) and [`BybitResponse`](BybitResponse) .
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum BybitMessage {
     Response(BybitResponse),
@@ -44,7 +46,7 @@ pub enum BybitMessage {
 ///     ]
 /// }
 /// ```
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BybitPayload<T> {
     #[serde(alias = "topic", deserialize_with = "de_message_subscription_id")]
     pub subscription_id: SubscriptionId,
@@ -60,8 +62,8 @@ pub struct BybitPayload<T> {
     pub data: T,
 }
 
-/// Deserialize a [`BybitPayload`] "s" (eg/ "publicTrade.BTCUSDT") as the associated
-/// [`SubscriptionId`].
+/// Deserialize a [`BybitPayload`] "s" (eg/ "publicTrade.BTCUSDT") as the
+/// associated [`SubscriptionId`].
 ///
 /// eg/ "publicTrade|BTCUSDT"
 pub fn de_message_subscription_id<'de, D>(deserializer: D) -> Result<SubscriptionId, D::Error>
@@ -106,9 +108,10 @@ mod tests {
     use super::*;
 
     mod de {
+        use barter_integration::error::SocketError;
+
         use super::*;
         use crate::exchange::bybit::subscription::BybitReturnMessage;
-        use barter_integration::error::SocketError;
 
         #[test]
         fn test_bybit_pong() {

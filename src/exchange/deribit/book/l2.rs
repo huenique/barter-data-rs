@@ -1,13 +1,3 @@
-use super::DeribitLevel;
-use crate::error::DataError;
-use crate::exchange::deribit::channel::DeribitChannel;
-use crate::exchange::deribit::message::DeribitSingleDataMessage;
-use crate::exchange::subscription::ExchangeSub;
-use crate::subscription::book::OrderBook;
-use crate::subscription::book::OrderBookSide;
-use crate::transformer::book::InstrumentOrderBook;
-use crate::transformer::book::OrderBookUpdater;
-use crate::Identifier;
 use async_trait::async_trait;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Side;
@@ -18,10 +8,21 @@ use serde::Deserialize;
 use serde::Serialize;
 use tokio::sync::mpsc;
 
-/// Terse type alias for an [`Deribit`](super::Deribit) real-time trades WebSocket message.
-pub type DeribitOrderBookL2 = DeribitSingleDataMessage<DeribitOrderBookL2Delta>;
+use crate::error::DataError;
+use crate::exchange::deribit::book::DeribitLevel;
+use crate::exchange::deribit::channel::DeribitChannel;
+use crate::exchange::deribit::message::DeribitSingleDataMessage;
+use crate::exchange::subscription::ExchangeSub;
+use crate::subscription::book::OrderBook;
+use crate::subscription::book::OrderBookSide;
+use crate::transformer::book::InstrumentOrderBook;
+use crate::transformer::book::OrderBookUpdater;
+use crate::Identifier;
 
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+/// Terse type alias for an [`Deribit`](super::Deribit) real-time trades
+/// WebSocket message.
+pub type DeribitOrderBookL2 = DeribitSingleDataMessage<DeribitOrderBookL2Delta>;
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct DeribitOrderBookL2Delta {
     pub instrument_name: String,
     pub change_id: u64,
@@ -52,19 +53,23 @@ impl From<DeribitOrderBookL2Delta> for OrderBook {
     }
 }
 
-// The first notification will contain the whole book (bid and ask amounts for all prices).
-// After that there will only be information about changes to individual price levels.
+// The first notification will contain the whole book (bid and ask amounts for
+// all prices). After that there will only be information about changes to
+// individual price levels.
 
-// The first notification will contain the amounts for all price levels (list of ['new', price, amount] tuples).
-// All following notifications will contain a list of tuples with action, price level and new amount ([action, price, amount]).
-// Action can be either new, change or delete.
+// The first notification will contain the amounts for all price levels (list of
+// ['new', price, amount] tuples). All following notifications will contain a
+// list of tuples with action, price level and new amount ([action, price,
+// amount]). Action can be either new, change or delete.
 
-// Each notification will contain a change_id field, and each message except for the first one will contain a field prev_change_id.
-// If prev_change_id is equal to the change_id of the previous message, this means that no messages have been missed.
+// Each notification will contain a change_id field, and each message except for
+// the first one will contain a field prev_change_id. If prev_change_id is equal
+// to the change_id of the previous message, this means that no messages have
+// been missed.
 
-// The amount for perpetual and futures is in USD units, for options it is in corresponding cryptocurrency contracts, e.g., BTC or ETH.
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+// The amount for perpetual and futures is in USD units, for options it is in
+// corresponding cryptocurrency contracts, e.g., BTC or ETH.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct DeribitBookUpdater {
     pub updates_processed: u64,
     pub change_id: u64,
@@ -94,8 +99,8 @@ impl OrderBookUpdater for DeribitBookUpdater {
         Exchange: Send,
         Kind: Send,
     {
-        // No need to fetch snapshot separately, as the first notification will contain the whole book
-        // Initialize empty OrderBook
+        // No need to fetch snapshot separately, as the first notification will contain
+        // the whole book Initialize empty OrderBook
         Ok(InstrumentOrderBook {
             instrument,
             updater: Self::new(0),
@@ -114,7 +119,8 @@ impl OrderBookUpdater for DeribitBookUpdater {
         book: &mut Self::OrderBook,
         update: Self::Update,
     ) -> Result<Option<Self::OrderBook>, DataError> {
-        // If prev_change_id is equal to the change_id of the previous message, this means that no messages have been missed.
+        // If prev_change_id is equal to the change_id of the previous message, this
+        // means that no messages have been missed.
         match update.params.data.prev_change_id {
             Some(prev_change_id) if prev_change_id != self.change_id => {
                 return Err(DataError::InvalidSequence {
@@ -146,11 +152,10 @@ mod tests {
     use super::*;
 
     mod de {
+        use super::*;
         use crate::exchange::deribit::book::Delta;
         use crate::exchange::deribit::message::SingleData;
         use crate::exchange::deribit::message::SubscriptionMethod;
-
-        use super::*;
 
         #[test]
         fn test_deribit_order_book_l2_delta() {

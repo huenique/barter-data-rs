@@ -1,14 +1,15 @@
-use super::Coinbase;
+use serde::Serialize;
+
+use crate::exchange::coinbase::Coinbase;
 use crate::subscription::trade::PublicTrades;
 use crate::subscription::Subscription;
 use crate::Identifier;
-use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Coinbase`](super::Coinbase) channel to be subscribed to.
 ///
 /// See docs: <https://docs.cloud.coinbase.com/exchange/docs/websocket-overview#subscribe>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct CoinbaseChannel(pub &'static str);
 
 impl CoinbaseChannel {

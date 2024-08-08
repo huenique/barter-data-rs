@@ -1,3 +1,14 @@
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Exchange;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Deserializer;
+use serde::Serialize;
+use serde_json::Value;
+
 use crate::event::MarketEvent;
 use crate::event::MarketIter;
 use crate::exchange::powertrade::channel::PowerTradeChannel;
@@ -9,17 +20,6 @@ use crate::subscription::book::Level;
 use crate::subscription::book::OrderBook;
 use crate::subscription::book::OrderBookSide;
 use crate::Identifier;
-
-use barter_integration::model::instrument::Instrument;
-use barter_integration::model::Exchange;
-use barter_integration::model::Side;
-use barter_integration::model::SubscriptionId;
-use chrono::DateTime;
-use chrono::Utc;
-use serde::Deserialize;
-use serde::Deserializer;
-use serde::Serialize;
-use serde_json::Value;
 
 /// The channel sends many messages, but we only care about "pb_snapshot". See:
 /// - <https://power-trade.github.io/api-docs-source/ws_feeds.html#Feeds_Introduction>

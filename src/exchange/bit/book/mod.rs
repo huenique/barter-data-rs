@@ -1,11 +1,11 @@
-pub mod l2;
-
-use crate::subscription::book::Level;
-
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+use crate::subscription::book::Level;
+
+pub mod l2;
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct BitLevel {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub price: f64,

@@ -1,11 +1,11 @@
-pub mod l2;
-
-use crate::subscription::book::Level;
-
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Clone, Copy, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+use crate::subscription::book::Level;
+
+pub mod l2;
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct DydxLevel {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub price: f64,

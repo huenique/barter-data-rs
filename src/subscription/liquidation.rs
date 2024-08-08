@@ -1,13 +1,14 @@
-use super::SubKind;
 use barter_integration::model::Side;
 use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields [`Liquidation`]
-/// [`MarketEvent<T>`](crate::event::MarketEvent) events.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+use crate::subscription::SubKind;
+
+/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields
+/// [`Liquidation`] [`MarketEvent<T>`](crate::event::MarketEvent) events.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Liquidations;
 
 impl SubKind for Liquidations {
@@ -15,7 +16,7 @@ impl SubKind for Liquidations {
 }
 
 /// Normalised Barter [`Liquidation`] model.
-#[derive(Clone, Copy, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct Liquidation {
     pub side: Side,
     pub price: f64,

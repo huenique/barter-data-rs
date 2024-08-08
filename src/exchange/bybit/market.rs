@@ -1,20 +1,22 @@
-use crate::exchange::bybit::Bybit;
-use crate::subscription::Subscription;
-use crate::Identifier;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// Type that defines how to translate a Barter [`Subscription`] into a [`Bybit`](super::Bybit)
-/// market that can be subscribed to.
+use crate::exchange::bybit::Bybit;
+use crate::subscription::Subscription;
+use crate::Identifier;
+
+/// Type that defines how to translate a Barter [`Subscription`] into a
+/// [`Bybit`](super::Bybit) market that can be subscribed to.
 ///
 /// See docs: <https://bybit-exchange.github.io/docs/v5/ws/connect>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BybitMarket(pub String);
 
 impl<Server, Kind> Identifier<BybitMarket> for Subscription<Bybit<Server>, Kind> {
     fn id(&self) -> BybitMarket {
         // Notes:
-        // - Must be uppercase since Bybit sends message with uppercase MARKET (eg/ BTCUSDT).
+        // - Must be uppercase since Bybit sends message with uppercase MARKET (eg/
+        //   BTCUSDT).
         BybitMarket(format!("{}{}", self.instrument.base, self.instrument.quote).to_uppercase())
     }
 }

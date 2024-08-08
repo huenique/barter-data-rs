@@ -1,7 +1,3 @@
-use crate::exchange::coincall::Coincall;
-use crate::subscription::Subscription;
-use crate::Identifier;
-
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::kind::OptionKind;
 use barter_integration::model::instrument::Instrument;
@@ -12,9 +8,13 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::exchange::coincall::Coincall;
+use crate::subscription::Subscription;
+use crate::Identifier;
+
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Coincall`](super::Coincall) market that can be subscribed to.
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct CoincallMarket(pub String);
 
 impl<Server, Kind> Identifier<CoincallMarket> for Subscription<Coincall<Server>, Kind> {

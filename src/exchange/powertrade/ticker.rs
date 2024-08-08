@@ -1,3 +1,14 @@
+use async_trait::async_trait;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::SubscriptionId;
+use barter_integration::protocol::websocket::WsMessage;
+use chrono::TimeZone;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
+use tokio::sync::mpsc;
+use tracing::info;
+
 use crate::error::DataError;
 use crate::event::MarketEvent;
 use crate::event::MarketIter;
@@ -17,17 +28,6 @@ use crate::subscription::ticker::Ticker;
 use crate::transformer::ticker::InstrumentTicker;
 use crate::transformer::ticker::TickerUpdater;
 use crate::Identifier;
-
-use async_trait::async_trait;
-use barter_integration::model::instrument::Instrument;
-use barter_integration::model::SubscriptionId;
-use barter_integration::protocol::websocket::WsMessage;
-use chrono::TimeZone;
-use chrono::Utc;
-use serde::Deserialize;
-use serde::Serialize;
-use tokio::sync::mpsc;
-use tracing::info;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
@@ -66,9 +66,12 @@ pub enum PowerTradeTicker {
 impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
     fn id(&self) -> Option<SubscriptionId> {
         // TODO:
-        // * Since we can't use composite keys rn to use different identifiers for the same
-        // * instrument, we can try fetching the symbol using the tradeable_entity_id or vice
-        // * versa. We'd have to use a local data structure in this module to map the identifier to
+        // * Since we can't use composite keys rn to use different identifiers for the
+        //   same
+        // * instrument, we can try fetching the symbol using the tradeable_entity_id or
+        //   vice
+        // * versa. We'd have to use a local data structure in this module to map the
+        //   identifier to
         // * the symbol.
         match self {
             PowerTradeTicker::DeliverableData { deliverable } => Some(
@@ -144,7 +147,6 @@ enum LTPrice {
     LastTradePrice(LastTradePrice),
     RteLastTradePrice(RteLastTradePrice),
 }
-
 #[derive(Debug, Default)]
 pub struct PowerTradeTickerAggregator {
     ticker: Ticker,
@@ -314,8 +316,8 @@ impl TickerUpdater for PowerTradeTicker {
         // let mut ticker = ticker.clone();
         // ticker.merge(&updated_ticker).map_err(|e| {
         //     DataError::Socket(SocketError::Deserialise {
-        //         error: serde_json::Error::custom(format!("Failed to merge ticker: {e}")),
-        //         payload: updated_ticker.to_string(),
+        //         error: serde_json::Error::custom(format!("Failed to merge ticker:
+        // {e}")),         payload: updated_ticker.to_string(),
         //     })
         // })?;
 

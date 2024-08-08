@@ -1,7 +1,8 @@
-use crate::Identifier;
 use barter_integration::model::SubscriptionId;
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::Identifier;
 
 /// [`Kraken`](super::Kraken) message variants that can be received over
 /// [`WebSocket`](barter_integration::protocol::websocket::WebSocket).
@@ -70,7 +71,7 @@ use serde::Serialize;
 ///     "event": "error"
 /// }
 /// ```
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(untagged, rename_all = "snake_case")]
 pub enum KrakenMessage<T> {
     Data(T),
@@ -89,32 +90,35 @@ where
     }
 }
 
-/// [`Kraken`](super::Kraken) messages received over the WebSocket which are not subscription data.
+/// [`Kraken`](super::Kraken) messages received over the WebSocket which are not
+/// subscription data.
 ///
-/// eg/ [`Kraken`](super::Kraken) sends a [`KrakenEvent::Heartbeat`] if no subscription traffic
-/// has been sent within the last second.
+/// eg/ [`Kraken`](super::Kraken) sends a [`KrakenEvent::Heartbeat`] if no
+/// subscription traffic has been sent within the last second.
 ///
 /// See [`KrakenMessage`] for full raw payload examples.
 ///
 /// See docs: <https://docs.kraken.com/websockets/#message-heartbeat>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(tag = "event", rename_all = "camelCase")]
 pub enum KrakenEvent {
     Heartbeat,
     Error(KrakenError),
 }
 
-/// [`Kraken`](super::Kraken) generic error message String received over the WebSocket.
+/// [`Kraken`](super::Kraken) generic error message String received over the
+/// WebSocket.
 ///
-/// Note that since the [`KrakenError`] is only made up of a renamed message String field, it can
-/// be used flexible as a [`KrakenSubResponse::Error`](super::subscription::KrakenSubResponse)
-/// or as a generic error received over the WebSocket while subscriptions are active.
+/// Note that since the [`KrakenError`] is only made up of a renamed message
+/// String field, it can be used flexible as a
+/// [`KrakenSubResponse::Error`](super::subscription::KrakenSubResponse) or as a
+/// generic error received over the WebSocket while subscriptions are active.
 ///
 /// See [`KrakenMessage`] for full raw payload examples.
 ///
 /// See docs: <https://docs.kraken.com/websockets/#errortypes> <br>
 /// See docs: <https://docs.kraken.com/websockets/#message-subscriptionStatus>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct KrakenError {
     #[serde(alias = "errorMessage")]
     pub message: String,
@@ -125,8 +129,9 @@ mod tests {
     use super::*;
 
     mod de {
-        use super::*;
         use barter_integration::error::SocketError;
+
+        use super::*;
 
         #[test]
         fn test_kraken_message_event() {

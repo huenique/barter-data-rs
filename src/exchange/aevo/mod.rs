@@ -1,11 +1,16 @@
+use std::time::Duration;
+
 use barter_integration::error::SocketError;
 use barter_integration::protocol::websocket::WsMessage;
 use barter_macro::DeExchange;
 use barter_macro::SerExchange;
 use serde_json::json;
-use std::time::Duration;
 use url::Url;
 
+use crate::exchange::aevo::book::l2::AevoBookUpdater;
+use crate::exchange::aevo::channel::AevoChannel;
+use crate::exchange::aevo::market::AevoMarket;
+use crate::exchange::aevo::subscription::AevoSubResponse;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
@@ -15,11 +20,6 @@ use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::book::OrderBooksL2;
 use crate::transformer::book::MultiBookTransformer;
 use crate::ExchangeWsStream;
-
-use self::book::l2::AevoBookUpdater;
-use self::channel::AevoChannel;
-use self::market::AevoMarket;
-use self::subscription::AevoSubResponse;
 
 pub mod channel;
 
@@ -45,7 +45,7 @@ pub const PING_INTERVAL_AEVO: Duration = Duration::from_secs(840);
 ///
 /// See docs: <https://docs.aevo.xyz/reference/overview>
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct Aevo;
 

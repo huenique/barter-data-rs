@@ -1,6 +1,6 @@
-use super::Bybit;
-use super::ExchangeServer;
+use crate::exchange::bybit::Bybit;
 use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeServer;
 
 /// [`BybitSpot`] WebSocket server base url.
 ///
@@ -11,7 +11,7 @@ pub const WEBSOCKET_BASE_URL_BYBIT_SPOT: &str = "wss://stream.bybit.com/v5/publi
 pub type BybitSpot = Bybit<BybitServerSpot>;
 
 /// [`Bybit`] spot [`ExchangeServer`].
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct BybitServerSpot;
 
 impl ExchangeServer for BybitServerSpot {

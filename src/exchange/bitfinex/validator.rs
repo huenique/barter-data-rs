@@ -1,11 +1,3 @@
-use super::subscription::BitfinexPlatformEvent;
-use super::subscription::BitfinexSubResponse;
-use crate::exchange::Connector;
-use crate::exchange::ExchangeSub;
-use crate::subscriber::validator::SubscriptionValidator;
-use crate::subscription::Map;
-use crate::subscription::SubKind;
-use crate::Identifier;
 use async_trait::async_trait;
 use barter_integration::error::SocketError;
 use barter_integration::model::instrument::Instrument;
@@ -19,18 +11,29 @@ use serde::Deserialize;
 use serde::Serialize;
 use tracing::debug;
 
+use crate::exchange::bitfinex::subscription::BitfinexPlatformEvent;
+use crate::exchange::bitfinex::subscription::BitfinexSubResponse;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeSub;
+use crate::subscriber::validator::SubscriptionValidator;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
+use crate::Identifier;
+
 /// [`Bitfinex`](super::Bitfinex) specific [`SubscriptionValidator`].
 ///
 /// ### Notes
-/// - Required because Bitfinex has a non-self-describing data format after subscriptions have been
-///   validated.
-/// - The [`BitfinexChannelId`](super::subscription::BitfinexChannelId) is used to identify the
-///   [`Subscription`](crate::subscription::Subscription) associated with incoming
-///   events, rather than a `String` channel-market identifier.
-/// - Therefore the [`SubscriptionId`] format must change during [`BitfinexWebSocketSubValidator::validate`]
-///   to use the [`BitfinexChannelId`](super::subscription::BitfinexChannelId)
-///   (see module level "SubscriptionId" documentation notes for more details).
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+/// - Required because Bitfinex has a non-self-describing data format after
+///   subscriptions have been validated.
+/// - The [`BitfinexChannelId`](super::subscription::BitfinexChannelId) is used
+///   to identify the [`Subscription`](crate::subscription::Subscription)
+///   associated with incoming events, rather than a `String` channel-market
+///   identifier.
+/// - Therefore the [`SubscriptionId`] format must change during
+///   [`BitfinexWebSocketSubValidator::validate`] to use the
+///   [`BitfinexChannelId`](super::subscription::BitfinexChannelId) (see module
+///   level "SubscriptionId" documentation notes for more details).
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitfinexWebSocketSubValidator;
 
 #[async_trait]

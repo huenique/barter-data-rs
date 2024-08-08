@@ -1,10 +1,3 @@
-use crate::error::DataError;
-use crate::subscription::book::OrderBook;
-use crate::subscription::book::OrderBookL1;
-use crate::subscription::candle::Candle;
-use crate::subscription::liquidation::Liquidation;
-use crate::subscription::ticker::Ticker;
-use crate::subscription::trade::PublicTrade;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use chrono::DateTime;
@@ -12,7 +5,16 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// Convenient new type containing a collection of [`MarketEvent<T>`](MarketEvent)s.
+use crate::error::DataError;
+use crate::subscription::book::OrderBook;
+use crate::subscription::book::OrderBookL1;
+use crate::subscription::candle::Candle;
+use crate::subscription::liquidation::Liquidation;
+use crate::subscription::ticker::Ticker;
+use crate::subscription::trade::PublicTrade;
+
+/// Convenient new type containing a collection of
+/// [`MarketEvent<T>`](MarketEvent)s.
 #[derive(Debug)]
 pub struct MarketIter<T>(pub Vec<Result<MarketEvent<T>, DataError>>);
 
@@ -25,7 +27,8 @@ impl<T> FromIterator<Result<MarketEvent<T>, DataError>> for MarketIter<T> {
     }
 }
 
-/// Normalised Barter [`MarketEvent<T>`](Self) wrapping the `T` data variant in metadata.
+/// Normalised Barter [`MarketEvent<T>`](Self) wrapping the `T` data variant in
+/// metadata.
 ///
 /// Note: `T` can be an enum such as the [`DataKind`] if required.
 ///
@@ -35,7 +38,7 @@ impl<T> FromIterator<Result<MarketEvent<T>, DataError>> for MarketIter<T> {
 /// - [`MarketEvent<PublicTrade>`](crate::subscription::trade::PublicTrade)
 /// - [`MarketEvent<OrderBookL1>`](crate::subscription::book::OrderBookL1)
 /// - [`MarketEvent<DataKind>`](DataKind)
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct MarketEvent<T> {
     pub exchange_time: DateTime<Utc>,
     pub received_time: DateTime<Utc>,
@@ -47,14 +50,15 @@ pub struct MarketEvent<T> {
 /// Available kinds of normalised Barter [`MarketEvent<T>`](MarketEvent).
 ///
 /// ### Notes
-/// - [`Self`] is only used as the [`MarketEvent<DataKind>`](MarketEvent) `Output` when combining
-///   several [`Streams<SubKind::Event>`](crate::streams::Streams) using the
+/// - [`Self`] is only used as the [`MarketEvent<DataKind>`](MarketEvent)
+///   `Output` when combining several
+///   [`Streams<SubKind::Event>`](crate::streams::Streams) using the
 ///   [`MultiStreamBuilder<Output>`](crate::streams::builder::multi::MultiStreamBuilder).
 /// - [`Self`] is purposefully not supported in any
-///   [`Subscription`](crate::subscription::Subscription)s directly, it is only used to
-///   make ergonomic [`Streams`](crate::streams::Streams) containing many
-///   [`MarketEvent<T>`](MarketEvent) kinds.
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+///   [`Subscription`](crate::subscription::Subscription)s directly, it is only
+///   used to make ergonomic [`Streams`](crate::streams::Streams) containing
+///   many [`MarketEvent<T>`](MarketEvent) kinds.
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub enum DataKind {
     Trade(PublicTrade),
     OrderBookL1(OrderBookL1),

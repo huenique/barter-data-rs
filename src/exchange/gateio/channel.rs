@@ -1,14 +1,15 @@
+use barter_integration::model::instrument::kind::InstrumentKind;
+use serde::Serialize;
+
 use crate::subscription::trade::PublicTrades;
 use crate::subscription::Subscription;
 use crate::Identifier;
-use barter_integration::model::instrument::kind::InstrumentKind;
-use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Gateio`](super::Gateio) channel to be subscribed to.
 ///
 /// See docs: <https://www.okx.com/docs-v5/en/#websocket-api-public-channel>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct GateioChannel(pub &'static str);
 
 impl GateioChannel {
@@ -17,7 +18,8 @@ impl GateioChannel {
     /// See docs: <https://www.gate.io/docs/developers/apiv4/ws/en/#public-trades-channel>
     pub const SPOT_TRADES: Self = Self("spot.trades");
 
-    /// Gateio [`InstrumentKind::Future`] & [`InstrumentKind::Perpetual`] real-time trades channel.
+    /// Gateio [`InstrumentKind::Future`] & [`InstrumentKind::Perpetual`]
+    /// real-time trades channel.
     ///
     /// See docs: <https://www.gate.io/docs/developers/futures/ws/en/#trades-subscription>
     /// See docs: <https://www.gate.io/docs/developers/delivery/ws/en/#trades-subscription>

@@ -1,9 +1,3 @@
-use super::super::BinanceChannel;
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::subscription::liquidation::Liquidation;
-use crate::Identifier;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
@@ -12,6 +6,13 @@ use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::binance::BinanceChannel;
+use crate::exchange::ExchangeId;
+use crate::subscription::liquidation::Liquidation;
+use crate::Identifier;
 
 /// [`BinanceFuturesUsd`](super::BinanceFuturesUsd) Liquidation order message.
 ///
@@ -36,7 +37,7 @@ use serde::Serialize;
 ///     }
 /// }
 /// ```
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct BinanceLiquidation {
     #[serde(alias = "o")]
     pub order: BinanceLiquidationOrder,
@@ -62,7 +63,7 @@ pub struct BinanceLiquidation {
 /// ```
 ///
 /// See docs: <https://binance-docs.github.io/apidocs/futures/en/#liquidation-order-streams>
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct BinanceLiquidationOrder {
     #[serde(alias = "s", deserialize_with = "de_liquidation_subscription_id")]
     pub subscription_id: SubscriptionId,
@@ -104,8 +105,8 @@ impl From<(ExchangeId, Instrument, BinanceLiquidation)> for MarketIter<Liquidati
     }
 }
 
-/// Deserialize a [`BinanceLiquidationOrder`] "s" (eg/ "BTCUSDT") as the associated
-/// [`SubscriptionId`].
+/// Deserialize a [`BinanceLiquidationOrder`] "s" (eg/ "BTCUSDT") as the
+/// associated [`SubscriptionId`].
 ///
 /// eg/ "forceOrder|BTCUSDT"
 pub fn de_liquidation_subscription_id<'de, D>(deserializer: D) -> Result<SubscriptionId, D::Error>
@@ -122,9 +123,11 @@ mod tests {
     use super::*;
 
     mod de {
-        use super::*;
-        use barter_integration::de::datetime_utc_from_epoch_duration;
         use std::time::Duration;
+
+        use barter_integration::de::datetime_utc_from_epoch_duration;
+
+        use super::*;
 
         #[test]
         fn test_binance_liquidation() {

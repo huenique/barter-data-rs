@@ -1,12 +1,3 @@
-use self::mapper::SubscriptionMapper;
-use self::mapper::WebSocketSubMapper;
-use self::validator::SubscriptionValidator;
-use crate::exchange::Connector;
-use crate::subscription::Map;
-use crate::subscription::SubKind;
-use crate::subscription::Subscription;
-use crate::subscription::SubscriptionMeta;
-use crate::Identifier;
 use async_trait::async_trait;
 use barter_integration::error::SocketError;
 use barter_integration::model::instrument::Instrument;
@@ -18,12 +9,23 @@ use serde::Serialize;
 use tracing::debug;
 use tracing::info;
 
-/// [`SubscriptionMapper`](mapper::SubscriptionMapper) implementations defining how to map a
-/// collection of Barter [`Subscription`]s into exchange specific [`SubscriptionMeta`].
+use crate::exchange::Connector;
+use crate::subscriber::mapper::SubscriptionMapper;
+use crate::subscriber::mapper::WebSocketSubMapper;
+use crate::subscriber::validator::SubscriptionValidator;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
+use crate::subscription::Subscription;
+use crate::subscription::SubscriptionMeta;
+use crate::Identifier;
+
+/// [`SubscriptionMapper`](mapper::SubscriptionMapper) implementations defining
+/// how to map a collection of Barter [`Subscription`]s into exchange specific
+/// [`SubscriptionMeta`].
 pub mod mapper;
 
-/// [`SubscriptionValidator`](validator::SubscriptionValidator) implementations defining how to
-/// validate actioned [`Subscription`]s were successful.
+/// [`SubscriptionValidator`](validator::SubscriptionValidator) implementations
+/// defining how to validate actioned [`Subscription`]s were successful.
 pub mod validator;
 
 /// Defines how to connect to a socket and subscribe to market data streams.
@@ -41,7 +43,7 @@ pub trait Subscriber {
 }
 
 /// Standard [`Subscriber`] for [`WebSocket`]s suitable for most exchanges.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct WebSocketSubscriber;
 
 #[async_trait]

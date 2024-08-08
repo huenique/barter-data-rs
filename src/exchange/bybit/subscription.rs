@@ -25,15 +25,13 @@ use serde::Serialize;
 ///     "req_id": "10001",
 ///     "op": "subscribe"
 /// }
-///
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BybitResponse {
     pub success: bool,
     #[serde(default)]
     pub ret_msg: BybitReturnMessage,
 }
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub enum BybitReturnMessage {
     #[serde(alias = "")]
     None,

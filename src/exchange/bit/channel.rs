@@ -1,15 +1,15 @@
+use serde::Serialize;
+
 use crate::exchange::bit::Bit;
 use crate::subscription::book::OrderBooksL2;
 use crate::Identifier;
 use crate::Subscription;
 
-use serde::Serialize;
-
-/// Type that defines how to translate a Barter [`Subscription`] into a [`Bit`](super::Bit)
-/// channel to be subscribed to.
+/// Type that defines how to translate a Barter [`Subscription`] into a
+/// [`Bit`](super::Bit) channel to be subscribed to.
 ///
 /// See docs: <https://www.bit.com/docs/en-us/#channel-summary>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitChannel(pub &'static str);
 
 impl BitChannel {

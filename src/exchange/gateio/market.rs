@@ -1,6 +1,3 @@
-use super::Gateio;
-use crate::subscription::Subscription;
-use crate::Identifier;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::kind::OptionKind;
 use barter_integration::model::instrument::Instrument;
@@ -11,11 +8,15 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::exchange::gateio::Gateio;
+use crate::subscription::Subscription;
+use crate::Identifier;
+
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Gateio`](super::Gateio) market that can be subscribed to.
 ///
 /// See docs: <https://www.okx.com/docs-v5/en/#websocket-api-public-channel>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct GateioMarket(pub String);
 
 impl<Server, Kind> Identifier<GateioMarket> for Subscription<Gateio<Server>, Kind> {

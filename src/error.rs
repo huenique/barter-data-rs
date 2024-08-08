@@ -20,7 +20,8 @@ pub enum DataError {
 }
 
 impl DataError {
-    /// Determine if an error requires a [`MarketStream`](super::MarketStream) to re-initialise.
+    /// Determine if an error requires a [`MarketStream`](super::MarketStream)
+    /// to re-initialise.
     #[allow(clippy::match_like_matches_macro)]
     pub fn is_terminal(&self) -> bool {
         match self {
@@ -30,8 +31,10 @@ impl DataError {
     }
 
     /// TODO: Implement [`SubscriptionValidator`] for exchanges that require it.
-    /// Remove this method, which was intended to handle `SocketError::Unidentifiable` errors
-    /// caused by using `#[serde(default)]` on fields to purposely ignore unknown message formats.
+    /// Remove this method, which was intended to handle
+    /// `SocketError::Unidentifiable` errors caused by using
+    /// `#[serde(default)]` on fields to purposely ignore unknown message
+    /// formats.
     pub fn is_unidentified(&self) -> bool {
         matches!(self, DataError::Socket(SocketError::Unidentifiable(_)))
     }

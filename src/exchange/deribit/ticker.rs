@@ -1,3 +1,9 @@
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::event::MarketIter;
 use crate::exchange::deribit::message::DeribitSingleDataMessage;
 use crate::exchange::deribit::DeribitChannel;
@@ -8,12 +14,6 @@ use crate::subscription::ticker::Ticker;
 use crate::ExchangeId;
 use crate::Identifier;
 use crate::MarketEvent;
-
-use barter_integration::model::SubscriptionId;
-use chrono::DateTime;
-use chrono::Utc;
-use serde::Deserialize;
-use serde::Serialize;
 
 pub type DeribitTicker = DeribitSingleDataMessage<DeribitTickerData>;
 
@@ -68,7 +68,6 @@ impl From<DeribitTickerData> for Ticker {
         }
     }
 }
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DeribitTickerData {
     pub instrument_name: String,
@@ -92,8 +91,7 @@ pub struct DeribitTickerData {
     pub current_funding: Option<f64>,
     pub interest_value: Option<f64>,
 }
-
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct DeribitGreeks {
     pub delta: f64,
     pub gamma: f64,

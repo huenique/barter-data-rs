@@ -1,14 +1,15 @@
-use super::Okx;
+use serde::Serialize;
+
+use crate::exchange::okx::Okx;
 use crate::subscription::trade::PublicTrades;
 use crate::subscription::Subscription;
 use crate::Identifier;
-use serde::Serialize;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Okx`](super::Okx) channel to be subscribed to.
 ///
 /// See docs: <https://www.okx.com/docs-v5/en/#websocket-api-public-channel>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct OkxChannel(pub &'static str);
 
 impl OkxChannel {

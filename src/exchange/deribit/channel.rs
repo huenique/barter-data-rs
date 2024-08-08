@@ -1,5 +1,6 @@
 use serde::Serialize;
 
+use crate::exchange::deribit::Deribit;
 use crate::subscription::book::OrderBooksL1;
 use crate::subscription::book::OrderBooksL2;
 use crate::subscription::index::Indices;
@@ -8,13 +9,11 @@ use crate::subscription::trade::PublicTrades;
 use crate::subscription::Subscription;
 use crate::Identifier;
 
-use super::Deribit;
-
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Deribit`](super::Deribit) channel to be subscribed to.
 ///
 /// See docs: <https://docs.deribit.com/#subscriptions>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct DeribitChannel(pub &'static str);
 
 impl DeribitChannel {
@@ -23,7 +22,8 @@ impl DeribitChannel {
     /// See docs: <https://docs.deribit.com/#trades-instrument_name-interval>
     pub const TRADES_RAW: Self = Self("trades.{}.100ms");
 
-    /// [`Deribit`](super::Deribit) real-time OrderBook Level1 (top of book) channel name.
+    /// [`Deribit`](super::Deribit) real-time OrderBook Level1 (top of book)
+    /// channel name.
     ///
     /// See docs:<https://docs.deribit.com/#quote-instrument_name>
     pub const ORDER_BOOK_L1: Self = Self("quote.{}");

@@ -1,12 +1,13 @@
-use crate::subscription::Subscription;
-use crate::Identifier;
 use barter_integration::model::SubscriptionId;
 use serde::Deserialize;
 
-/// Defines an exchange specific market and channel combination used by an exchange
-/// [`Connector`](super::Connector) to build the
-/// [`WsMessage`](barter_integration::protocol::websocket::WsMessage) subscription payloads to
-/// send to the exchange server.
+use crate::subscription::Subscription;
+use crate::Identifier;
+
+/// Defines an exchange specific market and channel combination used by an
+/// exchange [`Connector`](super::Connector) to build the
+/// [`WsMessage`](barter_integration::protocol::websocket::WsMessage)
+/// subscription payloads to send to the exchange server.
 ///
 /// ### Examples
 /// #### Binance OrderBooksL2
@@ -23,18 +24,19 @@ use serde::Deserialize;
 ///     market: KrakenChannel("BTC/USDT")
 /// }
 /// ```
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct ExchangeSub<Channel, Market> {
-    /// Type that defines how to translate a Barter [`Subscription`] into an exchange specific
-    /// channel to be subscribed to.
+    /// Type that defines how to translate a Barter [`Subscription`] into an
+    /// exchange specific channel to be subscribed to.
     ///
     /// ### Examples
-    /// - [`BinanceChannel("@depth@100ms")`](super::binance::channel::BinanceChannel)
+    /// - [`BinanceChannel("@depth@100ms"
+    ///   )`](super::binance::channel::BinanceChannel)
     /// - [`KrakenChannel("trade")`](super::kraken::channel::KrakenChannel)
     pub channel: Channel,
 
-    /// Type that defines how to translate a Barter [`Subscription`] into an exchange specific
-    /// market that can be subscribed to.
+    /// Type that defines how to translate a Barter [`Subscription`] into an
+    /// exchange specific market that can be subscribed to.
     ///
     /// ### Examples
     /// - [`BinanceMarket("btcusdt")`](super::binance::market::BinanceMarket)
@@ -61,7 +63,8 @@ where
     Channel: AsRef<str>,
     Market: AsRef<str>,
 {
-    /// Construct a new exchange specific [`Self`] with the Barter [`Subscription`] provided.
+    /// Construct a new exchange specific [`Self`] with the Barter
+    /// [`Subscription`] provided.
     pub fn new<Exchange, Kind>(sub: &Subscription<Exchange, Kind>) -> Self
     where
         Subscription<Exchange, Kind>: Identifier<Channel> + Identifier<Market>,

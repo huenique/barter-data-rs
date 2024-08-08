@@ -1,5 +1,5 @@
-use self::trade::GateioFuturesTrades;
-use super::Gateio;
+use crate::exchange::gateio::perpetual::trade::GateioFuturesTrades;
+use crate::exchange::gateio::Gateio;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeServer;
 use crate::exchange::StreamSelector;
@@ -19,7 +19,7 @@ pub const WEBSOCKET_BASE_URL_GATEIO_PERPETUALS_USD: &str = "wss://fx-ws.gateio.w
 pub type GateioPerpetualsUsd = Gateio<GateioServerPerpetualsUsd>;
 
 /// [`Gateio`] perpetual usd [`ExchangeServer`].
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct GateioServerPerpetualsUsd;
 
 impl ExchangeServer for GateioServerPerpetualsUsd {
@@ -43,7 +43,7 @@ pub const WEBSOCKET_BASE_URL_GATEIO_PERPETUALS_BTC: &str = "wss://fx-ws.gateio.w
 pub type GateioPerpetualsBtc = Gateio<GateioServerPerpetualsBtc>;
 
 /// [`Gateio`] perpetual btc [`ExchangeServer`].
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct GateioServerPerpetualsBtc;
 
 impl ExchangeServer for GateioServerPerpetualsBtc {

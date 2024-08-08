@@ -1,12 +1,11 @@
 use serde::Serialize;
 
+use crate::exchange::lyra::Lyra;
 use crate::subscription::ticker::Tickers;
 use crate::subscription::Subscription;
 use crate::Identifier;
 
-use super::Lyra;
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct LyraChannel(pub &'static str);
 
 impl LyraChannel {

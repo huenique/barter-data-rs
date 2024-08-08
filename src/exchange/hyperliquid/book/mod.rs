@@ -1,6 +1,5 @@
+use crate::exchange::hyperliquid::book::l2::WsLevel;
 use crate::subscription::book::Level;
-
-use self::l2::WsLevel;
 
 pub mod l2;
 

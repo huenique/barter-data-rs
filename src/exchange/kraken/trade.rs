@@ -1,9 +1,3 @@
-use super::KrakenMessage;
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 use barter_integration::de::datetime_utc_from_epoch_duration;
 use barter_integration::de::extract_next;
 use barter_integration::model::instrument::Instrument;
@@ -14,15 +8,25 @@ use chrono::DateTime;
 use chrono::Utc;
 use serde::Serialize;
 
-/// Terse type alias for an [`Kraken`](super::Kraken) real-time trades WebSocket message.
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::kraken::message::KrakenMessage;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+
+/// Terse type alias for an [`Kraken`](super::Kraken) real-time trades WebSocket
+/// message.
 pub type KrakenTrades = KrakenMessage<KrakenTradesInner>;
 
-/// Collection of [`KrakenTrade`] items with an associated [`SubscriptionId`] (eg/ "trade|XBT/USD").
+/// Collection of [`KrakenTrade`] items with an associated [`SubscriptionId`]
+/// (eg/ "trade|XBT/USD").
 ///
-/// See [`KrakenMessage`](super::message::KrakenMessage) for full raw payload examples.
+/// See [`KrakenMessage`](super::message::KrakenMessage) for full raw payload
+/// examples.
 ///
 /// See docs: <https://docs.kraken.com/websockets/#message-trade>
-#[derive(Clone, PartialEq, PartialOrd, Debug, Serialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Serialize)]
 pub struct KrakenTradesInner {
     pub subscription_id: SubscriptionId,
     pub trades: Vec<KrakenTrade>,
@@ -30,10 +34,11 @@ pub struct KrakenTradesInner {
 
 /// [`Kraken`](super::Kraken) trade.
 ///
-/// See [`KrakenMessage`](super::message::KrakenMessage) for full raw payload examples.
+/// See [`KrakenMessage`](super::message::KrakenMessage) for full raw payload
+/// examples.
 ///
 /// See docs: <https://docs.kraken.com/websockets/#message-trade>
-#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Serialize)]
 pub struct KrakenTrade {
     pub price: f64,
     #[serde(rename = "quantity")]
@@ -48,8 +53,8 @@ impl Identifier<Option<SubscriptionId>> for KrakenTradesInner {
     }
 }
 
-/// Generate a custom [`Kraken`](super::Kraken) trade identifier since it is not provided in the
-/// [`KrakenTrade`] model.
+/// Generate a custom [`Kraken`](super::Kraken) trade identifier since it is not
+/// provided in the [`KrakenTrade`] model.
 fn custom_kraken_trade_id(trade: &KrakenTrade) -> String {
     format!(
         "{:?}_{}_{}_{}",
@@ -108,8 +113,8 @@ impl<'de> serde::de::Deserialize<'de> for KrakenTradesInner {
                 SeqAccessor: serde::de::SeqAccess<'de>,
             {
                 // KrakenTrades Sequence Format:
-                // [channelID, [[price, volume, time, side, orderType, misc]], channelName, pair]
-                // <https://docs.kraken.com/websockets/#message-trade>
+                // [channelID, [[price, volume, time, side, orderType, misc]], channelName,
+                // pair] <https://docs.kraken.com/websockets/#message-trade>
 
                 // Extract deprecated channelID & ignore
                 let _: serde::de::IgnoredAny = extract_next(&mut seq, "channelID")?;
@@ -209,11 +214,12 @@ mod tests {
     use super::*;
 
     mod de {
-        use super::*;
         use barter_integration::de::datetime_utc_from_epoch_duration;
         use barter_integration::error::SocketError;
         use barter_integration::model::Side;
         use barter_integration::model::SubscriptionId;
+
+        use super::*;
 
         #[test]
         fn test_kraken_message_trades() {

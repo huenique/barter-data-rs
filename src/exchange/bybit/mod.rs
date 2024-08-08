@@ -1,3 +1,15 @@
+use std::fmt::Debug;
+use std::marker::PhantomData;
+use std::time::Duration;
+
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WsMessage;
+use serde::de::Error;
+use serde::de::Unexpected;
+use tokio::time;
+use url::Url;
+
 use crate::exchange::bybit::channel::BybitChannel;
 use crate::exchange::bybit::market::BybitMarket;
 use crate::exchange::bybit::message::BybitMessage;
@@ -14,27 +26,19 @@ use crate::subscription::trade::PublicTrades;
 use crate::subscription::Map;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-use barter_integration::error::SocketError;
-use barter_integration::model::instrument::Instrument;
-use barter_integration::protocol::websocket::WsMessage;
-use serde::de::Error;
-use serde::de::Unexpected;
-use std::fmt::Debug;
-use std::marker::PhantomData;
-use std::time::Duration;
-use tokio::time;
-use url::Url;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific channel used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific channel used for generating [`Connector::requests`].
 pub mod channel;
 
 /// [`ExchangeServer`] and [`StreamSelector`] implementations for
 /// [`BybitFuturesUsd`](futures::BybitPerpetualsUsd).
 pub mod futures;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific market used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific market used for generating [`Connector::requests`].
 pub mod market;
 
 /// Generic [`BybitPayload<T>`](message::BybitPayload) type common to
@@ -45,8 +49,9 @@ pub mod message;
 /// [`BybitSpot`](spot::BybitSpot).
 pub mod spot;
 
-/// [`Subscription`](crate::subscription::Subscription) response type and response
-/// [`Validator`](barter_integration::Validator) common to both [`BybitSpot`](spot::BybitSpot)
+/// [`Subscription`](crate::subscription::Subscription) response type and
+/// response [`Validator`](barter_integration::Validator) common to both
+/// [`BybitSpot`](spot::BybitSpot)
 /// and [`BybitFuturesUsd`](futures::BybitPerpetualsUsd).
 pub mod subscription;
 
@@ -57,9 +62,10 @@ pub mod trade;
 /// Generic [`Bybit<Server>`](Bybit) exchange.
 ///
 /// ### Notes
-/// A `Server` [`ExchangeServer`](super::ExchangeServer) implementations exists for
-/// [`BybitSpot`](spot::BybitSpot) and [`BybitFuturesUsd`](futures::BybitPerpetualsUsd).
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+/// A `Server` [`ExchangeServer`](super::ExchangeServer) implementations exists
+/// for [`BybitSpot`](spot::BybitSpot) and
+/// [`BybitFuturesUsd`](futures::BybitPerpetualsUsd).
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Bybit<Server> {
     server: PhantomData<Server>,
 }

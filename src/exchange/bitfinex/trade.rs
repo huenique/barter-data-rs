@@ -1,7 +1,3 @@
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::subscription::trade::PublicTrade;
 use barter_integration::de::datetime_utc_from_epoch_duration;
 use barter_integration::de::extract_next;
 use barter_integration::model::instrument::Instrument;
@@ -10,6 +6,11 @@ use barter_integration::model::Side;
 use chrono::DateTime;
 use chrono::Utc;
 use serde::Serialize;
+
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
 
 /// [`Bitfinex`](super::Bitfinex) real-time trade message.
 ///
@@ -31,13 +32,14 @@ use serde::Serialize;
 /// ```
 ///
 /// ## Notes:
-/// - [`Bitfinex`](super::Bitfinex) trades subscriptions results in receiving tag="te" & tag="tu"
-///     trades, both of which are identical.
+/// - [`Bitfinex`](super::Bitfinex) trades subscriptions results in receiving
+///   tag="te" & tag="tu" trades, both of which are identical.
 /// - "te" trades arrive marginally faster.
-/// - Therefore, tag="tu" trades are filtered out and considered only as additional Heartbeats.
+/// - Therefore, tag="tu" trades are filtered out and considered only as
+///   additional Heartbeats.
 ///
 /// See docs: <https://docs.bitfinex.com/reference/ws-public-trades>
-#[derive(Clone, Copy, PartialEq, PartialOrd, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Serialize)]
 pub struct BitfinexTrade {
     pub id: u64,
     pub time: DateTime<Utc>,

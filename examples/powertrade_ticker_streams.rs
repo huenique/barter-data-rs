@@ -41,7 +41,8 @@ async fn main() {
     }
 }
 
-// Initialise an INFO `Subscriber` for `Tracing` logs and install it as the global default.
+// Initialise an INFO `Subscriber` for `Tracing` logs and install it as the
+// global default.
 fn init_logging() {
     tracing_subscriber::fmt()
         .with_env_filter(

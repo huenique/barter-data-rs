@@ -1,8 +1,10 @@
-pub mod book;
-pub mod channel;
-pub mod market;
-pub mod message;
-pub mod subscription;
+use std::fmt::Debug;
+
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use url::Url;
 
 use crate::exchange::dydx::book::l2::DydxOrderBookUpdater;
 use crate::exchange::dydx::channel::DydxChannel;
@@ -18,17 +20,19 @@ use crate::subscription::book::OrderBooksL2;
 use crate::transformer::book::MultiBookTransformer;
 use crate::ExchangeWsStream;
 
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use std::fmt::Debug;
-use url::Url;
+pub mod book;
+
+pub mod channel;
+
+pub mod market;
+
+pub mod message;
+
+pub mod subscription;
 
 const BASE_URL_DYDX: &str = "wss://indexer.dydx.trade/v4/ws";
-
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct Dydx;
 

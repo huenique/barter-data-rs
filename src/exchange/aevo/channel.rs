@@ -1,16 +1,15 @@
 use serde::Serialize;
 
+use crate::exchange::aevo::Aevo;
 use crate::subscription::book::OrderBooksL2;
 use crate::subscription::Subscription;
 use crate::Identifier;
-
-use super::Aevo;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Aevo`](super::Aevo) channel to be subscribed to.
 ///
 /// See docs: <https://docs.aevo.xyz/reference/publish-channel>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct AevoChannel(pub &'static str);
 
 impl AevoChannel {

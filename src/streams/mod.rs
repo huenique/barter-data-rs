@@ -1,22 +1,27 @@
-use self::builder::multi::MultiStreamBuilder;
-use self::builder::StreamBuilder;
-use crate::exchange::ExchangeId;
-use crate::subscription::SubKind;
 use std::collections::HashMap;
+
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use tokio_stream::StreamMap;
 
+use crate::exchange::ExchangeId;
+use crate::streams::builder::multi::MultiStreamBuilder;
+use crate::streams::builder::StreamBuilder;
+use crate::subscription::SubKind;
+
 /// Defines the [`StreamBuilder`](builder::StreamBuilder) and
-/// [`MultiStreamBuilder`](builder::multi::MultiStreamBuilder) APIs for ergonomically initialising
-/// [`MarketStream`](super::MarketStream) [`Streams`].
+/// [`MultiStreamBuilder`](builder::multi::MultiStreamBuilder) APIs for
+/// ergonomically initialising [`MarketStream`](super::MarketStream)
+/// [`Streams`].
 pub mod builder;
 
-/// Central consumer loop functionality used by the [`StreamBuilder`](builder::StreamBuilder) to
-/// to drive a re-connecting [`MarketStream`](super::MarketStream).
+/// Central consumer loop functionality used by the
+/// [`StreamBuilder`](builder::StreamBuilder) to to drive a re-connecting
+/// [`MarketStream`](super::MarketStream).
 pub mod consumer;
 
-/// Ergonomic collection of exchange [`MarketEvent<T>`](crate::event::MarketEvent) receivers.
+/// Ergonomic collection of exchange
+/// [`MarketEvent<T>`](crate::event::MarketEvent) receivers.
 #[derive(Debug)]
 pub struct Streams<T> {
     pub streams: HashMap<ExchangeId, mpsc::UnboundedReceiver<T>>,
@@ -38,7 +43,8 @@ impl<T> Streams<T> {
         MultiStreamBuilder::<T>::new()
     }
 
-    /// Remove an exchange [`mpsc::UnboundedReceiver`] from the [`Streams`] `HashMap`.
+    /// Remove an exchange [`mpsc::UnboundedReceiver`] from the [`Streams`]
+    /// `HashMap`.
     pub fn select(&mut self, exchange: ExchangeId) -> Option<mpsc::UnboundedReceiver<T>> {
         self.streams.remove(&exchange)
     }
@@ -63,7 +69,8 @@ impl<T> Streams<T> {
         joined_rx
     }
 
-    /// Join all exchange [`mpsc::UnboundedReceiver`] streams into a unified [`StreamMap`].
+    /// Join all exchange [`mpsc::UnboundedReceiver`] streams into a unified
+    /// [`StreamMap`].
     pub async fn join_map(self) -> StreamMap<ExchangeId, UnboundedReceiverStream<T>>
     where
         T: Send + 'static,

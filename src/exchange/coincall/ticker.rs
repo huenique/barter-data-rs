@@ -1,3 +1,9 @@
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::event::MarketIter;
 use crate::exchange::coincall::CoincallChannel;
 use crate::exchange::subscription::ExchangeSub;
@@ -6,14 +12,7 @@ use crate::subscription::ticker::Ticker;
 use crate::ExchangeId;
 use crate::Identifier;
 use crate::MarketEvent;
-
-use barter_integration::model::SubscriptionId;
-use chrono::DateTime;
-use chrono::Utc;
-use serde::Deserialize;
-use serde::Serialize;
-
-#[derive(Copy, Clone, Debug, Default, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct CoincallTicker {}
 
 impl Identifier<Option<SubscriptionId>> for CoincallTicker {

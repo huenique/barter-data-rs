@@ -1,10 +1,3 @@
-use super::super::book::l2::BinanceOrderBookL2Snapshot;
-use super::super::book::BinanceLevel;
-use crate::error::DataError;
-use crate::subscription::book::OrderBook;
-use crate::transformer::book::InstrumentOrderBook;
-use crate::transformer::book::OrderBookUpdater;
-use crate::Identifier;
 use async_trait::async_trait;
 use barter_integration::error::SocketError;
 use barter_integration::model::instrument::Instrument;
@@ -15,12 +8,22 @@ use serde::Deserialize;
 use serde::Serialize;
 use tokio::sync::mpsc;
 
-/// [`BinanceFuturesUsd`](super::BinanceFuturesUsd) HTTP OrderBook L2 snapshot url.
+use crate::error::DataError;
+use crate::exchange::binance::book::l2::BinanceOrderBookL2Snapshot;
+use crate::exchange::binance::book::BinanceLevel;
+use crate::subscription::book::OrderBook;
+use crate::transformer::book::InstrumentOrderBook;
+use crate::transformer::book::OrderBookUpdater;
+use crate::Identifier;
+
+/// [`BinanceFuturesUsd`](super::BinanceFuturesUsd) HTTP OrderBook L2 snapshot
+/// url.
 ///
 /// See docs: <https://binance-docs.github.io/apidocs/futures/en/#order-book>
 pub const HTTP_BOOK_L2_SNAPSHOT_URL_BINANCE_SPOT: &str = "https://fapi.binance.com/fapi/v1/depth";
 
-/// [`BinanceFuturesUsd`](super::BinanceFuturesUsd) OrderBook Level2 deltas WebSocket message.
+/// [`BinanceFuturesUsd`](super::BinanceFuturesUsd) OrderBook Level2 deltas
+/// WebSocket message.
 ///
 /// ### Raw Payload Examples
 /// See docs: <https://binance-docs.github.io/apidocs/futures/en/#partial-book-depth-streams>
@@ -41,7 +44,7 @@ pub const HTTP_BOOK_L2_SNAPSHOT_URL_BINANCE_SPOT: &str = "https://fapi.binance.c
 ///     ]
 /// }
 /// ```
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct BinanceFuturesOrderBookL2Delta {
     #[serde(
         alias = "s",
@@ -66,7 +69,8 @@ impl Identifier<Option<SubscriptionId>> for BinanceFuturesOrderBookL2Delta {
     }
 }
 
-/// [`Binance`](super::super::Binance) [`BinanceServerFuturesUsd`](super::BinanceServerFuturesUsd)
+/// [`Binance`](super::super::Binance)
+/// [`BinanceServerFuturesUsd`](super::BinanceServerFuturesUsd)
 /// [`OrderBookUpdater`].
 ///
 /// BinanceFuturesUsd: How To Manage A Local OrderBook Correctly
@@ -74,32 +78,33 @@ impl Identifier<Option<SubscriptionId>> for BinanceFuturesOrderBookL2Delta {
 /// 1. Open a stream to wss://fstream.binance.com/stream?streams=BTCUSDT@depth.
 /// 2. Buffer the events you receive from the stream.
 /// 3. Get a depth snapshot from <https://fapi.binance.com/fapi/v1/depth?symbol=BTCUSDT&limit=1000>.
-/// 4. -- *DIFFERENT FROM SPOT* --
-///    Drop any event where u is < lastUpdateId in the snapshot.
-/// 5. -- *DIFFERENT FROM SPOT* --
-///    The first processed event should have U <= lastUpdateId AND u >= lastUpdateId
-/// 6. -- *DIFFERENT FROM SPOT* --
-///    While listening to the stream, each new event's pu should be equal to the previous
-///    event's u, otherwise initialize the process from step 3.
+/// 4. -- *DIFFERENT FROM SPOT* -- Drop any event where u is < lastUpdateId in
+///    the snapshot.
+/// 5. -- *DIFFERENT FROM SPOT* -- The first processed event should have U <=
+///    lastUpdateId AND u >= lastUpdateId
+/// 6. -- *DIFFERENT FROM SPOT* -- While listening to the stream, each new
+///    event's pu should be equal to the previous event's u, otherwise
+///    initialize the process from step 3.
 /// 7. The data in each event is the absolute quantity for a price level.
 /// 8. If the quantity is 0, remove the price level.
 ///
 /// Notes:
-///  - Receiving an event that removes a price level that is not in your local order book can happen and is normal.
+///  - Receiving an event that removes a price level that is not in your local
+///    order book can happen and is normal.
 ///  - Uppercase U => first_update_id
 ///  - Lowercase u => last_update_id,
 ///  - Lowercase pu => prev_last_update_id
 ///
 /// See docs: <https://binance-docs.github.io/apidocs/futures/en/#how-to-manage-a-local-order-book-correctly>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BinanceFuturesBookUpdater {
     pub updates_processed: u64,
     pub last_update_id: u64,
 }
 
 impl BinanceFuturesBookUpdater {
-    /// Construct a new BinanceFutures [`OrderBookUpdater`] using the provided last_update_id from
-    /// a HTTP snapshot.
+    /// Construct a new BinanceFutures [`OrderBookUpdater`] using the provided
+    /// last_update_id from a HTTP snapshot.
     pub fn new(last_update_id: u64) -> Self {
         Self {
             updates_processed: 0,
@@ -108,7 +113,8 @@ impl BinanceFuturesBookUpdater {
     }
 
     /// BinanceFuturesUsd: How To Manage A Local OrderBook Correctly: Step 5:
-    /// "The first processed event should have U <= lastUpdateId AND u >= lastUpdateId"
+    /// "The first processed event should have U <= lastUpdateId AND u >=
+    /// lastUpdateId"
     ///
     /// See docs: <https://binance-docs.github.io/apidocs/futures/en/#how-to-manage-a-local-order-book-correctly>
     pub fn is_first_update(&self) -> bool {
@@ -116,7 +122,8 @@ impl BinanceFuturesBookUpdater {
     }
 
     /// BinanceFuturesUsd: How To Manage A Local OrderBook Correctly: Step 5:
-    /// "The first processed event should have U <= lastUpdateId AND u >= lastUpdateId"
+    /// "The first processed event should have U <= lastUpdateId AND u >=
+    /// lastUpdateId"
     ///
     /// See docs: <https://binance-docs.github.io/apidocs/futures/en/#how-to-manage-a-local-order-book-correctly>
     pub fn validate_first_update(
@@ -136,8 +143,9 @@ impl BinanceFuturesBookUpdater {
     }
 
     /// BinanceFuturesUsd: How To Manage A Local OrderBook Correctly: Step 6:
-    /// "While listening to the stream, each new event's pu should be equal to the previous
-    ///  event's u, otherwise initialize the process from step 3."
+    /// "While listening to the stream, each new event's pu should be equal to
+    /// the previous  event's u, otherwise initialize the process from step
+    /// 3."
     ///
     /// See docs: <https://binance-docs.github.io/apidocs/futures/en/#how-to-manage-a-local-order-book-correctly>
     pub fn validate_next_update(
@@ -206,7 +214,8 @@ impl OrderBookUpdater for BinanceFuturesBookUpdater {
         }
 
         if self.is_first_update() {
-            // 5. The first processed event should have U <= lastUpdateId AND u >= lastUpdateId:
+            // 5. The first processed event should have U <= lastUpdateId AND u >=
+            //    lastUpdateId:
             self.validate_first_update(&update)?;
         } else {
             // 6. Each new event's pu should be equal to the previous event's u:
@@ -282,10 +291,11 @@ mod tests {
     }
 
     mod binance_futures_book_updater {
+        use barter_integration::model::Side;
+
         use super::*;
         use crate::subscription::book::Level;
         use crate::subscription::book::OrderBookSide;
-        use barter_integration::model::Side;
 
         #[test]
         fn test_is_first_update() {

@@ -1,7 +1,14 @@
-use self::channel::CoinbaseChannel;
-use self::market::CoinbaseMarket;
-use self::subscription::CoinbaseSubResponse;
-use self::trade::CoinbaseTrade;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use serde_json::json;
+use url::Url;
+
+use crate::exchange::coinbase::channel::CoinbaseChannel;
+use crate::exchange::coinbase::market::CoinbaseMarket;
+use crate::exchange::coinbase::subscription::CoinbaseSubResponse;
+use crate::exchange::coinbase::trade::CoinbaseTrade;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
@@ -11,23 +18,19 @@ use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::trade::PublicTrades;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use serde_json::json;
-use url::Url;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific channel used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific channel used for generating [`Connector::requests`].
 pub mod channel;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific market used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific market used for generating [`Connector::requests`].
 pub mod market;
 
-/// [`Subscription`](crate::subscription::Subscription) response type and response
-/// [`Validator`](barter_integration::Validator) for [`Coinbase`].
+/// [`Subscription`](crate::subscription::Subscription) response type and
+/// response [`Validator`](barter_integration::Validator) for [`Coinbase`].
 pub mod subscription;
 
 /// Public trade types for [`Coinbase`].
@@ -42,7 +45,7 @@ pub const BASE_URL_COINBASE: &str = "wss://ws-feed.exchange.coinbase.com";
 ///
 /// See docs: <https://docs.cloud.coinbase.com/exchange/docs/websocket-overview>
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct Coinbase;
 

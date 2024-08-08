@@ -5,20 +5,32 @@
 )]
 
 //! # Barter-Data
-//! A high-performance WebSocket integration library for streaming public market data from leading cryptocurrency
-//! exchanges - batteries included. It is:
-//! * **Easy**: Barter-Data's simple [`StreamBuilder`](streams::builder::StreamBuilder) interface allows for easy & quick setup (see example below!).
-//! * **Normalised**: Barter-Data's unified interface for consuming public WebSocket data means every Exchange returns a normalised data model.
-//! * **Real-Time**: Barter-Data utilises real-time WebSocket integrations enabling the consumption of normalised tick-by-tick data.
-//! * **Extensible**: Barter-Data is highly extensible, and therefore easy to contribute to with coding new integrations!
+//! A high-performance WebSocket integration library for streaming public market
+//! data from leading cryptocurrency exchanges - batteries included. It is:
+//! * **Easy**: Barter-Data's simple
+//!   [`StreamBuilder`](streams::builder::StreamBuilder) interface allows for
+//!   easy & quick setup (see example below!).
+//! * **Normalised**: Barter-Data's unified interface for consuming public
+//!   WebSocket data means every Exchange returns a normalised data model.
+//! * **Real-Time**: Barter-Data utilises real-time WebSocket integrations
+//!   enabling the consumption of normalised tick-by-tick data.
+//! * **Extensible**: Barter-Data is highly extensible, and therefore easy to
+//!   contribute to with coding new integrations!
 //!
 //! ## User API
-//! - [`StreamBuilder`](streams::builder::StreamBuilder) for initialising [`MarketStream`]s of various kinds.
-//! - Define what exchange market data you want to stream using the [`Subscription`] type.
-//! - Pass [`Subscription`]s to the [`StreamBuilder::subscribe`](streams::builder::StreamBuilder::subscribe) method.
-//! - Each call to the [`StreamBuilder::subscribe`](streams::builder::StreamBuilder::subscribe)
-//!   method opens a new WebSocket connection to the exchange - giving you full control.
-//! - Call [`StreamBuilder::init`](streams::builder::StreamBuilder::init) to start streaming!
+//! - [`StreamBuilder`](streams::builder::StreamBuilder) for initialising
+//!   [`MarketStream`]s of various kinds.
+//! - Define what exchange market data you want to stream using the
+//!   [`Subscription`] type.
+//! - Pass [`Subscription`]s to the
+//!   [`StreamBuilder::subscribe`](streams::builder::StreamBuilder::subscribe)
+//!   method.
+//! - Each call to the
+//!   [`StreamBuilder::subscribe`](streams::builder::StreamBuilder::subscribe)
+//!   method opens a new WebSocket connection to the exchange - giving you full
+//!   control.
+//! - Call [`StreamBuilder::init`](streams::builder::StreamBuilder::init) to
+//!   start streaming!
 //!
 //! ## Examples
 //! For a comprehensive collection of examples, see the /examples directory.
@@ -81,15 +93,6 @@
 //! }
 //! ```
 
-use crate::error::DataError;
-use crate::event::MarketEvent;
-use crate::exchange::Connector;
-use crate::exchange::ExchangeId;
-use crate::exchange::PingInterval;
-use crate::subscriber::Subscriber;
-use crate::subscription::SubKind;
-use crate::subscription::Subscription;
-use crate::transformer::ExchangeTransformer;
 use async_trait::async_trait;
 use barter_integration::protocol::websocket::WebSocketParser;
 use barter_integration::protocol::websocket::WsMessage;
@@ -103,10 +106,21 @@ use tokio::sync::mpsc;
 use tracing::debug;
 use tracing::error;
 
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::PingInterval;
+use crate::subscriber::Subscriber;
+use crate::subscription::SubKind;
+use crate::subscription::Subscription;
+use crate::transformer::ExchangeTransformer;
+
 /// All [`Error`](std::error::Error)s generated in Barter-Data.
 pub mod error;
 
-/// Defines the generic [`MarketEvent<T>`](event::MarketEvent) used in every [`MarketStream`].
+/// Defines the generic [`MarketEvent<T>`](event::MarketEvent) used in every
+/// [`MarketStream`].
 pub mod event;
 
 /// [`Connector`] implementations for each exchange.
@@ -116,24 +130,28 @@ pub mod exchange;
 /// of Barter [`Subscription`]s.
 pub mod streams;
 
-/// [`Subscriber`], [`SubscriptionMapper`](subscriber::mapper::SubscriptionMapper) and
-/// [`SubscriptionValidator`](subscriber::validator::SubscriptionValidator)  traits that define how a
-/// [`Connector`] will subscribe to exchange [`MarketStream`]s.
+/// [`Subscriber`],
+/// [`SubscriptionMapper`](subscriber::mapper::SubscriptionMapper) and
+/// [`SubscriptionValidator`](subscriber::validator::SubscriptionValidator)
+/// traits that define how a [`Connector`] will subscribe to exchange
+/// [`MarketStream`]s.
 ///
-/// Standard implementations for subscribing to WebSocket [`MarketStream`]s are included.
+/// Standard implementations for subscribing to WebSocket [`MarketStream`]s are
+/// included.
 pub mod subscriber;
 
-/// Types that communicate the type of each [`MarketStream`] to initialise, and what normalised
-/// Barter output type the exchange will be transformed into.
+/// Types that communicate the type of each [`MarketStream`] to initialise, and
+/// what normalised Barter output type the exchange will be transformed into.
 pub mod subscription;
 
-/// Generic [`ExchangeTransformer`] implementations used by [`MarketStream`]s to translate exchange
-/// specific types to normalised Barter types.
+/// Generic [`ExchangeTransformer`] implementations used by [`MarketStream`]s to
+/// translate exchange specific types to normalised Barter types.
 ///
-/// Standard implementations that work for most exchanges are included such as: <br>
+/// Standard implementations that work for most exchanges are included such as:
+/// <br>
 /// - [`StatelessTransformer`](transformer::stateless::StatelessTransformer) for
-///   [`PublicTrades`](crate::subscription::trade::PublicTrades)
-///   and [`OrderBooksL1`](crate::subscription::book::OrderBooksL1) streams. <br>
+///   [`PublicTrades`](crate::subscription::trade::PublicTrades) and
+///   [`OrderBooksL1`](crate::subscription::book::OrderBooksL1) streams. <br>
 /// - [`MultiBookTransformer`](transformer::book::MultiBookTransformer) for
 ///   [`OrderBooksL2`](crate::subscription::book::OrderBooksL2) and
 ///   [`OrderBooksL3`](crate::subscription::book::OrderBooksL3) streams.
@@ -148,8 +166,9 @@ pub trait Identifier<T> {
     fn id(&self) -> T;
 }
 
-/// [`Stream`] that yields [`Market<Kind>`](MarketEvent) events. The type of [`Market<Kind>`](MarketEvent)
-/// depends on the provided [`SubKind`] of the passed [`Subscription`]s.
+/// [`Stream`] that yields [`Market<Kind>`](MarketEvent) events. The type of
+/// [`Market<Kind>`](MarketEvent) depends on the provided [`SubKind`] of the
+/// passed [`Subscription`]s.
 #[async_trait]
 pub trait MarketStream<Exchange, Kind>
 where
@@ -180,7 +199,8 @@ where
         // Split WebSocket into WsStream & WsSink components
         let (ws_sink, ws_stream) = websocket.split();
 
-        // Spawn task to distribute Transformer messages (eg/ custom pongs) to the exchange
+        // Spawn task to distribute Transformer messages (eg/ custom pongs) to the
+        // exchange
         let (ws_sink_tx, ws_sink_rx) = mpsc::unbounded_channel();
         tokio::spawn(distribute_messages_to_exchange(
             Exchange::ID,
@@ -188,7 +208,8 @@ where
             ws_sink_rx,
         ));
 
-        // Spawn optional task to distribute custom application-level pings to the exchange
+        // Spawn optional task to distribute custom application-level pings to the
+        // exchange
         if let Some(ping_interval) = Exchange::ping_interval() {
             tokio::spawn(schedule_pings_to_exchange(
                 Exchange::ID,
@@ -204,12 +225,13 @@ where
     }
 }
 
-/// Transmit [`WsMessage`]s sent from the [`ExchangeTransformer`] to the exchange via
-/// the [`WsSink`].
+/// Transmit [`WsMessage`]s sent from the [`ExchangeTransformer`] to the
+/// exchange via the [`WsSink`].
 ///
 /// **Note:**
-/// ExchangeTransformer is operating in a synchronous trait context so we use this separate task
-/// to avoid adding `#[\async_trait\]` to the transformer - this avoids allocations.
+/// ExchangeTransformer is operating in a synchronous trait context so we use
+/// this separate task to avoid adding `#[\async_trait\]` to the transformer -
+/// this avoids allocations.
 pub async fn distribute_messages_to_exchange(
     exchange: ExchangeId,
     mut ws_sink: WsSink,
@@ -231,12 +253,14 @@ pub async fn distribute_messages_to_exchange(
     }
 }
 
-/// Schedule the sending of custom application-level ping [`WsMessage`]s to the exchange using
-/// the provided [`PingInterval`].
+/// Schedule the sending of custom application-level ping [`WsMessage`]s to the
+/// exchange using the provided [`PingInterval`].
 ///
 /// **Notes:**
-///  - This is only used for those exchanges that require custom application-level pings.
-///  - This is additional to the protocol-level pings already handled by `tokio_tungstenite`.
+///  - This is only used for those exchanges that require custom
+///    application-level pings.
+///  - This is additional to the protocol-level pings already handled by
+///    `tokio_tungstenite`.
 pub async fn schedule_pings_to_exchange(
     exchange: ExchangeId,
     ws_sink_tx: mpsc::UnboundedSender<WsMessage>,

@@ -1,29 +1,40 @@
 //!
 //! ### Notes
 //! #### SubscripionId
-//! - Successful Bitfinex subscription responses contain a numeric `CHANNEL_ID` that must be used to
-//!   identify future messages relating to that subscription (not persistent across connections).
-//! - To identify the initial subscription response containing the `CHANNEL_ID`, the "channel" &
-//!   "market" identifiers can be used for the `SubscriptionId(channel|market)`
-//!   (eg/ SubscriptionId("trades|tBTCUSD")).
-//! - Once the subscription has been validated and the `CHANNEL_ID` determined, each `SubscriptionId`
-//!   in the `SubscriptionIds` `HashMap` is mutated to become `SubscriptionId(CHANNEL_ID)`.
-//!   eg/ SubscriptionId("trades|tBTCUSD") -> SubscriptionId(69)
+//! - Successful Bitfinex subscription responses contain a numeric `CHANNEL_ID`
+//!   that must be used to identify future messages relating to that
+//!   subscription (not persistent across connections).
+//! - To identify the initial subscription response containing the `CHANNEL_ID`,
+//!   the "channel" & "market" identifiers can be used for the
+//!   `SubscriptionId(channel|market)` (eg/ SubscriptionId("trades|tBTCUSD")).
+//! - Once the subscription has been validated and the `CHANNEL_ID` determined,
+//!   each `SubscriptionId` in the `SubscriptionIds` `HashMap` is mutated to
+//!   become `SubscriptionId(CHANNEL_ID)`. eg/ SubscriptionId("trades|tBTCUSD")
+//!   -> SubscriptionId(69)
 //!
 //! #### Connection Limits
 //! - The user is allowed up to 20 connections per minute on the public API.
 //! - Each connection can be used to connect up to 25 different channels.
 //!
 //! #### Trade Variants
-//! - Bitfinex trades subscriptions results in receiving tag="te" & tag="tu" trades.
+//! - Bitfinex trades subscriptions results in receiving tag="te" & tag="tu"
+//!   trades.
 //! - Both appear to be identical payloads, but "te" arriving marginally faster.
-//! - Therefore, tag="tu" trades are filtered out and considered only as additional Heartbeats.
+//! - Therefore, tag="tu" trades are filtered out and considered only as
+//!   additional Heartbeats.
 
-use self::channel::BitfinexChannel;
-use self::market::BitfinexMarket;
-use self::message::BitfinexMessage;
-use self::subscription::BitfinexPlatformEvent;
-use self::validator::BitfinexWebSocketSubValidator;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use serde_json::json;
+use url::Url;
+
+use crate::exchange::bitfinex::channel::BitfinexChannel;
+use crate::exchange::bitfinex::market::BitfinexMarket;
+use crate::exchange::bitfinex::message::BitfinexMessage;
+use crate::exchange::bitfinex::subscription::BitfinexPlatformEvent;
+use crate::exchange::bitfinex::validator::BitfinexWebSocketSubValidator;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
@@ -32,26 +43,22 @@ use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::trade::PublicTrades;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use serde_json::json;
-use url::Url;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific channel used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific channel used for generating [`Connector::requests`].
 pub mod channel;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific market used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific market used for generating [`Connector::requests`].
 pub mod market;
 
 /// [`BitfinexMessage`](message::BitfinexMessage) type for [`Bitfinex`].
 pub mod message;
 
-/// [`Subscription`](crate::subscription::Subscription) response types and response
-/// [`Validator`](barter_integration::Validator) for [`Bitfinex`].
+/// [`Subscription`](crate::subscription::Subscription) response types and
+/// response [`Validator`](barter_integration::Validator) for [`Bitfinex`].
 pub mod subscription;
 
 /// Public trade types for [`Bitfinex`].
@@ -70,7 +77,7 @@ pub const BASE_URL_BITFINEX: &str = "wss://api-pub.bitfinex.com/ws/2";
 ///
 /// See docs: <https://docs.bitfinex.com/docs/ws-general>
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct Bitfinex;
 

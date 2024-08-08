@@ -1,3 +1,11 @@
+use std::time::Duration;
+
+use futures::StreamExt;
+use tokio::sync::mpsc;
+use tracing::error;
+use tracing::info;
+use tracing::warn;
+
 use crate::error::DataError;
 use crate::event::MarketEvent;
 use crate::exchange::StreamSelector;
@@ -5,23 +13,19 @@ use crate::subscription::SubKind;
 use crate::subscription::Subscription;
 use crate::Identifier;
 use crate::MarketStream;
-use futures::StreamExt;
-use std::time::Duration;
-use tokio::sync::mpsc;
-use tracing::error;
-use tracing::info;
-use tracing::warn;
 
-/// Initial duration that the [`consume`] function should wait after disconnecting before attempting
-/// to re-initialise a [`MarketStream`]. This duration will increase exponentially as a result
-/// of repeated disconnections with re-initialisation failures.
+/// Initial duration that the [`consume`] function should wait after
+/// disconnecting before attempting to re-initialise a [`MarketStream`]. This
+/// duration will increase exponentially as a result of repeated disconnections
+/// with re-initialisation failures.
 pub const STARTING_RECONNECT_BACKOFF_MS: u64 = 125;
 
 /// Central [`MarketEvent<T>`](MarketEvent) consumer loop.
 ///
-/// Initialises an exchange [`MarketStream`] using a collection of [`Subscription`]s. Consumed
-/// events are distributed downstream via the `exchange_tx mpsc::UnboundedSender`. A re-connection
-/// mechanism with an exponential backoff policy is utilised to ensure maximum up-time.
+/// Initialises an exchange [`MarketStream`] using a collection of
+/// [`Subscription`]s. Consumed events are distributed downstream via the
+/// `exchange_tx mpsc::UnboundedSender`. A re-connection mechanism with an
+/// exponential backoff policy is utilised to ensure maximum up-time.
 pub async fn consume<Exchange, Kind>(
     subscriptions: Vec<Subscription<Exchange, Kind>>,
     exchange_tx: mpsc::UnboundedSender<MarketEvent<Kind::Event>>,
@@ -51,7 +55,8 @@ where
         backoff_ms *= 2;
         info!(%exchange, attempt, "attempting to initialise MarketStream");
 
-        // Attempt to initialise MarketStream: if it fails on first attempt return DataError
+        // Attempt to initialise MarketStream: if it fails on first attempt return
+        // DataError
         let mut stream = match Exchange::Stream::init(&subscriptions).await {
             Ok(stream) => {
                 info!(%exchange, attempt, "successfully initialised MarketStream");
@@ -110,7 +115,8 @@ where
 
                     // Skip logging and processing for "pong" messages
                     if payload.contains("pong") {
-                        // * NOTE: This logic is here to ignore "pong" messages which are not valid JSON.
+                        // * NOTE: This logic is here to ignore "pong" messages which are not valid
+                        //   JSON.
                         // TODO: TRemove this check once 'pong' messages are handled upstream.
                         continue;
                     }

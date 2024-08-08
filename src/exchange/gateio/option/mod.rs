@@ -16,7 +16,7 @@ pub const WEBSOCKET_BASE_URL_GATEIO_OPTIONS_USD: &str = "wss://op-ws.gateio.live
 pub type GateioOptions = Gateio<GateioServerOptions>;
 
 /// [`Gateio`] options [`ExchangeServer`].
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct GateioServerOptions;
 
 impl ExchangeServer for GateioServerOptions {

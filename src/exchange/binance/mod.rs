@@ -1,8 +1,16 @@
-use self::book::l1::BinanceOrderBookL1;
-use self::channel::BinanceChannel;
-use self::market::BinanceMarket;
-use self::subscription::BinanceSubResponse;
-use self::trade::BinanceTrade;
+use std::fmt::Debug;
+use std::marker::PhantomData;
+
+use barter_integration::error::SocketError;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::protocol::websocket::WsMessage;
+use url::Url;
+
+use crate::exchange::binance::book::l1::BinanceOrderBookL1;
+use crate::exchange::binance::channel::BinanceChannel;
+use crate::exchange::binance::market::BinanceMarket;
+use crate::exchange::binance::subscription::BinanceSubResponse;
+use crate::exchange::binance::trade::BinanceTrade;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeServer;
@@ -15,35 +23,32 @@ use crate::subscription::trade::PublicTrades;
 use crate::subscription::Map;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-use barter_integration::error::SocketError;
-use barter_integration::model::instrument::Instrument;
-use barter_integration::protocol::websocket::WsMessage;
-use std::fmt::Debug;
-use std::marker::PhantomData;
-use url::Url;
 
 /// OrderBook types common to both [`BinanceSpot`](spot::BinanceSpot) and
 /// [`BinanceFuturesUsd`](futures::BinanceFuturesUsd).
 pub mod book;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific channel used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific channel used for generating [`Connector::requests`].
 pub mod channel;
 
 /// [`ExchangeServer`] and [`StreamSelector`] implementations for
 /// [`BinanceFuturesUsd`](futures::BinanceFuturesUsd).
 pub mod futures;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific market used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific market used for generating [`Connector::requests`].
 pub mod market;
 
 /// [`ExchangeServer`] and [`StreamSelector`] implementations for
 /// [`BinanceSpot`](spot::BinanceSpot).
 pub mod spot;
 
-/// [`Subscription`](crate::subscription::Subscription) response type and response
-/// [`Validator`](barter_integration::Validator) common to both [`BinanceSpot`](spot::BinanceSpot)
+/// [`Subscription`](crate::subscription::Subscription) response type and
+/// response [`Validator`](barter_integration::Validator) common to both
+/// [`BinanceSpot`](spot::BinanceSpot)
 /// and [`BinanceFuturesUsd`](futures::BinanceFuturesUsd).
 pub mod subscription;
 
@@ -54,9 +59,10 @@ pub mod trade;
 /// Generic [`Binance<Server>`](Binance) exchange.
 ///
 /// ### Notes
-/// A `Server` [`ExchangeServer`](super::ExchangeServer) implementations exists for
-/// [`BinanceSpot`](spot::BinanceSpot) and [`BinanceFuturesUsd`](futures::BinanceFuturesUsd).
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+/// A `Server` [`ExchangeServer`](super::ExchangeServer) implementations exists
+/// for [`BinanceSpot`](spot::BinanceSpot) and
+/// [`BinanceFuturesUsd`](futures::BinanceFuturesUsd).
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Binance<Server> {
     server: PhantomData<Server>,
 }

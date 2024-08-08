@@ -1,19 +1,21 @@
-use super::trade::BitfinexTrade;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 use barter_integration::de::extract_next;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::SubscriptionId;
 use serde::Serialize;
 
+use crate::event::MarketIter;
+use crate::exchange::bitfinex::trade::BitfinexTrade;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+
 /// [`Bitfinex`](super::Bitfinex) message received over
-/// [`WebSocket`](barter_integration::protocol::websocket::WebSocket) relating to an active
-/// [`Subscription`](crate::Subscription).
+/// [`WebSocket`](barter_integration::protocol::websocket::WebSocket) relating
+/// to an active [`Subscription`](crate::Subscription).
 ///
-/// The message is associated with the original [`Subscription`](crate::Subscription) using the
-/// `channel_id` field as the [`SubscriptionId`](barter_integration::model::SubscriptionId).
+/// The message is associated with the original
+/// [`Subscription`](crate::Subscription) using the `channel_id` field as the
+/// [`SubscriptionId`](barter_integration::model::SubscriptionId).
 ///
 /// ### Raw Payload Examples
 /// #### Heartbeat
@@ -33,7 +35,7 @@ use serde::Serialize;
 /// ```json
 /// [420191,"te",[1225484398,1665452200022,-0.08980641,19027.02807752]]
 /// ```
-#[derive(Clone, Copy, PartialEq, PartialOrd, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Serialize)]
 pub struct BitfinexMessage {
     pub channel_id: u32,
     pub payload: BitfinexPayload,
@@ -45,7 +47,7 @@ pub struct BitfinexMessage {
 /// See [`BitfinexMessage`] for full raw payload examples.
 ///
 /// See docs: <https://docs.bitfinex.com/docs/ws-general>
-#[derive(Clone, Copy, PartialEq, PartialOrd, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Serialize)]
 pub enum BitfinexPayload {
     Heartbeat,
     Trade(BitfinexTrade),
@@ -94,7 +96,8 @@ impl<'de> serde::Deserialize<'de> for BitfinexMessage {
                 // Heartbeat: [ CHANNEL_ID, "hb" ]
                 // Candle: [CHANNEL_ID, [MTS, OPEN, CLOSE, HIGH, LOW, VOLUME]]
 
-                // Extract CHANNEL_ID used to identify SubscriptionId: 1st element of the sequence
+                // Extract CHANNEL_ID used to identify SubscriptionId: 1st element of the
+                // sequence
                 let channel_id: u32 = extract_next(&mut seq, "channel_id")?;
 
                 // Extract message tag to identify payload type: 2nd element of the sequence
@@ -131,11 +134,13 @@ impl<'de> serde::Deserialize<'de> for BitfinexMessage {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::time::Duration;
+
     use barter_integration::de::datetime_utc_from_epoch_duration;
     use barter_integration::error::SocketError;
     use barter_integration::model::Side;
-    use std::time::Duration;
+
+    use super::*;
 
     #[test]
     fn test_de_bitfinex_message() {

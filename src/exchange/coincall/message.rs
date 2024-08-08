@@ -1,7 +1,6 @@
 use serde::Deserialize;
 use serde::Serialize;
-
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct CoincallMessage<T> {
     pub data: T,
     pub channel: Option<String>,

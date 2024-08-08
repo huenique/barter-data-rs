@@ -4,7 +4,6 @@ use barter_data::subscription::book::OrderBooksL2;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use tabled::Table;
 use tabled::Tabled;
-
 #[derive(Tabled)]
 struct TabledOrderBook {
     #[tabled(rename = "Price")]
@@ -19,7 +18,8 @@ async fn main() {
     init_logging();
 
     // Initialise OrderBooksL2 Streams for Deribit only
-    // '--> each call to StreamBuilder::subscribe() creates a separate WebSocket connection
+    // '--> each call to StreamBuilder::subscribe() creates a separate WebSocket
+    // connection
     let streams = Streams::<OrderBooksL2>::builder()
         .subscribe([(
             Aevo::default(),
@@ -83,7 +83,8 @@ async fn main() {
     }
 }
 
-// Initialise an INFO `Subscriber` for `Tracing` Json logs and install it as the global default.
+// Initialise an INFO `Subscriber` for `Tracing` Json logs and install it as the
+// global default.
 fn init_logging() {
     tracing_subscriber::fmt()
         // Filter messages based on the INFO

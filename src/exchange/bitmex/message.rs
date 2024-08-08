@@ -1,8 +1,9 @@
-use crate::exchange::bitmex::trade::BitmexTrade;
-use crate::Identifier;
 use barter_integration::model::SubscriptionId;
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::exchange::bitmex::trade::BitmexTrade;
+use crate::Identifier;
 
 /// ### Raw Payload Examples
 /// See docs: <https://www.bitmex.com/app/wsAPI#Response-Format>
@@ -27,8 +28,8 @@ use serde::Serialize;
 ///         }
 ///     ]
 /// }
-///```
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize)]
+/// ```
+#[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitmexMessage<T> {
     pub table: String,
     pub data: Vec<T>,

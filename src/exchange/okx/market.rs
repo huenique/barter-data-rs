@@ -1,6 +1,3 @@
-use super::Okx;
-use crate::subscription::Subscription;
-use crate::Identifier;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::kind::OptionKind;
 use barter_integration::model::instrument::Instrument;
@@ -11,11 +8,15 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::exchange::okx::Okx;
+use crate::subscription::Subscription;
+use crate::Identifier;
+
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Okx`](super::Okx) market that can be subscribed to.
 ///
 /// See docs: <https://www.okx.com/docs-v5/en/#websocket-api-public-channel>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct OkxMarket(pub String);
 
 impl<Kind> Identifier<OkxMarket> for Subscription<Okx, Kind> {

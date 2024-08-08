@@ -1,13 +1,14 @@
-use self::trade::GateioSpotTrade;
-use super::Gateio;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+
+use crate::exchange::gateio::spot::trade::GateioSpotTrade;
+use crate::exchange::gateio::Gateio;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeServer;
 use crate::exchange::StreamSelector;
 use crate::subscription::trade::PublicTrades;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
 
 /// Public trades types.
 pub mod trade;
@@ -22,7 +23,7 @@ pub type GateioSpot = Gateio<GateioServerSpot>;
 
 /// [`Gateio`](super::Gateio) spot [`ExchangeServer`].
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct GateioServerSpot;
 

@@ -1,14 +1,15 @@
+use serde::Serialize;
+
 use crate::exchange::bitmex::Bitmex;
 use crate::subscription::trade::PublicTrades;
 use crate::subscription::Subscription;
 use crate::Identifier;
-use serde::Serialize;
 
-/// Type that defines how to translate a Barter [`Subscription`] into a [`Bitmex`](super::Bitmex)
-/// channel to be subscribed to.
+/// Type that defines how to translate a Barter [`Subscription`] into a
+/// [`Bitmex`](super::Bitmex) channel to be subscribed to.
 ///
 /// See docs: <https://www.bitmex.com/app/wsAPI>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitmexChannel(pub &'static str);
 
 impl BitmexChannel {

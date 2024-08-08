@@ -1,6 +1,6 @@
-use super::Bybit;
-use super::ExchangeServer;
+use crate::exchange::bybit::Bybit;
 use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeServer;
 
 /// [`BybitPerpetualsUsd`] WebSocket server base url.
 ///
@@ -11,7 +11,7 @@ pub const WEBSOCKET_BASE_URL_BYBIT_PERPETUALS_USD: &str = "wss://stream.bybit.co
 pub type BybitPerpetualsUsd = Bybit<BybitServerPerpetualsUsd>;
 
 /// [`Bybit`] perpetual [`ExchangeServer`].
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct BybitServerPerpetualsUsd;
 
 impl ExchangeServer for BybitServerPerpetualsUsd {

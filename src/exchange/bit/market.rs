@@ -1,7 +1,3 @@
-use crate::exchange::bit::Bit;
-use crate::subscription::Subscription;
-use crate::Identifier;
-
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::kind::OptionKind;
 use barter_integration::model::instrument::Instrument;
@@ -12,7 +8,11 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+use crate::exchange::bit::Bit;
+use crate::subscription::Subscription;
+use crate::Identifier;
+
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitMarket(pub String);
 
 impl AsRef<str> for BitMarket {

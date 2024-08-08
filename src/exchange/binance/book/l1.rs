@@ -1,11 +1,3 @@
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::binance::channel::BinanceChannel;
-use crate::exchange::subscription::ExchangeSub;
-use crate::exchange::ExchangeId;
-use crate::subscription::book::Level;
-use crate::subscription::book::OrderBookL1;
-use crate::Identifier;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::SubscriptionId;
@@ -14,7 +6,17 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// [`Binance`](super::super::Binance) real-time OrderBook Level1 (top of book) message.
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::binance::channel::BinanceChannel;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::ExchangeId;
+use crate::subscription::book::Level;
+use crate::subscription::book::OrderBookL1;
+use crate::Identifier;
+
+/// [`Binance`](super::super::Binance) real-time OrderBook Level1 (top of book)
+/// message.
 ///
 /// ### Raw Payload Examples
 /// #### BinanceSpot OrderBookL1
@@ -42,7 +44,7 @@ use serde::Serialize;
 ///     "A":"13.93900000"
 /// }
 /// ```
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct BinanceOrderBookL1 {
     #[serde(alias = "s", deserialize_with = "de_ob_l1_subscription_id")]
     pub subscription_id: SubscriptionId,
@@ -84,7 +86,8 @@ impl From<(ExchangeId, Instrument, BinanceOrderBookL1)> for MarketIter<OrderBook
     }
 }
 
-/// Deserialize a [`BinanceOrderBookL1`] "s" (eg/ "BTCUSDT") as the associated [`SubscriptionId`].
+/// Deserialize a [`BinanceOrderBookL1`] "s" (eg/ "BTCUSDT") as the associated
+/// [`SubscriptionId`].
 ///
 /// eg/ "@bookTicker|BTCUSDT"
 pub fn de_ob_l1_subscription_id<'de, D>(deserializer: D) -> Result<SubscriptionId, D::Error>

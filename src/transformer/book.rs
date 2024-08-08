@@ -1,3 +1,14 @@
+use std::marker::PhantomData;
+
+use async_trait::async_trait;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::SubscriptionId;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_integration::Transformer;
+use serde::Deserialize;
+use serde::Serialize;
+use tokio::sync::mpsc;
+
 use crate::error::DataError;
 use crate::event::MarketEvent;
 use crate::event::MarketIter;
@@ -7,15 +18,6 @@ use crate::subscription::Map;
 use crate::subscription::SubKind;
 use crate::transformer::ExchangeTransformer;
 use crate::Identifier;
-use async_trait::async_trait;
-use barter_integration::model::instrument::Instrument;
-use barter_integration::model::SubscriptionId;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_integration::Transformer;
-use serde::Deserialize;
-use serde::Serialize;
-use std::marker::PhantomData;
-use tokio::sync::mpsc;
 
 /// Defines how to apply a [`Self::Update`] to an [`Self::OrderBook`].
 #[async_trait]
@@ -26,8 +28,9 @@ where
     type OrderBook;
     type Update;
 
-    /// Initialises the [`InstrumentOrderBook`] for the provided [`Instrument`]. This often requires
-    /// a HTTP call to receive a starting [`OrderBook`] snapshot.
+    /// Initialises the [`InstrumentOrderBook`] for the provided [`Instrument`].
+    /// This often requires a HTTP call to receive a starting [`OrderBook`]
+    /// snapshot.
     async fn init<Exchange, Kind>(
         ws_sink_tx: mpsc::UnboundedSender<WsMessage>,
         instrument: Instrument,
@@ -44,19 +47,19 @@ where
     ) -> Result<Option<Self::OrderBook>, DataError>;
 }
 
-/// [`OrderBook`] for an [`Instrument`] with an exchange specific [`OrderBookUpdater`] to define
-/// how to update it.
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize)]
+/// [`OrderBook`] for an [`Instrument`] with an exchange specific
+/// [`OrderBookUpdater`] to define how to update it.
+#[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct InstrumentOrderBook<Updater> {
     pub instrument: Instrument,
     pub updater: Updater,
     pub book: OrderBook,
 }
 
-/// Standard generic [`ExchangeTransformer`] to translate exchange specific OrderBook types into
-/// normalised Barter OrderBook types. Requires an exchange specific [`OrderBookUpdater`]
-/// implementation.
-#[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
+/// Standard generic [`ExchangeTransformer`] to translate exchange specific
+/// OrderBook types into normalised Barter OrderBook types. Requires an exchange
+/// specific [`OrderBookUpdater`] implementation.
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct MultiBookTransformer<Exchange, Kind, Updater> {
     pub book_map: Map<InstrumentOrderBook<Updater>>,
     phantom: PhantomData<(Exchange, Kind)>,
@@ -125,7 +128,8 @@ where
             None => return vec![],
         };
 
-        // Retrieve the InstrumentOrderBook associated with this update (snapshot or delta)
+        // Retrieve the InstrumentOrderBook associated with this update (snapshot or
+        // delta)
         let book = match self.book_map.find_mut(&subscription_id) {
             Ok(book) => book,
             Err(unidentifiable) => return vec![Err(DataError::Socket(unidentifiable))],
@@ -138,7 +142,8 @@ where
             updater,
         } = book;
 
-        // Apply update (snapshot or delta) to OrderBook & generate Market<OrderBook> snapshot
+        // Apply update (snapshot or delta) to OrderBook & generate Market<OrderBook>
+        // snapshot
         match updater.update(book, update) {
             Ok(Some(book)) => {
                 MarketIter::<OrderBook>::from((Exchange::ID, instrument.clone(), book)).0

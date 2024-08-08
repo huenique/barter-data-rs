@@ -1,12 +1,10 @@
 use serde::Deserialize;
 use serde::Serialize;
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Response {
     pub funding_rate: FundingRate,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct FundingRate {
     pub timestamp: String,
     pub tradeable_entity_id: String,

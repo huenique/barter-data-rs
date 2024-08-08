@@ -1,7 +1,6 @@
 use serde::Deserialize;
 use serde::Serialize;
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LastTradePrice {
     pub timestamp: String,
     pub tradeable_entity_id: String,
@@ -10,8 +9,7 @@ pub struct LastTradePrice {
     pub price: f64,
     pub price_type: String,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct TradeData {
     pub last_trade_prirce: LastTradePrice,
 }

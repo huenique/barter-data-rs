@@ -55,7 +55,7 @@ use serde::Serialize;
 /// ```
 ///
 /// See docs: <https://www.gate.io/docs/developers/apiv4/ws/en/#public-trades-channel>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct GateioMessage<T> {
     pub channel: String,
     pub error: Option<GateioError>,
@@ -66,7 +66,7 @@ pub struct GateioMessage<T> {
 /// [`Gateio`](super::Gateio) WebSocket error message.
 ///
 /// See docs: <https://www.gate.io/docs/developers/apiv4/ws/en/#public-trades-channel>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct GateioError {
     pub code: u8,
     pub message: String,

@@ -1,4 +1,8 @@
-use crate::exchange::StreamSelector;
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::fmt::Display;
+use std::fmt::Formatter;
+
 use barter_integration::error::SocketError;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::symbol::Symbol;
@@ -8,10 +12,8 @@ use barter_integration::protocol::websocket::WsMessage;
 use barter_integration::Validator;
 use serde::Deserialize;
 use serde::Serialize;
-use std::collections::HashMap;
-use std::fmt::Debug;
-use std::fmt::Display;
-use std::fmt::Formatter;
+
+use crate::exchange::StreamSelector;
 
 /// OrderBook [`SubKind`]s and the associated Barter output data models.
 pub mod book;
@@ -31,7 +33,8 @@ pub mod ticker;
 /// Index [`SubKind`] and the associated Barter output data model.
 pub mod index;
 
-/// Defines the type of a [`Subscription`], and the output [`Self::Event`] that it yields.
+/// Defines the type of a [`Subscription`], and the output [`Self::Event`] that
+/// it yields.
 pub trait SubKind
 where
     Self: Debug + Clone,
@@ -39,9 +42,9 @@ where
     type Event: Debug;
 }
 
-/// Barter [`Subscription`] used to subscribe to a [`SubKind`] for a particular exchange
-/// [`Instrument`].
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Deserialize, Serialize)]
+/// Barter [`Subscription`] used to subscribe to a [`SubKind`] for a particular
+/// exchange [`Instrument`].
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Subscription<Exchange, Kind> {
     pub exchange: Exchange,
     #[serde(flatten)]
@@ -119,22 +122,25 @@ where
     }
 }
 
-/// Metadata generated from a collection of Barter [`Subscription`]s, including the exchange
-/// specific subscription payloads that are sent to the exchange.
-#[derive(Clone, Eq, PartialEq, Debug)]
+/// Metadata generated from a collection of Barter [`Subscription`]s, including
+/// the exchange specific subscription payloads that are sent to the exchange.
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SubscriptionMeta {
     /// `HashMap` containing the mapping between a [`SubscriptionId`] and
     /// it's associated Barter [`Instrument`].
     pub instrument_map: Map<Instrument>,
-    /// Collection of [`WsMessage`]s containing exchange specific subscription payloads to be sent.
+    /// Collection of [`WsMessage`]s containing exchange specific subscription
+    /// payloads to be sent.
     pub subscriptions: Vec<WsMessage>,
 }
 
-/// New type`HashMap` that maps a [`SubscriptionId`] to some associated type `T`.
+/// New type`HashMap` that maps a [`SubscriptionId`] to some associated type
+/// `T`.
 ///
-/// Used by [`ExchangeTransformer`](crate::transformer::ExchangeTransformer)s to identify the
-/// Barter [`Instrument`] associated with incoming exchange messages.
-#[derive(Clone, Eq, PartialEq, Debug, Deserialize, Serialize)]
+/// Used by [`ExchangeTransformer`](crate::transformer::ExchangeTransformer)s to
+/// identify the Barter [`Instrument`] associated with incoming exchange
+/// messages.
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Map<T>(pub HashMap<SubscriptionId, T>);
 
 impl<T> FromIterator<(SubscriptionId, T)> for Map<T> {
@@ -158,7 +164,8 @@ impl<T> Map<T> {
             .ok_or_else(|| SocketError::Unidentifiable(id.clone()))
     }
 
-    /// Find the mutable reference to `T` associated with the provided [`SubscriptionId`].
+    /// Find the mutable reference to `T` associated with the provided
+    /// [`SubscriptionId`].
     pub fn find_mut(&mut self, id: &SubscriptionId) -> Result<&mut T, SocketError> {
         self.0
             .get_mut(id)
@@ -171,11 +178,12 @@ mod tests {
     use super::*;
 
     mod subscription {
+        use barter_integration::model::instrument::kind::InstrumentKind;
+
         use super::*;
         use crate::exchange::coinbase::Coinbase;
         use crate::exchange::okx::Okx;
         use crate::subscription::trade::PublicTrades;
-        use barter_integration::model::instrument::kind::InstrumentKind;
 
         mod de {
             use super::*;
@@ -370,9 +378,10 @@ mod tests {
     }
 
     mod instrument_map {
-        use super::*;
         use barter_integration::model::instrument::kind::InstrumentKind;
         use barter_integration::model::instrument::Instrument;
+
+        use super::*;
 
         #[test]
         fn test_find_instrument() {

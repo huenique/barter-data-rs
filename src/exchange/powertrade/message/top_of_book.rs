@@ -1,7 +1,6 @@
 use serde::Deserialize;
 use serde::Serialize;
-
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct TopOfBook {
     #[serde(deserialize_with = "de::de_str_to_i64")]
     pub timestamp: i64,
@@ -20,7 +19,9 @@ pub struct TopOfBook {
 pub mod de {
     use serde::Deserialize;
     use serde::Deserializer;
-    use serde::{self};
+    use serde::{
+        self,
+    };
 
     pub fn de_str_to_option_f64<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
     where

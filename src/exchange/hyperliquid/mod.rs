@@ -1,36 +1,41 @@
-pub mod book;
-pub mod channel;
-pub mod market;
-pub mod message;
-pub mod subscription;
+use std::time::Duration;
 
-use self::book::l2::HyperliquidOrderBookUpdater;
-use self::channel::HyperliquidChannel;
-use self::market::HyperliquidMarket;
-use self::subscription::HyperliquidSubResponse;
-use super::PingInterval;
-use super::StreamSelector;
-use crate::exchange::Connector;
-use crate::exchange::ExchangeId;
-use crate::exchange::ExchangeSub;
-use crate::subscriber::validator::WebSocketSubValidator;
-use crate::subscriber::WebSocketSubscriber;
-use crate::subscription::book::OrderBooksL2;
-use crate::transformer::book::MultiBookTransformer;
-use crate::ExchangeWsStream;
 use barter_integration::error::SocketError;
 use barter_integration::protocol::websocket::WsMessage;
 use barter_macro::DeExchange;
 use barter_macro::SerExchange;
 use serde_json::json;
-use std::time::Duration;
 use tokio::time;
 use url::Url;
 
-const HYPERLIQUID_URL: &str = "wss://api.hyperliquid.xyz/ws";
+use crate::exchange::hyperliquid::book::l2::HyperliquidOrderBookUpdater;
+use crate::exchange::hyperliquid::channel::HyperliquidChannel;
+use crate::exchange::hyperliquid::market::HyperliquidMarket;
+use crate::exchange::hyperliquid::subscription::HyperliquidSubResponse;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::exchange::PingInterval;
+use crate::exchange::StreamSelector;
+use crate::subscriber::validator::WebSocketSubValidator;
+use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::book::OrderBooksL2;
+use crate::transformer::book::MultiBookTransformer;
+use crate::ExchangeWsStream;
 
+pub mod book;
+
+pub mod channel;
+
+pub mod market;
+
+pub mod message;
+
+pub mod subscription;
+
+const HYPERLIQUID_URL: &str = "wss://api.hyperliquid.xyz/ws";
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct Hyperliquid;
 

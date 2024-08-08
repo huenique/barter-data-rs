@@ -7,12 +7,12 @@ use crate::Identifier;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Coincall`](super::Coincall) channel to be subscribed to.
-///
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct CoincallChannel(pub &'static str);
 
 impl CoincallChannel {
-    /// [`Coincall`](super::Coincall) OrderBook Level2 channel name (raw updates).
+    /// [`Coincall`](super::Coincall) OrderBook Level2 channel name (raw
+    /// updates).
     pub const TICKER: Self = Self("ticker");
 }
 

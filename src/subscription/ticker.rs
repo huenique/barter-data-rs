@@ -2,26 +2,26 @@ use std::cmp::Ordering;
 use std::error::Error;
 use std::fmt;
 
-use crate::event::MarketIter;
-use crate::subscription::Instrument;
-use crate::ExchangeId;
-use crate::MarketEvent;
-use crate::SubKind;
-
 use chrono::TimeZone;
 use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
 
-/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields [`Ticker`] [`MarketEvent<T>`](crate::event::MarketEvent) events.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+use crate::event::MarketIter;
+use crate::subscription::Instrument;
+use crate::ExchangeId;
+use crate::MarketEvent;
+use crate::SubKind;
+
+/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields
+/// [`Ticker`] [`MarketEvent<T>`](crate::event::MarketEvent) events.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Tickers;
 
 impl SubKind for Tickers {
     type Event = Ticker;
 }
-
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct Ticker {
     pub instrument_name: String,
@@ -44,8 +44,7 @@ pub struct Ticker {
     pub bid_iv: Option<f64>,
     pub index_price: f64,
 }
-
-#[derive(Copy, Clone, Default, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct Greeks {
     pub delta: Option<f64>,
     pub gamma: Option<f64>,

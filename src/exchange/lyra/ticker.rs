@@ -1,3 +1,7 @@
+use barter_integration::model::SubscriptionId;
+use chrono::DateTime;
+use chrono::Utc;
+
 use crate::event::MarketIter;
 use crate::exchange::lyra::channel::LyraChannel;
 use crate::exchange::lyra::message::LyraInstrumentTicker;
@@ -9,10 +13,6 @@ use crate::subscription::ticker::Ticker;
 use crate::ExchangeId;
 use crate::Identifier;
 use crate::MarketEvent;
-
-use barter_integration::model::SubscriptionId;
-use chrono::DateTime;
-use chrono::Utc;
 
 pub type LyraTicker = Message;
 

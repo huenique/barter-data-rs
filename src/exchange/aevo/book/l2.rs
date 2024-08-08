@@ -1,3 +1,14 @@
+use async_trait::async_trait;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use barter_integration::protocol::websocket::WsMessage;
+use chrono::Utc;
+use crc32fast::Hasher;
+use serde::Deserialize;
+use serde::Serialize;
+use tokio::sync::mpsc;
+
 use crate::error::DataError;
 use crate::exchange::aevo::book::AevoLevel;
 use crate::exchange::aevo::channel::AevoChannel;
@@ -10,21 +21,10 @@ use crate::transformer::book::InstrumentOrderBook;
 use crate::transformer::book::OrderBookUpdater;
 use crate::Identifier;
 
-use async_trait::async_trait;
-use barter_integration::model::instrument::Instrument;
-use barter_integration::model::Side;
-use barter_integration::model::SubscriptionId;
-use barter_integration::protocol::websocket::WsMessage;
-use chrono::Utc;
-use crc32fast::Hasher;
-use serde::Deserialize;
-use serde::Serialize;
-use tokio::sync::mpsc;
-
-/// Terse type alias for an [`Aevo`](super::Aevo) real-time trades WebSocket message.
+/// Terse type alias for an [`Aevo`](super::Aevo) real-time trades WebSocket
+/// message.
 pub type AevoOrderBookL2 = AevoMessage<AevoOrderBookL2Delta>;
-
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct AevoOrderBookL2Delta {
     pub r#type: String,
     pub instrument_id: String,
@@ -52,8 +52,7 @@ impl From<AevoOrderBookL2Delta> for OrderBook {
         }
     }
 }
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct AevoBookUpdater {
     pub updates_processed: u64,
     pub last_checksum: u32,
@@ -121,8 +120,8 @@ impl OrderBookUpdater for AevoBookUpdater {
         Exchange: Send,
         Kind: Send,
     {
-        // No need to fetch snapshot separately, as the first notification will contain the whole book
-        // Initialize empty OrderBook
+        // No need to fetch snapshot separately, as the first notification will contain
+        // the whole book Initialize empty OrderBook
         Ok(InstrumentOrderBook {
             instrument,
             updater: Self::new(0),
@@ -143,15 +142,16 @@ impl OrderBookUpdater for AevoBookUpdater {
         book: &mut Self::OrderBook,
         update: Self::Update,
     ) -> Result<Option<Self::OrderBook>, DataError> {
-        // If the checksum matches the previous message, ignore it. Aevo currently sends a snapshot
-        // message with the full order book, but will switch to incremental updates in the future.
+        // If the checksum matches the previous message, ignore it. Aevo currently sends
+        // a snapshot message with the full order book, but will switch to
+        // incremental updates in the future.
         if self.last_checksum == update.data.checksum && update.data.r#type == "snapshot" {
             return Ok(None);
         }
 
-        // When updating OrderBook metadata and levels, it's important to note that each event's
-        // data shows the exact quantity for a price level. If the quantity is 0, then the price
-        // level should be removed.
+        // When updating OrderBook metadata and levels, it's important to note that each
+        // event's data shows the exact quantity for a price level. If the
+        // quantity is 0, then the price level should be removed.
         book.last_update_time = Utc::now();
         book.bids.upsert(update.data.bids);
         book.asks.upsert(update.data.asks);

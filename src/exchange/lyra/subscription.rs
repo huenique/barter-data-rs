@@ -5,13 +5,12 @@ use barter_integration::Validator;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Clone, Eq, PartialEq, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct LyraSubResponse {
     id: Option<String>,
     result: Option<LyraSubResult>,
 }
-
-#[derive(Clone, Eq, PartialEq, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct LyraSubResult {
     status: HashMap<String, String>,
     current_subscriptions: Vec<String>,
@@ -22,8 +21,9 @@ impl Validator for LyraSubResponse {
     where
         Self: Sized,
     {
-        // It should be safe to ignore failed subscription responses. Worst case scenario is that
-        // we won't receive any data for an invalid subscription
+        // It should be safe to ignore failed subscription responses. Worst case
+        // scenario is that we won't receive any data for an invalid
+        // subscription
         Ok(self)
         // if let Some(result) = &self.result {
         //     let failed_tickers: Vec<_> = result
@@ -42,8 +42,8 @@ impl Validator for LyraSubResponse {
         //         Ok(self)
         //     } else {
         //         Err(SocketError::Subscribe(format!(
-        //             "Received failure subscription response for tickers: {:?}",
-        //             failed_tickers
+        //             "Received failure subscription response for tickers:
+        // {:?}",             failed_tickers
         //         )))
         //     }
         // } else {

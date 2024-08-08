@@ -25,7 +25,7 @@ use serde::Serialize;
 ///     "reason":"GIBBERISH-USD is not a valid product"
 /// }
 /// ```
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum CoinbaseSubResponse {
     #[serde(alias = "subscriptions")]
@@ -37,13 +37,13 @@ pub enum CoinbaseSubResponse {
     },
 }
 
-/// Communicates the [`Coinbase`](super::Coinbase) product_ids (eg/ "ETH-USD") associated with
-/// a successful channel (eg/ "matches") subscription.
+/// Communicates the [`Coinbase`](super::Coinbase) product_ids (eg/ "ETH-USD")
+/// associated with a successful channel (eg/ "matches") subscription.
 ///
 /// See [`CoinbaseSubResponse`] for full raw paylaod examples.
 ///
 /// See docs: <https://docs.cloud.coinbase.com/exchange/docs/websocket-overview#subscribe>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct CoinbaseChannels {
     #[serde(alias = "name")]
     pub channel: String,

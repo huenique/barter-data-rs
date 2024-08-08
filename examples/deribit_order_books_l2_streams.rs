@@ -45,7 +45,8 @@ async fn main() {
     }
 }
 
-// Initialise an INFO `Subscriber` for `Tracing` Json logs and install it as the global default.
+// Initialise an INFO `Subscriber` for `Tracing` Json logs and install it as the
+// global default.
 fn init_logging() {
     tracing_subscriber::fmt()
         // Filter messages based on the INFO

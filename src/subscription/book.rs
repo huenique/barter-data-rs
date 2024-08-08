@@ -1,7 +1,4 @@
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::subscription::SubKind;
+use std::cmp::Ordering;
 
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
@@ -12,23 +9,28 @@ use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
-use std::cmp::Ordering;
 use tracing::debug;
 
-/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields level 1 [`OrderBook`]
-/// [`MarketEvent<T>`](crate::event::MarketEvent) events.
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use crate::subscription::SubKind;
+
+/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields level 1
+/// [`OrderBook`] [`MarketEvent<T>`](crate::event::MarketEvent) events.
 ///
-/// Level 1 refers to the best non-aggregated bid and ask [`Level`] on each side of the
-/// [`OrderBook`].
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, DeSubKind, SerSubKind)]
+/// Level 1 refers to the best non-aggregated bid and ask [`Level`] on each side
+/// of the [`OrderBook`].
+#[derive(Clone, Copy, DeSubKind, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, SerSubKind)]
 pub struct OrderBooksL1;
 
 impl SubKind for OrderBooksL1 {
     type Event = OrderBookL1;
 }
 
-/// Normalised Barter [`OrderBookL1`] snapshot containing the latest best bid and ask.
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize)]
+/// Normalised Barter [`OrderBookL1`] snapshot containing the latest best bid
+/// and ask.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct OrderBookL1 {
     pub last_update_time: DateTime<Utc>,
     pub best_bid: Level,
@@ -36,15 +38,16 @@ pub struct OrderBookL1 {
 }
 
 impl OrderBookL1 {
-    /// Calculate the mid price by taking the average of the best bid and ask prices.
+    /// Calculate the mid price by taking the average of the best bid and ask
+    /// prices.
     ///
     /// See Docs: <https://www.quantstart.com/articles/high-frequency-trading-ii-limit-order-book>
     pub fn mid_price(&self) -> f64 {
         mid_price(self.best_bid.price, self.best_ask.price)
     }
 
-    /// Calculate the volume weighted mid price (micro-price), weighing the best bid and ask prices
-    /// with their associated amount.
+    /// Calculate the volume weighted mid price (micro-price), weighing the best
+    /// bid and ask prices with their associated amount.
     ///
     /// See Docs: <https://www.quantstart.com/articles/high-frequency-trading-ii-limit-order-book>
     pub fn volume_weighed_mid_price(&self) -> f64 {
@@ -52,23 +55,23 @@ impl OrderBookL1 {
     }
 }
 
-/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields level 2 [`OrderBook`]
-/// [`MarketEvent<T>`](crate::event::MarketEvent) events.
+/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields level 2
+/// [`OrderBook`] [`MarketEvent<T>`](crate::event::MarketEvent) events.
 ///
 /// Level 2 refers to the [`OrderBook`] aggregated by price.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, DeSubKind, SerSubKind)]
+#[derive(Clone, Copy, DeSubKind, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, SerSubKind)]
 pub struct OrderBooksL2;
 
 impl SubKind for OrderBooksL2 {
     type Event = OrderBook;
 }
 
-/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields level 3 [`OrderBook`]
-/// [`MarketEvent<T>`](crate::event::MarketEvent) events.
+/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields level 3
+/// [`OrderBook`] [`MarketEvent<T>`](crate::event::MarketEvent) events.
 ///
-/// Level 3 refers to the non-aggregated [`OrderBook`]. This is a direct replication of the exchange
-/// [`OrderBook`].
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, DeSubKind, SerSubKind)]
+/// Level 3 refers to the non-aggregated [`OrderBook`]. This is a direct
+/// replication of the exchange [`OrderBook`].
+#[derive(Clone, Copy, DeSubKind, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, SerSubKind)]
 pub struct OrderBooksL3;
 
 impl SubKind for OrderBooksL3 {
@@ -76,7 +79,7 @@ impl SubKind for OrderBooksL3 {
 }
 
 /// Normalised Barter [`OrderBook`] snapshot.
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct OrderBook {
     pub last_update_time: DateTime<Utc>,
     pub bids: OrderBookSide,
@@ -84,7 +87,8 @@ pub struct OrderBook {
 }
 
 impl OrderBook {
-    /// Generate an [`OrderBook`] snapshot by cloning [`Self`] after sorting each [`OrderBookSide`].
+    /// Generate an [`OrderBook`] snapshot by cloning [`Self`] after sorting
+    /// each [`OrderBookSide`].
     pub fn snapshot(&mut self) -> Self {
         // Sort OrderBook & Clone
         self.bids.sort();
@@ -92,7 +96,8 @@ impl OrderBook {
         self.clone()
     }
 
-    /// Calculate the mid price by taking the average of the best bid and ask prices.
+    /// Calculate the mid price by taking the average of the best bid and ask
+    /// prices.
     ///
     /// See Docs: <https://www.quantstart.com/articles/high-frequency-trading-ii-limit-order-book>
     pub fn mid_price(&self) -> Option<f64> {
@@ -104,8 +109,8 @@ impl OrderBook {
         }
     }
 
-    /// Calculate the volume weighted mid price (micro-price), weighing the best bid and ask prices
-    /// with their associated amount.
+    /// Calculate the volume weighted mid price (micro-price), weighing the best
+    /// bid and ask prices with their associated amount.
     ///
     /// See Docs: <https://www.quantstart.com/articles/high-frequency-trading-ii-limit-order-book>
     pub fn volume_weighed_mid_price(&self) -> Option<f64> {
@@ -121,7 +126,7 @@ impl OrderBook {
 }
 
 /// Normalised Barter [`Level`]s for one [`Side`] of the [`OrderBook`].
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct OrderBookSide {
     side: Side,
     pub levels: Vec<Level>,
@@ -209,9 +214,9 @@ impl OrderBookSide {
     }
 }
 
-/// An iterative version of QuickSort that avoids recursion by using a manually managed stack,
-/// ensuring it doesn't exhaust the call stack. This makes it suitable for sorting large arrays
-/// without causing stack overflows.
+/// An iterative version of QuickSort that avoids recursion by using a manually
+/// managed stack, ensuring it doesn't exhaust the call stack. This makes it
+/// suitable for sorting large arrays without causing stack overflows.
 ///
 /// # Arguments
 ///
@@ -242,10 +247,10 @@ fn quicksort_iterative(arr: &mut [Level]) {
     }
 }
 
-/// Partitions the array around a pivot element chosen as the last element in the range.
-/// Elements less than or equal to the pivot are moved to the left of the pivot,
-/// and elements greater than the pivot are moved to the right. Returns the index of the pivot element
-/// after partitioning.
+/// Partitions the array around a pivot element chosen as the last element in
+/// the range. Elements less than or equal to the pivot are moved to the left of
+/// the pivot, and elements greater than the pivot are moved to the right.
+/// Returns the index of the pivot element after partitioning.
 ///
 /// # Arguments
 ///
@@ -283,7 +288,7 @@ fn partition(arr: &mut [Level], low: isize, high: isize) -> isize {
 }
 
 /// Normalised Barter OrderBook [`Level`].
-#[derive(Clone, Copy, PartialEq, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct Level {
     pub price: f64,
     pub amount: f64,
@@ -332,15 +337,16 @@ impl Level {
 
 // Todo: Add tests
 
-/// Calculate the mid price by taking the average of the best bid and ask prices.
+/// Calculate the mid price by taking the average of the best bid and ask
+/// prices.
 ///
 /// See Docs: <https://www.quantstart.com/articles/high-frequency-trading-ii-limit-order-book>
 pub fn mid_price(best_bid_price: f64, best_ask_price: f64) -> f64 {
     (best_bid_price + best_ask_price) / 2.0
 }
 
-/// Calculate the volume weighted mid price (micro-price), weighing the best bid and ask prices
-/// with their associated amount.
+/// Calculate the volume weighted mid price (micro-price), weighing the best bid
+/// and ask prices with their associated amount.
 ///
 /// See Docs: <https://www.quantstart.com/articles/high-frequency-trading-ii-limit-order-book>
 pub fn volume_weighted_mid_price(best_bid: Level, best_ask: Level) -> f64 {

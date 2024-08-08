@@ -1,12 +1,13 @@
+use std::cmp::Ordering;
+
 use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
 use rand::Rng;
 use serde::Deserialize;
 use serde::Serialize;
-use std::cmp::Ordering;
 
-#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct Level {
     pub price: f64,
     pub amount: f64,
@@ -20,13 +21,11 @@ impl Ord for Level {
             .unwrap_or_else(|| panic!("{:?}.partial_cmp({:?}) impossible", self, other))
     }
 }
-
 #[derive(Debug)]
 pub struct OrderBookSide {
     pub levels: Vec<Level>,
     pub side: Side,
 }
-
 #[derive(Debug)]
 pub enum Side {
     Buy,

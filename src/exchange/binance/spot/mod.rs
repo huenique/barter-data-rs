@@ -1,14 +1,15 @@
-use self::l2::BinanceSpotBookUpdater;
-use super::Binance;
-use super::ExchangeServer;
+use crate::exchange::binance::spot::l2::BinanceSpotBookUpdater;
+use crate::exchange::binance::Binance;
 use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeServer;
 use crate::exchange::StreamSelector;
 use crate::subscription::book::OrderBooksL2;
 use crate::transformer::book::MultiBookTransformer;
 use crate::ExchangeWsStream;
 
 /// Level 2 OrderBook types (top of book) and spot
-/// [`OrderBookUpdater`](crate::transformer::book::OrderBookUpdater) implementation.
+/// [`OrderBookUpdater`](crate::transformer::book::OrderBookUpdater)
+/// implementation.
 pub mod l2;
 
 /// [`BinanceSpot`] WebSocket server base url.
@@ -19,8 +20,9 @@ pub const WEBSOCKET_BASE_URL_BINANCE_SPOT: &str = "wss://stream.binance.com:9443
 /// [`Binance`](super::Binance) spot exchange.
 pub type BinanceSpot = Binance<BinanceServerSpot>;
 
-/// [`Binance`](super::Binance) spot [`ExchangeServer`](super::super::ExchangeServer).
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+/// [`Binance`](super::Binance) spot
+/// [`ExchangeServer`](super::super::ExchangeServer).
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct BinanceServerSpot;
 
 impl ExchangeServer for BinanceServerSpot {

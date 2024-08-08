@@ -1,10 +1,12 @@
-use super::message::KrakenError;
 use barter_integration::error::SocketError;
 use barter_integration::Validator;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// [`Kraken`](super::Kraken) message received in response to WebSocket subscription requests.
+use crate::exchange::kraken::message::KrakenError;
+
+/// [`Kraken`](super::Kraken) message received in response to WebSocket
+/// subscription requests.
 ///
 /// ### Raw Payload Examples
 /// See docs: <https://docs.kraken.com/websockets/#message-subscriptionStatus>
@@ -34,7 +36,7 @@ use serde::Serialize;
 ///   }
 /// }
 /// ```
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(tag = "status", rename_all = "camelCase")]
 pub enum KrakenSubResponse {
     Subscribed {

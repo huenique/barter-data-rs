@@ -1,9 +1,3 @@
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::exchange::ExchangeSub;
-use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
@@ -13,7 +7,15 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// Terse type alias for an [`Okx`](super::Okx) real-time trades WebSocket message.
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+
+/// Terse type alias for an [`Okx`](super::Okx) real-time trades WebSocket
+/// message.
 pub type OkxTrades = OkxMessage<OkxTrade>;
 
 /// [`Okx`](super::Okx) market data WebSocket message.
@@ -59,7 +61,7 @@ pub type OkxTrades = OkxMessage<OkxTrade>;
 ///   ]
 /// }
 /// ```
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct OkxMessage<T> {
     #[serde(
         rename = "arg",
@@ -80,7 +82,7 @@ impl<T> Identifier<Option<SubscriptionId>> for OkxMessage<T> {
 /// See [`OkxMessage`] for full raw payload examples.
 ///
 /// See docs: <https://www.okx.com/docs-v5/en/#websocket-api-public-channel-trades-channel>
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct OkxTrade {
     #[serde(rename = "tradeId")]
     pub id: String,
@@ -142,10 +144,12 @@ mod tests {
     use super::*;
 
     mod de {
-        use super::*;
+        use std::time::Duration;
+
         use barter_integration::de::datetime_utc_from_epoch_duration;
         use barter_integration::error::SocketError;
-        use std::time::Duration;
+
+        use super::*;
 
         #[test]
         fn test_okx_message_trades() {

@@ -17,13 +17,11 @@ pub enum PowerTradeSubResponse {
     },
     Unknown(Value),
 }
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Subscribed {
     pub tradeable_entity_id: String,
     pub symbol: String,
 }
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SubscribeError {
     pub message: String,

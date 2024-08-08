@@ -1,10 +1,3 @@
-use super::super::message::GateioMessage;
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::ExchangeId;
-use crate::exchange::ExchangeSub;
-use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
@@ -14,7 +7,16 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// Terse type alias for an [`GateioSpot`](super::GateioSpot) real-time trades WebSocket message.
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::gateio::message::GateioMessage;
+use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeSub;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
+
+/// Terse type alias for an [`GateioSpot`](super::GateioSpot) real-time trades
+/// WebSocket message.
 pub type GateioSpotTrade = GateioMessage<GateioSpotTradeInner>;
 
 /// [`GateioSpot`](super::GateioSpot) real-time trade WebSocket message.
@@ -32,7 +34,7 @@ pub type GateioSpotTrade = GateioMessage<GateioSpotTradeInner>;
 ///   "price": "0.4705000000"
 /// }
 /// ```
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct GateioSpotTradeInner {
     #[serde(rename = "currency_pair")]
     pub market: String,

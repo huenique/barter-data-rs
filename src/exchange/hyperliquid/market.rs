@@ -1,10 +1,11 @@
-use super::Hyperliquid;
-use crate::subscription::Subscription;
-use crate::Identifier;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+use crate::exchange::hyperliquid::Hyperliquid;
+use crate::subscription::Subscription;
+use crate::Identifier;
+
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct HyperliquidMarket(pub String);
 
 impl<Kind> Identifier<HyperliquidMarket> for Subscription<Hyperliquid, Kind> {

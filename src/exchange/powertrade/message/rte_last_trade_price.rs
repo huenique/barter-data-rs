@@ -1,12 +1,10 @@
 use serde::Deserialize;
 use serde::Serialize;
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Response {
     pub last_trade_prirce: RteLastTradePrice,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct RteLastTradePrice {
     pub timestamp: String,
     pub tradeable_entity_id: String,

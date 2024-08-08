@@ -8,12 +8,11 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::exchange::powertrade::PowerTrade;
 use crate::subscription::Subscription;
 use crate::Identifier;
 
-use super::PowerTrade;
-
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct PowerTradeMarket(pub String);
 
 impl AsRef<str> for PowerTradeMarket {

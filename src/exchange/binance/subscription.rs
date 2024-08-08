@@ -22,7 +22,7 @@ use serde::Serialize;
 ///     "result":[]
 /// }
 /// ```
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BinanceSubResponse {
     result: Option<Vec<String>>,
     id: u32,

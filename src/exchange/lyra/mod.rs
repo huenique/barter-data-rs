@@ -1,3 +1,10 @@
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use serde_json::json;
+use url::Url;
+
 use crate::exchange::lyra::channel::LyraChannel;
 use crate::exchange::lyra::market::LyraMarket;
 use crate::exchange::lyra::subscription::LyraSubResponse;
@@ -11,13 +18,6 @@ use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::ticker::Tickers;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use serde_json::json;
-use url::Url;
 
 pub mod channel;
 
@@ -38,7 +38,7 @@ pub const BASE_URL_LYRA: &str = "wss://api.lyra.finance/ws";
 ///
 /// See docs: <https://docs.lyra.finance/reference/json-rpc#websocket>
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct Lyra;
 

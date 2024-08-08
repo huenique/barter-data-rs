@@ -1,12 +1,3 @@
-use super::super::KrakenMessage;
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::kraken::channel::KrakenChannel;
-use crate::exchange::subscription::ExchangeSub;
-use crate::exchange::ExchangeId;
-use crate::subscription::book::Level;
-use crate::subscription::book::OrderBookL1;
-use crate::Identifier;
 use barter_integration::de::extract_next;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
@@ -16,17 +7,28 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// Terse type alias for an [`Kraken`](super::super::Kraken) real-time OrderBook Level1
-/// (top of book) WebSocket message.
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::kraken::channel::KrakenChannel;
+use crate::exchange::kraken::message::KrakenMessage;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::ExchangeId;
+use crate::subscription::book::Level;
+use crate::subscription::book::OrderBookL1;
+use crate::Identifier;
+
+/// Terse type alias for an [`Kraken`](super::super::Kraken) real-time OrderBook
+/// Level1 (top of book) WebSocket message.
 pub type KrakenOrderBookL1 = KrakenMessage<KrakenOrderBookL1Inner>;
 
-/// [`Kraken`](super::super::Kraken) real-time OrderBook Level1 (top of book) data and the
-/// associated [`SubscriptionId`].
+/// [`Kraken`](super::super::Kraken) real-time OrderBook Level1 (top of book)
+/// data and the associated [`SubscriptionId`].
 ///
-/// See [`KrakenMessage`](super::super::message::KrakenMessage) for full raw payload examples.
+/// See [`KrakenMessage`](super::super::message::KrakenMessage) for full raw
+/// payload examples.
 ///
 /// See docs: <https://docs.kraken.com/websockets/#message-spread>
-#[derive(Clone, PartialEq, PartialOrd, Debug, Serialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Serialize)]
 pub struct KrakenOrderBookL1Inner {
     pub subscription_id: SubscriptionId,
     pub spread: KrakenSpread,
@@ -34,10 +36,11 @@ pub struct KrakenOrderBookL1Inner {
 
 /// [`Kraken`](super::super::Kraken) best bid and ask.
 ///
-/// See [`KrakenMessage`](super::super::message::KrakenMessage) for full raw payload examples.
+/// See [`KrakenMessage`](super::super::message::KrakenMessage) for full raw
+/// payload examples.
 ///
 /// See docs: <https://docs.kraken.com/websockets/#message-spread>
-#[derive(Clone, Copy, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct KrakenSpread {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub best_bid_price: f64,
@@ -135,10 +138,11 @@ mod tests {
     use super::*;
 
     mod de {
-        use super::*;
         use barter_integration::de::datetime_utc_from_epoch_duration;
         use barter_integration::error::SocketError;
         use barter_integration::model::SubscriptionId;
+
+        use super::*;
 
         #[test]
         fn test_kraken_message_order_book_l1() {

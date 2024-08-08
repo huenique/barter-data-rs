@@ -1,9 +1,3 @@
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::subscription::ExchangeSub;
-use crate::exchange::ExchangeId;
-use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
@@ -13,10 +7,17 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-use super::channel::DeribitChannel;
-use super::message::DeribitMultipleDataMessage;
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::deribit::channel::DeribitChannel;
+use crate::exchange::deribit::message::DeribitMultipleDataMessage;
+use crate::exchange::subscription::ExchangeSub;
+use crate::exchange::ExchangeId;
+use crate::subscription::trade::PublicTrade;
+use crate::Identifier;
 
-/// Terse type alias for an [`Deribit`](super::Deribit) real-time trades WebSocket message.
+/// Terse type alias for an [`Deribit`](super::Deribit) real-time trades
+/// WebSocket message.
 pub type DeribitTrades = DeribitMultipleDataMessage<DeribitTrade>;
 
 // {
@@ -46,7 +47,7 @@ pub type DeribitTrades = DeribitMultipleDataMessage<DeribitTrade>;
 /// See [`DeribitMessage`] for full raw payload examples.
 ///
 /// See docs: <https://docs.deribit.com/#trades-instrument_name-interval>
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct DeribitTrade {
     #[serde(rename = "trade_id")]
     pub id: String,

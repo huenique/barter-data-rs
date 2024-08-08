@@ -1,12 +1,11 @@
 use serde::Serialize;
 
+use crate::exchange::dydx::Dydx;
 use crate::subscription::book::OrderBooksL2;
 use crate::subscription::Subscription;
 use crate::Identifier;
 
-use super::Dydx;
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct DydxChannel(pub &'static str);
 
 impl DydxChannel {

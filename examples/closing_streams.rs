@@ -1,11 +1,12 @@
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+use std::sync::Arc;
+
 use barter_data::exchange::deribit::DeribitMain;
 use barter_data::exchange::ExchangeId;
 use barter_data::streams::Streams;
 use barter_data::subscription::ticker::Tickers;
 use barter_integration::model::instrument::kind::InstrumentKind;
-use std::sync::atomic::AtomicBool;
-use std::sync::atomic::Ordering;
-use std::sync::Arc;
 use tracing::info;
 use tracing_subscriber;
 
@@ -53,7 +54,8 @@ async fn main() {
     }
 }
 
-// Initialise an INFO `Subscriber` for `Tracing` logs and install it as the global default.
+// Initialise an INFO `Subscriber` for `Tracing` logs and install it as the
+// global default.
 fn init_logging() {
     tracing_subscriber::fmt()
         .with_env_filter(

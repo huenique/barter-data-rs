@@ -1,9 +1,15 @@
-use self::book::l1::KrakenOrderBookL1;
-use self::channel::KrakenChannel;
-use self::market::KrakenMarket;
-use self::message::KrakenMessage;
-use self::subscription::KrakenSubResponse;
-use self::trade::KrakenTrades;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use serde_json::json;
+use url::Url;
+
+use crate::exchange::kraken::book::l1::KrakenOrderBookL1;
+use crate::exchange::kraken::channel::KrakenChannel;
+use crate::exchange::kraken::market::KrakenMarket;
+use crate::exchange::kraken::subscription::KrakenSubResponse;
+use crate::exchange::kraken::trade::KrakenTrades;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
@@ -14,29 +20,25 @@ use crate::subscription::book::OrderBooksL1;
 use crate::subscription::trade::PublicTrades;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use serde_json::json;
-use url::Url;
 
 /// Order book types for [`Kraken`]
 pub mod book;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`] specific channel used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`] specific channel used for generating [`Connector::requests`].
 pub mod channel;
 
-/// Defines the type that translates a Barter [`Subscription`](crate::subscription::Subscription)
-/// into an exchange [`Connector`]  specific market used for generating [`Connector::requests`].
+/// Defines the type that translates a Barter
+/// [`Subscription`](crate::subscription::Subscription) into an exchange
+/// [`Connector`]  specific market used for generating [`Connector::requests`].
 pub mod market;
 
 /// [`KrakenMessage`](message::KrakenMessage) type for [`Kraken`].
 pub mod message;
 
-/// [`Subscription`](crate::subscription::Subscription) response type and response
-/// [`Validator`](barter_integration) for [`Kraken`].
+/// [`Subscription`](crate::subscription::Subscription) response type and
+/// response [`Validator`](barter_integration) for [`Kraken`].
 pub mod subscription;
 
 /// Public trade types for [`Kraken`].
@@ -51,7 +53,7 @@ pub const BASE_URL_KRAKEN: &str = "wss://ws.kraken.com/";
 ///
 /// See docs: <https://docs.kraken.com/websockets/#overview>
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange,
+    Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
 pub struct Kraken;
 

@@ -3,8 +3,8 @@ use barter_integration::Validator;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// [`Bitfinex`](super::Bitfinex) platform event detailing the variants expected to be received
-/// while connecting and subscribing.
+/// [`Bitfinex`](super::Bitfinex) platform event detailing the variants expected
+/// to be received while connecting and subscribing.
 ///
 /// ### Raw Payload Examples
 /// See docs: <https://docs.bitfinex.com/docs/ws-general>
@@ -37,7 +37,7 @@ use serde::Serialize;
 ///    "msg": ERROR_MSG,
 ///    "code": ERROR_CODE
 /// }
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(tag = "event", rename_all = "lowercase")]
 pub enum BitfinexPlatformEvent {
     #[serde(rename = "info")]
@@ -68,8 +68,9 @@ impl Validator for BitfinexPlatformEvent {
     }
 }
 
-/// [`Bitfinex`](super::Bitfinex) platform status message containing the server we are connecting
-/// to, the version of the API, and if it is in maintenance mode.
+/// [`Bitfinex`](super::Bitfinex) platform status message containing the server
+/// we are connecting to, the version of the API, and if it is in maintenance
+/// mode.
 ///
 /// ### Raw Payload Examples
 /// See docs: <https://docs.bitfinex.com/docs/ws-general#info-messages>
@@ -96,7 +97,7 @@ impl Validator for BitfinexPlatformEvent {
 ///   }
 /// }
 /// ```
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitfinexPlatformStatus {
     #[serde(rename = "version")]
     api_version: u8,
@@ -106,18 +107,20 @@ pub struct BitfinexPlatformStatus {
     status: Status,
 }
 
-/// [`Bitfinex`](super::Bitfinex) platform [`Status`] indicating if the API is in maintenance mode.
+/// [`Bitfinex`](super::Bitfinex) platform [`Status`] indicating if the API is
+/// in maintenance mode.
 ///
 /// See [`BitfinexPlatformStatus`] for full raw payload examples.
 ///
 /// See docs: <https://docs.bitfinex.com/docs/ws-general#info-messages>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub enum Status {
     Maintenance,
     Operative,
 }
 
-/// [`Bitfinex`](super::Bitfinex) subscription success response variants for each channel.
+/// [`Bitfinex`](super::Bitfinex) subscription success response variants for
+/// each channel.
 ///
 /// ### Raw Payload Examples
 /// See docs: <https://docs.bitfinex.com/docs/ws-general>
@@ -139,7 +142,7 @@ pub enum Status {
 ///    "msg": ERROR_MSG,
 ///    "code": ERROR_CODE
 /// }
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitfinexSubResponse {
     pub channel: String,
     #[serde(rename = "symbol")]
@@ -148,16 +151,16 @@ pub struct BitfinexSubResponse {
     pub channel_id: BitfinexChannelId,
 }
 
-/// [`Bitfinex`](super::Bitfinex) channel identifier that is used to identify the subscription
-/// associated with incoming events. See the module level "SubscriptionId" documentation notes
-/// for more details.
+/// [`Bitfinex`](super::Bitfinex) channel identifier that is used to identify
+/// the subscription associated with incoming events. See the module level
+/// "SubscriptionId" documentation notes for more details.
 ///
 /// See docs: <https://docs.bitfinex.com/docs/ws-general#subscribe-to-channels>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitfinexChannelId(pub u32);
 
-/// [`Bitfinex`](super::Bitfinex) error message that is received if a [`BitfinexSubResponse`]
-/// indicates a WebSocket subscription failure.
+/// [`Bitfinex`](super::Bitfinex) error message that is received if a
+/// [`BitfinexSubResponse`] indicates a WebSocket subscription failure.
 ///
 /// ### Subscription Error Codes:
 /// 10300: Generic failure
@@ -167,7 +170,7 @@ pub struct BitfinexChannelId(pub u32);
 /// See [`BitfinexPlatformStatus`] for full raw payload examples.
 ///
 /// See docs: <https://docs.bitfinex.com/docs/ws-general>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BitfinexError {
     msg: String,
     code: u32,

@@ -1,11 +1,11 @@
-use crate::exchange::dydx::message::ChannelDataMessage;
-use crate::exchange::dydx::message::ErrorMessage;
-use crate::exchange::dydx::message::SubscribedMessage;
-
 use barter_integration::error::SocketError;
 use barter_integration::Validator;
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::exchange::dydx::message::ChannelDataMessage;
+use crate::exchange::dydx::message::ErrorMessage;
+use crate::exchange::dydx::message::SubscribedMessage;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
@@ -15,7 +15,6 @@ pub enum DydxSubResponse {
     ChannelData(ChannelDataMessage),
     Error(ErrorMessage),
 }
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ConnectedMessage {
     #[serde(rename = "type")]

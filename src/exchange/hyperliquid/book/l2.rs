@@ -1,12 +1,3 @@
-use crate::error::DataError;
-use crate::exchange::hyperliquid::message::HyperliquidMessage;
-use crate::exchange::subscription::ExchangeSub;
-use crate::subscription::book::OrderBook;
-use crate::subscription::book::OrderBookSide;
-use crate::transformer::book::InstrumentOrderBook;
-use crate::transformer::book::OrderBookUpdater;
-use crate::Identifier;
-
 use async_trait::async_trait;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Side;
@@ -17,6 +8,15 @@ use serde::Deserialize;
 use serde::Serialize;
 use tokio::sync::mpsc;
 
+use crate::error::DataError;
+use crate::exchange::hyperliquid::message::HyperliquidMessage;
+use crate::exchange::subscription::ExchangeSub;
+use crate::subscription::book::OrderBook;
+use crate::subscription::book::OrderBookSide;
+use crate::transformer::book::InstrumentOrderBook;
+use crate::transformer::book::OrderBookUpdater;
+use crate::Identifier;
+
 pub type HyperliquidOrderBookL2Snapshot = HyperliquidMessage<WsBook>;
 
 impl Identifier<Option<SubscriptionId>> for HyperliquidOrderBookL2Snapshot {
@@ -26,7 +26,7 @@ impl Identifier<Option<SubscriptionId>> for HyperliquidOrderBookL2Snapshot {
 }
 
 // Order book snapshot for L2 as per the WsBook interface
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct WsBook {
     pub coin: String,
     pub levels: (Vec<WsLevel>, Vec<WsLevel>), // tuple of bids and asks
@@ -45,7 +45,7 @@ impl WsBook {
 }
 
 // Level detail for order books as per the WsLevel interface
-#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct WsLevel {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub px: f64, // price
@@ -53,8 +53,7 @@ pub struct WsLevel {
     pub sz: f64, // size
     pub n: u32, // number of orders
 }
-
-#[derive(Copy, Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
 pub struct HyperliquidOrderBookUpdater {}
 
 #[async_trait]
@@ -86,7 +85,8 @@ impl OrderBookUpdater for HyperliquidOrderBookUpdater {
         update: Self::Update,
     ) -> Result<Option<OrderBook>, DataError> {
         book.last_update_time = Utc::now();
-        // We can replace the entire order book since Hyperliquid sends full snapshots with each update.
+        // We can replace the entire order book since Hyperliquid sends full snapshots
+        // with each update.
         book.bids = OrderBookSide::new(Side::Buy, update.data.levels.0);
         book.asks = OrderBookSide::new(Side::Sell, update.data.levels.1);
         Ok(Some(book.snapshot()))

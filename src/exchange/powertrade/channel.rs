@@ -1,12 +1,12 @@
+use serde::Serialize;
+
 use crate::exchange::powertrade::PowerTrade;
 use crate::subscription::book::OrderBooksL3;
 use crate::subscription::ticker::Tickers;
 use crate::Identifier;
 use crate::Subscription;
 
-use serde::Serialize;
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct PowerTradeChannel(pub &'static str);
 
 impl PowerTradeChannel {

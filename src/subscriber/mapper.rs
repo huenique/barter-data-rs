@@ -1,3 +1,9 @@
+use std::collections::HashMap;
+
+use barter_integration::model::SubscriptionId;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::exchange::subscription::ExchangeSub;
 use crate::exchange::Connector;
 use crate::subscription::Map;
@@ -5,13 +11,10 @@ use crate::subscription::SubKind;
 use crate::subscription::Subscription;
 use crate::subscription::SubscriptionMeta;
 use crate::Identifier;
-use barter_integration::model::SubscriptionId;
-use serde::Deserialize;
-use serde::Serialize;
-use std::collections::HashMap;
 
-/// Defines how to map a collection of Barter [`Subscription`]s into exchange specific
-/// [`SubscriptionMeta`], containing subscription payloads that are sent to the exchange.
+/// Defines how to map a collection of Barter [`Subscription`]s into exchange
+/// specific [`SubscriptionMeta`], containing subscription payloads that are
+/// sent to the exchange.
 pub trait SubscriptionMapper {
     fn map<Exchange, Kind>(subscriptions: &[Subscription<Exchange, Kind>]) -> SubscriptionMeta
     where
@@ -21,8 +24,9 @@ pub trait SubscriptionMapper {
 }
 
 /// Standard [`SubscriptionMapper`] for
-/// [`WebSocket`](barter_integration::protocol::websocket::WebSocket)s suitable for most exchanges.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+/// [`WebSocket`](barter_integration::protocol::websocket::WebSocket)s suitable
+/// for most exchanges.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct WebSocketSubMapper;
 
 impl SubscriptionMapper for WebSocketSubMapper {
@@ -33,7 +37,8 @@ impl SubscriptionMapper for WebSocketSubMapper {
         Subscription<Exchange, Kind>: Identifier<Exchange::Channel> + Identifier<Exchange::Market>,
         ExchangeSub<Exchange::Channel, Exchange::Market>: Identifier<SubscriptionId>,
     {
-        // Allocate SubscriptionIds HashMap to track identifiers for each actioned Subscription
+        // Allocate SubscriptionIds HashMap to track identifiers for each actioned
+        // Subscription
         let mut instrument_map = Map(HashMap::with_capacity(subscriptions.len()));
 
         // Map Barter Subscriptions to exchange specific subscriptions
@@ -43,7 +48,8 @@ impl SubscriptionMapper for WebSocketSubMapper {
                 // Translate Barter Subscription to exchange specific subscription
                 let exchange_sub = ExchangeSub::new(subscription);
 
-                // Determine the SubscriptionId associated with this exchange specific subscription
+                // Determine the SubscriptionId associated with this exchange specific
+                // subscription
                 let subscription_id = exchange_sub.id();
 
                 // Use ExchangeSub SubscriptionId as the link to this Barter Subscription

@@ -1,8 +1,8 @@
-use self::l2::BinanceFuturesBookUpdater;
-use self::liquidation::BinanceLiquidation;
-use super::Binance;
-use super::ExchangeServer;
+use crate::exchange::binance::futures::l2::BinanceFuturesBookUpdater;
+use crate::exchange::binance::futures::liquidation::BinanceLiquidation;
+use crate::exchange::binance::Binance;
 use crate::exchange::ExchangeId;
+use crate::exchange::ExchangeServer;
 use crate::exchange::StreamSelector;
 use crate::subscription::book::OrderBooksL2;
 use crate::subscription::liquidation::Liquidations;
@@ -11,7 +11,8 @@ use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
 
 /// Level 2 OrderBook types (top of book) and perpetual
-/// [`OrderBookUpdater`](crate::transformer::book::OrderBookUpdater) implementation.
+/// [`OrderBookUpdater`](crate::transformer::book::OrderBookUpdater)
+/// implementation.
 pub mod l2;
 
 /// Liquidation types.
@@ -25,8 +26,9 @@ pub const WEBSOCKET_BASE_URL_BINANCE_FUTURES_USD: &str = "wss://fstream.binance.
 /// [`Binance`](super::Binance) perpetual usd exchange.
 pub type BinanceFuturesUsd = Binance<BinanceServerFuturesUsd>;
 
-/// [`Binance`](super::Binance) perpetual usd [`ExchangeServer`](super::super::ExchangeServer).
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+/// [`Binance`](super::Binance) perpetual usd
+/// [`ExchangeServer`](super::super::ExchangeServer).
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct BinanceServerFuturesUsd;
 
 impl ExchangeServer for BinanceServerFuturesUsd {

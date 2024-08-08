@@ -33,8 +33,7 @@ pub type DeribitOrderBookL1 = DeribitSingleDataMessage<DeribitOrderBookL1Inner>;
 //     "method" : "subscription",
 //     "jsonrpc" : "2.0"
 //   }
-
-#[derive(Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct DeribitOrderBookL1Inner {
     pub instrument_name: String,
     pub best_bid_price: f64,

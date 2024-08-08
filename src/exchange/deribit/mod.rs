@@ -2,6 +2,11 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::time::Duration;
 
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use serde_json::json;
+use url::Url;
+
 use crate::exchange::deribit::book::l1::DeribitOrderBookL1;
 use crate::exchange::deribit::book::l2::DeribitBookUpdater;
 use crate::exchange::deribit::channel::DeribitChannel;
@@ -26,11 +31,6 @@ use crate::subscription::trade::PublicTrades;
 use crate::transformer::book::MultiBookTransformer;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
-
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use serde_json::json;
-use url::Url;
 
 pub mod channel;
 
@@ -63,8 +63,7 @@ pub const PING_INTERVAL_DERIBIT: Duration = Duration::from_secs(29);
 
 /// Testnet
 pub type DeribitTest = Deribit<DeribitTestnetServer>;
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct DeribitTestnetServer {}
 
 impl ExchangeServer for DeribitTestnetServer {
@@ -78,8 +77,7 @@ impl ExchangeServer for DeribitTestnetServer {
 
 /// Mainnet
 pub type DeribitMain = Deribit<DeribitMainnetServer>;
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct DeribitMainnetServer {}
 
 impl ExchangeServer for DeribitMainnetServer {
@@ -94,7 +92,7 @@ impl ExchangeServer for DeribitMainnetServer {
 /// [`Deribit`] exchange.
 ///
 /// See docs: <https://docs.deribit.com/#json-rpc-over-websocket>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Deribit<Server> {
     server: PhantomData<Server>,
 }

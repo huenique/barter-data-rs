@@ -1,35 +1,31 @@
 use serde::Deserialize;
 use serde::Serialize;
 
-// Separated into two message types: Single and Multiple data message types for easier deserialization.
-
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+// Separated into two message types: Single and Multiple data message types for
+// easier deserialization.
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct DeribitSingleDataMessage<T> {
     pub jsonrpc: String,
     pub method: SubscriptionMethod,
     pub params: SingleData<T>,
 }
-
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct DeribitMultipleDataMessage<T> {
     pub jsonrpc: String,
     pub method: SubscriptionMethod,
     pub params: MultipleData<T>,
 }
-
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SingleData<T> {
     pub data: T,
     pub channel: String,
 }
-
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct MultipleData<T> {
     pub data: Vec<T>,
     pub channel: String,
 }
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SubscriptionMethod {
     Subscription,

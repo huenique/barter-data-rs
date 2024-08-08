@@ -1,12 +1,5 @@
-use super::ExchangeTransformer;
-use crate::error::DataError;
-use crate::event::MarketEvent;
-use crate::event::MarketIter;
-use crate::exchange::Connector;
-use crate::exchange::ExchangeId;
-use crate::subscription::Map;
-use crate::subscription::SubKind;
-use crate::Identifier;
+use std::marker::PhantomData;
+
 use async_trait::async_trait;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::SubscriptionId;
@@ -14,14 +7,23 @@ use barter_integration::protocol::websocket::WsMessage;
 use barter_integration::Transformer;
 use serde::Deserialize;
 use serde::Serialize;
-use std::marker::PhantomData;
 use tokio::sync::mpsc;
 
-/// Standard generic stateless [`ExchangeTransformer`] to translate exchange specific types into
-/// normalised Barter types. Often used with
+use crate::error::DataError;
+use crate::event::MarketEvent;
+use crate::event::MarketIter;
+use crate::exchange::Connector;
+use crate::exchange::ExchangeId;
+use crate::subscription::Map;
+use crate::subscription::SubKind;
+use crate::transformer::ExchangeTransformer;
+use crate::Identifier;
+
+/// Standard generic stateless [`ExchangeTransformer`] to translate exchange
+/// specific types into normalised Barter types. Often used with
 /// [`PublicTrades`](crate::subscription::trade::PublicTrades) or
 /// [`OrderBooksL1`](crate::subscription::book::OrderBooksL1) streams.
-#[derive(Clone, Eq, PartialEq, Debug, Serialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct StatelessTransformer<Exchange, Kind, Input> {
     instrument_map: Map<Instrument>,
     phantom: PhantomData<(Exchange, Kind, Input)>,

@@ -1,13 +1,13 @@
-use crate::exchange::dydx::Dydx;
-use crate::subscription::Subscription;
-use crate::Identifier;
-
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::Instrument;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+use crate::exchange::dydx::Dydx;
+use crate::subscription::Subscription;
+use crate::Identifier;
+
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct DydxMarket(pub String);
 
 impl AsRef<str> for DydxMarket {

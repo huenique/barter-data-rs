@@ -1,3 +1,13 @@
+use async_trait::async_trait;
+use barter_integration::model::instrument::Instrument;
+use barter_integration::model::Side;
+use barter_integration::model::SubscriptionId;
+use barter_integration::protocol::websocket::WsMessage;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
+use tokio::sync::mpsc::UnboundedSender;
+
 use crate::error::DataError;
 use crate::exchange::dydx::book::DydxLevel;
 use crate::exchange::dydx::channel::DydxChannel;
@@ -13,16 +23,6 @@ use crate::subscription::book::OrderBookSide;
 use crate::transformer::book::InstrumentOrderBook;
 use crate::transformer::book::OrderBookUpdater;
 use crate::Identifier;
-
-use async_trait::async_trait;
-use barter_integration::model::instrument::Instrument;
-use barter_integration::model::Side;
-use barter_integration::model::SubscriptionId;
-use barter_integration::protocol::websocket::WsMessage;
-use chrono::Utc;
-use serde::Deserialize;
-use serde::Serialize;
-use tokio::sync::mpsc::UnboundedSender;
 
 pub type DydxOrderBookL2 = DydxMessage;
 
@@ -79,8 +79,7 @@ fn parse_order_data(side: Side, data: &[DydxLevel]) -> OrderBookSide {
             .collect::<Vec<Level>>(),
     )
 }
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct DydxOrderBookUpdater {
     pub updates_processed: u64,
     pub message_id: u64,
@@ -108,7 +107,8 @@ impl OrderBookUpdater for DydxOrderBookUpdater {
         Exchange: Send,
         Kind: Send,
     {
-        // No need for a separate snapshot fetch; the first notification will have the whole book.
+        // No need for a separate snapshot fetch; the first notification will have the
+        // whole book.
         Ok(InstrumentOrderBook {
             instrument,
             updater: Self::new(0),

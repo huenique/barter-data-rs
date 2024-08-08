@@ -1,12 +1,13 @@
-use super::SubKind;
 use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields [`Candle`]
-/// [`MarketEvent<T>`](crate::event::MarketEvent) events.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+use crate::subscription::SubKind;
+
+/// Barter [`Subscription`](super::Subscription) [`SubKind`] that yields
+/// [`Candle`] [`MarketEvent<T>`](crate::event::MarketEvent) events.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Candles;
 
 impl SubKind for Candles {
@@ -14,7 +15,7 @@ impl SubKind for Candles {
 }
 
 /// Normalised Barter OHLCV [`Candle`] model.
-#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct Candle {
     pub close_time: DateTime<Utc>,
     pub open: f64,

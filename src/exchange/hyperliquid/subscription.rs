@@ -1,22 +1,21 @@
+use std::fmt::Debug;
+
 use barter_integration::error::SocketError;
 use barter_integration::Validator;
 use serde::Deserialize;
 use serde::Serialize;
-use std::fmt::Debug;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct HyperliquidSubResponse {
     pub channel: String,
     pub data: SubscriptionData,
 }
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SubscriptionData {
     pub method: String,
     pub subscription: SubscriptionDetails,
 }
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SubscriptionDetails {
     #[serde(rename = "type")]
     pub subscription_type: String,

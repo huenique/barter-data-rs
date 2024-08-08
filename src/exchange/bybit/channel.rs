@@ -1,14 +1,15 @@
+use serde::Serialize;
+
 use crate::exchange::bybit::Bybit;
 use crate::subscription::trade::PublicTrades;
 use crate::subscription::Subscription;
 use crate::Identifier;
-use serde::Serialize;
 
-/// Type that defines how to translate a Barter [`Subscription`] into a [`Bybit`](super::Bybit)
-/// channel to be subscribed to.
+/// Type that defines how to translate a Barter [`Subscription`] into a
+/// [`Bybit`](super::Bybit) channel to be subscribed to.
 ///
 /// See docs: <https://bybit-exchange.github.io/docs/v5/ws/connect>
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BybitChannel(pub &'static str);
 
 impl BybitChannel {

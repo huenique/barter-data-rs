@@ -1,6 +1,11 @@
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use serde_json::json;
+use url::Url;
+
 use crate::exchange::coincall::channel::CoincallChannel;
 use crate::exchange::coincall::market::CoincallMarket;
 use crate::exchange::coincall::subscription::CoincallSubResponse;
@@ -16,11 +21,6 @@ use crate::subscription::ticker::Tickers;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
 
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use serde_json::json;
-use url::Url;
-
 pub mod channel;
 
 pub mod market;
@@ -35,7 +35,7 @@ pub mod ticker;
 pub const BASE_URL_COINCALL: &str = "";
 
 /// [`Coincall`] exchange.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Coincall<Server> {
     server: PhantomData<Server>,
 }

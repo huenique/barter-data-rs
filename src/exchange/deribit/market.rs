@@ -1,7 +1,3 @@
-use crate::exchange::deribit::Deribit;
-use crate::subscription::Subscription;
-use crate::Identifier;
-
 use barter_integration::model::instrument::kind::InstrumentKind;
 use barter_integration::model::instrument::kind::OptionKind;
 use barter_integration::model::instrument::Instrument;
@@ -9,15 +5,18 @@ use chrono::format::DelayedFormat;
 use chrono::format::StrftimeItems;
 use chrono::DateTime;
 use chrono::Utc;
-
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::exchange::deribit::Deribit;
+use crate::subscription::Subscription;
+use crate::Identifier;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
 /// [`Deribit`](super::Deribit) market that can be subscribed to.
 ///
 /// See docs: <https://www.okx.com/docs-v5/en/#websocket-api-public-channel>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct DeribitMarket(pub String);
 
 impl<Server, Kind> Identifier<DeribitMarket> for Subscription<Deribit<Server>, Kind> {

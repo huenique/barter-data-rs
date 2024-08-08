@@ -1,20 +1,23 @@
-use super::message::GateioMessage;
 use barter_integration::error::SocketError;
 use barter_integration::Validator;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// Expected [`Gateio`](super::Gateio) [`Subscription`](crate::subscription::Subscription) response
-/// type wrapped in the generic [`GateioMessage<T>`](GateioMessage).
+use crate::exchange::gateio::message::GateioMessage;
+
+/// Expected [`Gateio`](super::Gateio)
+/// [`Subscription`](crate::subscription::Subscription) response type wrapped in
+/// the generic [`GateioMessage<T>`](GateioMessage).
 pub type GateioSubResponse = GateioMessage<GateioSubResult>;
 
-/// Expected [`Gateio`](super::Gateio) [`Subscription`](crate::subscription::Subscription)
-/// response type.
+/// Expected [`Gateio`](super::Gateio)
+/// [`Subscription`](crate::subscription::Subscription) response type.
 ///
-/// See [`GateioMessage`](super::message::GateioMessage) for full raw payload examples.
+/// See [`GateioMessage`](super::message::GateioMessage) for full raw payload
+/// examples.
 ///
 /// See docs: <https://www.gate.io/docs/developers/apiv4/ws/en/#server-response>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct GateioSubResult {
     pub status: String,
 }

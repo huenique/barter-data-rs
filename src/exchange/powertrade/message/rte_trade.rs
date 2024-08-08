@@ -1,12 +1,10 @@
 use serde::Deserialize;
 use serde::Serialize;
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Response {
     pub rte_trade: RteTrade,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct RteTrade {
     pub timestamp: String,
     pub symbol: String,

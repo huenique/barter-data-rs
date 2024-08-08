@@ -22,7 +22,7 @@ use serde::Serialize;
 /// ```
 ///
 /// See docs: <https://docs.deribit.com/#public-subscribe>
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct AevoSubResponse {
     pub data: Vec<String>,
     pub error: Option<String>,

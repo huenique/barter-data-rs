@@ -1,13 +1,15 @@
 use std::fmt::Debug;
 
+use serde::Serialize;
+
 use crate::exchange::hyperliquid::Hyperliquid;
 use crate::subscription::book::OrderBooksL2;
 use crate::subscription::Subscription;
 use crate::Identifier;
-use serde::Serialize;
 
-/// Represents different channels available for subscription in the Hyperliquid WebSocket API.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize)]
+/// Represents different channels available for subscription in the Hyperliquid
+/// WebSocket API.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct HyperliquidChannel(pub &'static str);
 
 impl HyperliquidChannel {

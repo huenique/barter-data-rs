@@ -1,9 +1,8 @@
-pub mod book;
-pub mod channel;
-pub mod market;
-pub mod message;
-pub mod subscription;
-pub mod ticker;
+use barter_integration::error::SocketError;
+use barter_integration::protocol::websocket::WsMessage;
+use barter_macro::DeExchange;
+use barter_macro::SerExchange;
+use url::Url;
 
 use crate::exchange::powertrade::book::l3::PowerTradeOrderBookL3;
 use crate::exchange::powertrade::channel::PowerTradeChannel;
@@ -22,16 +21,21 @@ use crate::transformer::stateless::StatelessTransformer;
 use crate::transformer::ticker::MultiTickerTransformer;
 use crate::ExchangeWsStream;
 
-use barter_integration::error::SocketError;
-use barter_integration::protocol::websocket::WsMessage;
-use barter_macro::DeExchange;
-use barter_macro::SerExchange;
-use url::Url;
+pub mod book;
+
+pub mod channel;
+
+pub mod market;
+
+pub mod message;
+
+pub mod subscription;
+
+pub mod ticker;
 
 /// <https://power-trade.github.io/api-docs-source/ws_feeds.html#Market_Feeds_Connection_Parameters>
 pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data?type[]=all_rte,deliverable,funding_rate,last_trade_price,risk&mbp_period=1&mbo_period=0&snapshot_depth=100";
-
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, DeExchange, SerExchange)]
+#[derive(Clone, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange)]
 pub struct PowerTrade {
     pub connection_params: Vec<(&'static str, &'static str)>,
 }

@@ -1,17 +1,6 @@
 use std::cmp::Ordering;
 use std::marker::PhantomData;
 
-use crate::error::DataError;
-use crate::event::MarketIter;
-use crate::subscription::ticker::Ticker;
-use crate::subscription::Map;
-use crate::transformer::Transformer;
-use crate::Connector;
-use crate::ExchangeTransformer;
-use crate::MarketEvent;
-use crate::SubKind;
-
-use crate::Identifier;
 use async_trait::async_trait;
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::SubscriptionId;
@@ -19,6 +8,17 @@ use barter_integration::protocol::websocket::WsMessage;
 use serde::Deserialize;
 use serde::Serialize;
 use tokio::sync::mpsc;
+
+use crate::error::DataError;
+use crate::event::MarketIter;
+use crate::subscription::ticker::Ticker;
+use crate::subscription::Map;
+use crate::transformer::Transformer;
+use crate::Connector;
+use crate::ExchangeTransformer;
+use crate::Identifier;
+use crate::MarketEvent;
+use crate::SubKind;
 
 #[async_trait]
 pub trait TickerUpdater
@@ -39,8 +39,7 @@ where
         update: Self::Update,
     ) -> Result<Option<Self::Ticker>, DataError>;
 }
-
-#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct InstrumentTicker<Updater> {
     pub instrument: Instrument,
     pub updater: Updater,
@@ -60,8 +59,7 @@ impl<Updater: PartialEq + PartialOrd> PartialOrd for InstrumentTicker<Updater> {
         Some(self.cmp(other))
     }
 }
-
-#[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct MultiTickerTransformer<Exchange, Kind, Updater> {
     pub ticker_map: Map<InstrumentTicker<Updater>>,
     phantom: PhantomData<(Exchange, Kind)>,

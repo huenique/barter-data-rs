@@ -33,15 +33,15 @@ pub mod bybit;
 /// `Coinbase` [`Connector`] and [`StreamSelector`] implementations.
 pub mod coinbase;
 
+/// `Coincall` [`Connector`] and [`StreamSelector`] implementations.
+pub mod coincall;
+
 /// `GateioSpot`, `GateioFuturesUsd` & `GateioFuturesBtc` [`Connector`] and [`StreamSelector`]
 /// implementations.
 pub mod gateio;
 
 /// `Kraken` [`Connector`] and [`StreamSelector`] implementations.
 pub mod kraken;
-
-/// `Okx` [`Connector`] and [`StreamSelector`] implementations.
-pub mod okx;
 
 /// `DeribitMainnet` [`Connector`] and [`StreamSelector`] implementations.
 pub mod deribit;
@@ -52,9 +52,6 @@ pub mod aevo;
 /// `Hyperliquid` [`Connector`] and [`StreamSelector`] implementations.
 pub mod hyperliquid;
 
-/// `PowerTrade` [`Connector`] and [`StreamSelector`] implementations.
-pub mod powertrade;
-
 /// `Dydx` [`Connector`] and [`StreamSelector`] implementations.
 pub mod dydx;
 
@@ -63,6 +60,12 @@ pub mod bit;
 
 /// `Lyra` [`Connector`] and [`StreamSelector`] implementations.
 pub mod lyra;
+
+/// `Okx` [`Connector`] and [`StreamSelector`] implementations.
+pub mod okx;
+
+/// `PowerTrade` [`Connector`] and [`StreamSelector`] implementations.
+pub mod powertrade;
 
 /// Defines the generic [`ExchangeSub`] containing a market and channel combination used by an
 /// exchange [`Connector`] to build [`WsMessage`] subscription payloads.
@@ -201,6 +204,7 @@ pub enum ExchangeId {
     BybitPerpetualsUsd,
     BybitSpot,
     Coinbase,
+    Coincall,
     DeribitMainnet,
     DeribitTestnet,
     Dydx,
@@ -242,6 +246,7 @@ impl ExchangeId {
             ExchangeId::BybitPerpetualsUsd => "bybit_perpetuals_usd",
             ExchangeId::BybitSpot => "bybit_spot",
             ExchangeId::Coinbase => "coinbase",
+            ExchangeId::Coincall => "coincall",
             ExchangeId::DeribitMainnet => "deribit",
             ExchangeId::DeribitTestnet => "deribit_testnet",
             ExchangeId::Dydx => "dydx",

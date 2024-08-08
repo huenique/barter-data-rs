@@ -22,7 +22,7 @@ impl SubKind for Tickers {
     type Event = Ticker;
 }
 
-#[derive(Clone, PartialEq, Debug, Deserialize, Serialize, Default)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct Ticker {
     pub instrument_name: String,
     pub best_bid_price: f64,
@@ -45,7 +45,7 @@ pub struct Ticker {
     pub index_price: f64,
 }
 
-#[derive(Copy, Clone, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[derive(Copy, Clone, Default, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct Greeks {
     pub delta: Option<f64>,
     pub gamma: Option<f64>,

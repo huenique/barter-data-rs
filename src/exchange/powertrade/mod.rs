@@ -73,6 +73,7 @@ impl StreamSelector<OrderBooksL3> for PowerTrade {
     type Stream = ExchangeWsStream<StatelessTransformer<Self, OrderBooksL3, PowerTradeOrderBookL3>>;
 }
 
+// TODO: Should be implemented for type of Updater
 impl StreamSelector<Tickers> for PowerTrade {
     type Stream = ExchangeWsStream<MultiTickerTransformer<Self, Tickers, PowerTradeTicker>>;
 }

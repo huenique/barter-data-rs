@@ -219,7 +219,7 @@ pub enum ExchangeId {
     BybitPerpetualsUsd,
     BybitSpot,
     Coinbase,
-    Coincall,
+    CoincallOption,
     DeribitMainnet,
     DeribitTestnet,
     Dydx,
@@ -261,7 +261,7 @@ impl ExchangeId {
             ExchangeId::BybitPerpetualsUsd => "bybit_perpetuals_usd",
             ExchangeId::BybitSpot => "bybit_spot",
             ExchangeId::Coinbase => "coinbase",
-            ExchangeId::Coincall => "coincall",
+            ExchangeId::CoincallOption => "coincall_option",
             ExchangeId::DeribitMainnet => "deribit",
             ExchangeId::DeribitTestnet => "deribit_testnet",
             ExchangeId::Dydx => "dydx",
@@ -314,8 +314,8 @@ impl ExchangeId {
 
             // Option
             (
-                Aevo | Bit | DeribitMainnet | DeribitTestnet | GateioOptions | Lyra | Okx
-                | PowerTrade,
+                Aevo | Bit | CoincallOption | DeribitMainnet | DeribitTestnet | GateioOptions
+                | Lyra | Okx | PowerTrade,
                 Option(_),
             ) => true,
             (_, Option(_)) => false,

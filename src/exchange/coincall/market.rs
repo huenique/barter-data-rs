@@ -21,21 +21,19 @@ impl<Server, Kind> Identifier<CoincallMarket> for Subscription<Coincall<Server>,
     fn id(&self) -> CoincallMarket {
         use InstrumentKind::*;
 
-        let Instrument {
-            base,
-            quote: _,
-            kind,
-        } = &self.instrument;
+        let Instrument { base, quote, kind } = &self.instrument;
 
         CoincallMarket(match kind {
             Spot => todo!(),
             Future(_future) => todo!(),
             Perpetual => todo!(),
             Option(option) => format!(
-                "{base}-{}-{}-{}",
-                format_expiry(option.expiry),
-                option.strike,
-                match option.kind {
+                "{base}{quote}-{expiry}-{strike}-{kind}",
+                base = base,
+                quote = quote,
+                expiry = format_expiry(option.expiry),
+                strike = option.strike,
+                kind = match option.kind {
                     OptionKind::Call => "C",
                     OptionKind::Put => "P",
                 },

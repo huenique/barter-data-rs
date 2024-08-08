@@ -7,7 +7,7 @@ license = "MIT"
 documentation = "https://docs.rs/barter-data/"
 repository = "https://github.com/barter-rs/barter-data-rs"
 readme = "README.md"
-description = "High performance & normalised WebSocket intergration for leading cryptocurrency exchanges - batteries included."
+description = "High performance & normalised WebSocket integration for leading cryptocurrency exchanges - batteries included."
 keywords = ["trading", "backtesting", "crypto", "stocks", "investment"]
 categories = ["accessibility", "simulation"]
 
@@ -48,9 +48,23 @@ serde_json = "1.0.83"
 # Strategy
 ta = "0.5.0"
 
-# Misc
+# Date and Time
 chrono = {version = "0.4.21", features = ["serde"]}
+
+# Crypto
 crc32fast = "1.3.2"
+hex = "0.4.3"
+hmac = "0.12.1"
+sha2 = "0.10.8"
+
+# JWT
+jsonwebtoken = "9.3.0"
+
+# UUID
+uuid = { version = "1.10.0", features = ["v4"] }
+
+# Utility
+lazy_static = "1.5.0"
 
 [[bench]]
 name = "sorting"

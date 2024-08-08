@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 use std::marker::PhantomData;
+use std::time::Duration;
 
 use barter_integration::error::SocketError;
 use barter_integration::protocol::websocket::WsMessage;
@@ -9,17 +10,13 @@ use url::Url;
 use crate::exchange::coincall::channel::CoincallChannel;
 use crate::exchange::coincall::market::CoincallMarket;
 use crate::exchange::coincall::subscription::CoincallSubResponse;
-use crate::exchange::coincall::ticker::CoincallTicker;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeServer;
 use crate::exchange::ExchangeSub;
-use crate::exchange::StreamSelector;
 use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
-use crate::subscription::ticker::Tickers;
-use crate::transformer::stateless::StatelessTransformer;
-use crate::ExchangeWsStream;
+use crate::PingInterval;
 
 pub mod channel;
 
@@ -29,10 +26,14 @@ pub mod subscription;
 
 pub mod message;
 
-pub mod ticker;
+/// [`ExchangeServer`] and [`StreamSelector`] implementations for
+/// [`Coincall`](option::CoincallOption).
+pub mod option;
 
-/// [`Coincall`] server base url.
-pub const BASE_URL_COINCALL: &str = "";
+/// [`Coincall`] server [`PingInterval`] duration.
+///
+/// See docs: <https://docs.coincall.com/#options-websocket>
+pub const PING_INTERVAL_COINCALL: Duration = Duration::from_secs(29);
 
 /// [`Coincall`] exchange.
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -52,30 +53,33 @@ where
     type SubResponse = CoincallSubResponse;
 
     fn url() -> Result<Url, SocketError> {
-        Url::parse(BASE_URL_COINCALL).map_err(SocketError::UrlParse)
+        Url::parse(Server::websocket_url()).map_err(SocketError::UrlParse)
+    }
+
+    fn ping_interval() -> Option<super::PingInterval> {
+        Some(PingInterval {
+            interval: tokio::time::interval(PING_INTERVAL_COINCALL),
+            ping: || WsMessage::Text(json!({ "action": "heartbeat" }).to_string()),
+        })
     }
 
     fn requests(exchange_subs: Vec<ExchangeSub<Self::Channel, Self::Market>>) -> Vec<WsMessage> {
-        let stream_names = exchange_subs
+        exchange_subs
             .into_iter()
-            .map(|sub| format!("{}:{}", sub.channel.as_ref(), sub.market.as_ref()))
-            .collect::<Vec<String>>();
-
-        vec![WsMessage::Text(
-            json!({
-                "op": "subscribe",
-                "data": stream_names
+            .map(|ExchangeSub { channel: _, market }| {
+                WsMessage::Text(
+                    json!({
+                        "action": "subscribe",
+                        "dataType": "bsInfo",
+                        "payload": {
+                            "symbol": market.as_ref()
+                        }
+                    })
+                    .to_string(),
+                )
             })
-            .to_string(),
-        )]
+            .collect()
     }
-}
-
-impl<Server> StreamSelector<Tickers> for Coincall<Server>
-where
-    Server: ExchangeServer + Debug + Send + Sync,
-{
-    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, CoincallTicker>>;
 }
 
 impl<'de, Server> serde::Deserialize<'de> for Coincall<Server>

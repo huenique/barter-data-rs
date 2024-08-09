@@ -1,4 +1,4 @@
-use barter_data::exchange::coincall::option::CoincallOption;
+use barter_data::exchange::coincall::option::server::CoincallOption;
 use barter_data::streams::Streams;
 use barter_data::subscription::ticker::Tickers;
 use barter_integration::model::instrument::kind::InstrumentKind;

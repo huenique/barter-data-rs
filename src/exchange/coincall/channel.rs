@@ -11,9 +11,10 @@ use crate::Identifier;
 pub struct CoincallChannel(pub &'static str);
 
 impl CoincallChannel {
-    /// [`Coincall`](super::Coincall) OrderBook Level2 channel name (raw
-    /// updates).
-    pub const TICKER: Self = Self("ticker");
+    /// [`Coincall`](super::Coincall) Pricing information channel.
+    ///
+    /// See docs: <https://docs.coincall.com/#options-websocket-pricing-information>
+    pub const TICKER: Self = Self("3");
 }
 
 impl<Server> Identifier<CoincallChannel> for Subscription<Coincall<Server>, Tickers> {

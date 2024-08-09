@@ -17,7 +17,7 @@ criterion = "0.5.1"
 rand = "0.8"
 rust_decimal = "1.29.1"
 rust_decimal_macros = "1.29.1"
-tabled = "0.15.0"
+tabled = "0.16.0"
 tracing-subscriber = { version = "0.3.16", features = ["env-filter", "json"] }
 
 [dependencies]
@@ -29,10 +29,11 @@ barter-macro =  "0.1.1"
 tracing = "0.1.36"
 
 # Async
+async-trait = "0.1.57"
+futures = "0.3.21"
+crossbeam = "0.8.4"
 tokio = { version = "1.20.1", features = ["sync", "macros", "rt-multi-thread"] }
 tokio-stream = { version = "0.1.9", features = ["sync"] }
-futures = "0.3.21"
-async-trait = "0.1.57"
 
 # Protocol
 url = "2.3.1"
@@ -65,6 +66,7 @@ uuid = { version = "1.10.0", features = ["v4"] }
 
 # Utility
 lazy_static = "1.5.0"
+playwright = "0.0.20"
 
 [[bench]]
 name = "sorting"

@@ -9,14 +9,21 @@ use url::Url;
 
 use crate::exchange::coincall::channel::CoincallChannel;
 use crate::exchange::coincall::market::CoincallMarket;
+use crate::exchange::coincall::option::ticker::CoincallOptionTicker;
 use crate::exchange::coincall::subscription::CoincallSubResponse;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeServer;
 use crate::exchange::ExchangeSub;
+use crate::exchange::StreamSelector;
 use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::ticker::Tickers;
+use crate::transformer::stateless::StatelessTransformer;
+use crate::ExchangeWsStream;
 use crate::PingInterval;
+
+pub mod auth;
 
 pub mod channel;
 
@@ -59,20 +66,20 @@ where
     fn ping_interval() -> Option<super::PingInterval> {
         Some(PingInterval {
             interval: tokio::time::interval(PING_INTERVAL_COINCALL),
-            ping: || WsMessage::Text(json!({ "action": "heartbeat" }).to_string()),
+            ping: || WsMessage::Text(json!({"c": 11}).to_string()),
         })
     }
 
     fn requests(exchange_subs: Vec<ExchangeSub<Self::Channel, Self::Market>>) -> Vec<WsMessage> {
         exchange_subs
             .into_iter()
-            .map(|ExchangeSub { channel: _, market }| {
+            .map(|ExchangeSub { channel, market }| {
                 WsMessage::Text(
                     json!({
-                        "action": "subscribe",
-                        "dataType": "bsInfo",
-                        "payload": {
-                            "symbol": market.as_ref()
+                        "c": 20,
+                        "dt": channel.as_ref().parse::<i32>().unwrap(),
+                        "d": {
+                            "s": market.as_ref()
                         }
                     })
                     .to_string(),
@@ -80,6 +87,13 @@ where
             })
             .collect()
     }
+}
+
+impl<Server> StreamSelector<Tickers> for Coincall<Server>
+where
+    Server: ExchangeServer + Debug + Send + Sync,
+{
+    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, CoincallOptionTicker>>;
 }
 
 impl<'de, Server> serde::Deserialize<'de> for Coincall<Server>

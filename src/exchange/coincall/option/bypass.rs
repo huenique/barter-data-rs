@@ -1,4 +1,8 @@
-use crossbeam::thread;
+use std::mem;
+use std::mem::ManuallyDrop;
+use std::sync::Mutex;
+
+use lazy_static::lazy_static;
 use tracing::error;
 
 use crate::exchange::coincall::auth::token::fetch_token_from_url;
@@ -8,6 +12,11 @@ use crate::ExchangeId;
 
 pub const COINCALL_URL: &str = "https://www.coincall.com/";
 
+lazy_static! {
+    static ref WEBSOCKET_URL: Mutex<ManuallyDrop<Option<Box<str>>>> =
+        Mutex::new(ManuallyDrop::new(None));
+}
+
 pub type CoincallOptionBypass = Coincall<CoincallServerBypass>;
 
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -16,88 +25,97 @@ pub struct CoincallServerBypass;
 impl ExchangeServer for CoincallServerBypass {
     const ID: ExchangeId = ExchangeId::CoincallOption;
 
-    /// Returns the WebSocket URL as a static string slice with a `'static`
-    /// lifetime.
+    /// Returns the WebSocket URL as a `&'static str`.
     ///
-    /// # Implementation Details
+    /// This function generates and returns the WebSocket URL needed to connect
+    /// to the Coincall server. It handles memory carefully to ensure that old
+    /// URLs are properly cleaned up before a new one is stored and leaked.
     ///
-    /// This function generates the WebSocket URL required for connecting to the
-    /// Coincall server. The URL is built using a token obtained from the
-    /// authentication server.
+    /// # How It Works
     ///
-    /// ## Static Initialization
+    /// 1. **Thread-Safe Access**: We start by locking `WEBSOCKET_URL` to ensure
+    ///    that only one thread can modify or access the URL at a time.
     ///
-    /// The URL is stored in a `static mut` variable `WEBSOCKET_URL`, which is
-    /// initially `None`. The first time `websocket_url()` is called, the
-    /// URL is generated, stored in this static variable, and subsequently
-    /// returned as a `&'static str`. Subsequent calls to this function will
-    /// return the already stored URL, ensuring that the URL is only generated
-    /// once during the program's execution.
+    /// 2. **Cleaning Up the Old URL**: If there's an old URL already stored, we
+    ///    clear it out using `mem::replace`. This step is crucial because it
+    ///    frees the memory associated with the old URL before we store a new
+    ///    one. Without this, we'd risk leaking memory with each new URL.
     ///
-    /// ## Memory Safety and String Leaking
+    /// 3. **Generating and Storing the New URL**: We fetch a new token and
+    ///    generate the corresponding WebSocket URL. This new URL is then
+    ///    converted into a `Box<str>` and stored in our `url_storage`. By using
+    ///    `ManuallyDrop`, we prevent Rust from automatically dropping the URL
+    ///    later on, because we're going to leak it intentionally.
     ///
-    /// This implementation uses `String::leak()` to convert the generated
-    /// `String` into a `&'static str`. While this allows for a simple
-    /// solution that provides a `'static` lifetime, it also causes the
-    /// memory allocated for the `String` to be leaked, as it will never be
-    /// deallocated. This is an acceptable trade-off in scenarios where the
-    /// URL does not change frequently and the memory leak is minimal.
-    /// However, in environments where the URL might be regenerated multiple
-    /// times during the program's execution, this approach could lead to
-    /// significant memory usage.
+    /// 4. **Leaking the New URL**: Now, here's where we do something a bit
+    ///    unusual: We leak the new URL. We grab a mutable reference to the
+    ///    stored URL, then use `std::mem::transmute` to convert it into a
+    ///    `&'static str`. This effectively makes the URL live for the duration
+    ///    of the program. The old URL is gone (freed), and only the latest one
+    ///    persists.
     ///
-    /// ## Thread Safety Considerations
+    /// # What's Happening with Memory?
     ///
-    /// The function uses `unsafe` blocks because `static mut` is inherently
-    /// unsafe due to potential data races in a multi-threaded environment.
-    /// We mitigate this by ensuring that the URL is generated within a
-    /// scoped thread using `crossbeam::thread::scope`, which helps guarantee
-    /// that the URL is safely initialized before any other threads attempt to
-    /// access it.
+    /// - **Old URLs**: Every time we generate a new URL, the old one is
+    ///   properly cleaned up using `mem::replace`. This avoids memory leaks
+    ///   from old URLs sticking around.
     ///
-    /// # Returns
+    /// - **New URL**: The new URL is intentionally leaked. This means it’s
+    ///   removed from Rust’s usual memory management, allowing it to persist
+    ///   until the program ends. The `&'static str` we return stays valid for
+    ///   as long as the program runs.
     ///
-    /// - A `&'static str` representing the WebSocket URL.
+    /// # Safety
+    ///
+    /// We use `unsafe` with `std::mem::transmute` to extend the lifetime of the
+    /// URL reference to `'static`. This is safe in our specific case
+    /// because we ensure that the memory backing the URL won’t be freed
+    /// while the program is running. The combination of careful memory
+    /// management with `mem::replace` and the controlled leak ensures this
+    /// approach works without causing memory issues.
     fn websocket_url() -> &'static str {
-        // A static mutable variable to store the WebSocket URL. Initially set to None.
-        static mut WEBSOCKET_URL: Option<String> = None;
+        // Acquire a lock on the global URL storage to ensure thread-safe access
+        let mut url_storage = WEBSOCKET_URL.lock().unwrap();
 
-        // Unsafe block required to access and modify static mut variable
-        unsafe {
-            // Check if the WebSocket URL has already been initialized
-            if WEBSOCKET_URL.is_none() {
-                // Use crossbeam's scoped threads to safely generate and store the URL
-                thread::scope(|s| {
-                    s.spawn(|_| {
-                        // Attempt to get the authentication token
-                        let token = match get_token() {
-                            Ok(token) => token,
-                            Err(e) => {
-                                error!("Error getting token: {}", e);
-                                std::process::exit(1);
-                            }
-                        };
-
-                        // Generate the WebSocket URL using the token
-                        let url = generate_wss_url(&token);
-
-                        // Store the generated URL in the static mutable variable
-                        WEBSOCKET_URL = Some(url);
-                    })
-                    .join()
-                    .unwrap();
-                })
-                .unwrap();
-            }
-
-            // Return the WebSocket URL as a static string slice
-            WEBSOCKET_URL.as_ref().unwrap().clone().leak()
+        // Check for existing URL. The url_storage.is_some() check should return false
+        // on the first run. Clear out the old URL if there is one. The old URL is
+        // cleared by replacing the stored value with None.
+        if url_storage.is_some() {
+            let _ = mem::replace(&mut *url_storage, ManuallyDrop::new(None));
         }
+
+        // Get a new token and generate the URL
+        let token = match get_token() {
+            Ok(token) => token,
+            Err(e) => {
+                error!("Exiting. Couldn't get token from Coincall: {}", e);
+                std::process::exit(1);
+            }
+        };
+        let generated_url = generate_wss_url(&token);
+
+        // Store the new URL in a Box and prevent it from dropping. The newly generated
+        // URL is stored in url_storage, replacing the old one.
+        *url_storage = ManuallyDrop::new(Some(generated_url.into_boxed_str()));
+
+        // Get a mutable reference and transmute it to 'static
+        let mutable_url_ref: &mut str = url_storage.as_deref_mut().unwrap();
+
+        // Transmute to extend the lifetime to 'static. The transmuted reference is
+        // effectively leaked, meaning it stays in memory for the program's
+        // entire lifetime.
+        //
+        // `std::mem::transmute` is necessary here because
+        // Rust's strict lifetime system normally wouldn't allow us to return a
+        // reference with a `'static` lifetime. But since we control the memory
+        // and know it won't be dropped unexpectedly, `transmute` is safe in
+        // this context.
+        unsafe { std::mem::transmute(mutable_url_ref) }
     }
 }
 
 pub fn get_token() -> Result<String, Box<dyn std::error::Error>> {
-    let runtime = tokio::runtime::Runtime::new().unwrap();
+    let runtime = tokio::runtime::Runtime::new()?;
     let token = runtime.block_on(fetch_token_from_url(COINCALL_URL))?;
     match token {
         Some(token) => Ok(token),

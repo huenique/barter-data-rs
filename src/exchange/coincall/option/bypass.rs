@@ -5,6 +5,7 @@ use std::sync::Mutex;
 use lazy_static::lazy_static;
 use tracing::debug;
 use tracing::error;
+use tracing::info;
 
 use crate::exchange::coincall::auth::token::fetch_token_from_url;
 use crate::exchange::coincall::Coincall;
@@ -87,7 +88,10 @@ impl ExchangeServer for CoincallServerBypass {
 
         // Get a new token and generate the URL
         let token = match get_token() {
-            Ok(token) => token,
+            Ok(token) => {
+                info!("Got token from Coincall: {}", token);
+                token
+            }
             Err(e) => {
                 error!("Exiting. Couldn't get token from Coincall: {}", e);
                 std::process::exit(1);

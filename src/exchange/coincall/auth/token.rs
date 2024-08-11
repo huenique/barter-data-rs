@@ -5,16 +5,12 @@ use playwright::Playwright;
 use tracing::debug;
 
 pub async fn fetch_token_from_url(url: &str) -> Result<Option<String>, Box<dyn Error>> {
+    debug!("Fetching token from URL: {}", url);
     let playwright = initialize_playwright().await?;
     let browser = launch_browser(&playwright).await?;
     let page = open_page(&browser, url).await?;
 
     let token = extract_token_cookie(&page).await?;
-    if let Some(ref token_value) = token {
-        debug!("Token cookie found: {}", token_value);
-    } else {
-        debug!("Token cookie not found");
-    }
 
     close_browser(browser).await?;
 

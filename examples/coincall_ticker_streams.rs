@@ -1,4 +1,4 @@
-use barter_data::exchange::coincall::option::server::CoincallOption;
+use barter_data::exchange::coincall::option::bypass::CoincallOptionBypass;
 use barter_data::streams::Streams;
 use barter_data::subscription::ticker::Tickers;
 use barter_integration::model::instrument::kind::InstrumentKind;
@@ -18,7 +18,7 @@ async fn main() {
     let ticker_streams = Streams::<Tickers>::builder()
         .subscribe([
             (
-                CoincallOption::default(),
+                CoincallOptionBypass::default(),
                 "btc",
                 "usd",
                 InstrumentKind::Option(OptionContract {
@@ -30,7 +30,7 @@ async fn main() {
                 Tickers,
             ),
             (
-                CoincallOption::default(),
+                CoincallOptionBypass::default(),
                 "btc",
                 "usd",
                 InstrumentKind::Option(OptionContract {

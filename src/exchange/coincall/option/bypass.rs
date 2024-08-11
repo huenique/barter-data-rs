@@ -3,6 +3,7 @@ use std::mem::ManuallyDrop;
 use std::sync::Mutex;
 
 use lazy_static::lazy_static;
+use tracing::debug;
 use tracing::error;
 
 use crate::exchange::coincall::auth::token::fetch_token_from_url;
@@ -115,8 +116,12 @@ impl ExchangeServer for CoincallServerBypass {
 }
 
 pub fn get_token() -> Result<String, Box<dyn std::error::Error>> {
-    let runtime = tokio::runtime::Runtime::new()?;
-    let token = runtime.block_on(fetch_token_from_url(COINCALL_URL))?;
+    debug!("Getting token from Coincall");
+    let token = tokio::task::block_in_place(|| {
+        let rt = tokio::runtime::Handle::current();
+        rt.block_on(fetch_token_from_url(COINCALL_URL))
+    })?;
+
     match token {
         Some(token) => Ok(token),
         None => Err("Token not found".into()),

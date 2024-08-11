@@ -10,14 +10,12 @@ use crate::exchange::coincall::message::CoincallMessage;
 use crate::exchange::coincall::CoincallChannel;
 use crate::exchange::subscription::ExchangeSub;
 use crate::exchange::Instrument;
+use crate::subscription::ticker::Greeks;
 use crate::subscription::ticker::Ticker;
 use crate::ExchangeId;
 use crate::Identifier;
 use crate::MarketEvent;
 
-// pub type CoincallOptionTicker = CoincallMessage<CoincallOptionTickerData>;
-// enum CoincallHeartbeat and CoincallMessage<CoincallOptionTickerData> for
-// CoincallOptionTicker
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(untagged)]
 pub enum CoincallOptionTicker {
@@ -78,20 +76,62 @@ pub struct CoincallOptionTickerData {
 
 impl Identifier<Option<SubscriptionId>> for CoincallOptionTicker {
     fn id(&self) -> Option<SubscriptionId> {
-        Some(ExchangeSub::from((CoincallChannel::TICKER, "")).id())
+        match self {
+            CoincallOptionTicker::Data(data) => {
+                Some(ExchangeSub::from((CoincallChannel::TICKER, data.data.symbol.clone())).id())
+            }
+            _ => None,
+        }
     }
 }
 
 impl From<(ExchangeId, Instrument, CoincallOptionTicker)> for MarketIter<Ticker> {
     fn from(
-        (exchange_id, instrument, _ticker): (ExchangeId, Instrument, CoincallOptionTicker),
+        (exchange_id, instrument, ticker): (ExchangeId, Instrument, CoincallOptionTicker),
     ) -> Self {
+        let ticker = match ticker {
+            CoincallOptionTicker::Data(data) => Ticker::from(data.data),
+            _ => return Self(vec![]),
+        };
+
         Self(vec![Ok(MarketEvent {
             exchange_time: DateTime::<Utc>::default().with_timezone(&Utc),
             received_time: Utc::now(),
             exchange: exchange_id.into(),
             instrument,
-            kind: Ticker::default(),
+            kind: ticker,
         })])
+    }
+}
+
+impl From<CoincallOptionTickerData> for Ticker {
+    fn from(data: CoincallOptionTickerData) -> Self {
+        Ticker {
+            instrument_name: data.symbol,
+            best_bid_price: 0.0,
+            best_ask_price: 0.0,
+            best_bid_amount: 0.0,
+            best_ask_amount: 0.0,
+            mark_price: data.mark_price,
+            last_price: data.last_price,
+            open_interest: data.open_interest,
+            state: "".to_string(),
+            timestamp: data.timestamp,
+            greeks: Some(Greeks {
+                delta: Some(data.delta),
+                gamma: Some(data.gamma),
+                theta: Some(data.theta),
+                vega: Some(data.vega),
+                rho: None,
+            }),
+            interest_rate: Some(0f64),
+            mark_iv: Some(data.implied_volatility),
+            delivery_price: Some(0f64),
+            current_funding: Some(0f64),
+            interest_value: Some(0f64),
+            ask_iv: Some(0f64),
+            bid_iv: Some(0f64),
+            index_price: data.index_price,
+        }
     }
 }

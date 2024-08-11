@@ -19,7 +19,7 @@ lazy_static! {
         Mutex::new(ManuallyDrop::new(None));
 }
 
-pub type CoincallOptionBypass = Coincall<CoincallServerBypass>;
+pub type CoincallOptionAuthBypass = Coincall<CoincallServerBypass>;
 
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct CoincallServerBypass;

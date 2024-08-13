@@ -12,7 +12,6 @@ keywords = ["trading", "backtesting", "crypto", "stocks", "investment"]
 categories = ["accessibility", "simulation"]
 
 [dev-dependencies]
-clap = "4.5.4"
 criterion = "0.5.1"
 rand = "0.8"
 rust_decimal = "1.29.1"
@@ -66,6 +65,7 @@ uuid = { version = "1.10.0", features = ["v4"] }
 # Utility
 lazy_static = "1.5.0"
 playwright = "0.0.20"
+cached = "0.53.1"
 
 [[bench]]
 name = "sorting"

@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 use std::error::Error;
-use std::fmt;
 
 use chrono::TimeZone;
 use chrono::Utc;
@@ -22,6 +21,7 @@ pub struct Tickers;
 impl SubKind for Tickers {
     type Event = Ticker;
 }
+
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct Ticker {
     pub instrument_name: String,
@@ -44,7 +44,8 @@ pub struct Ticker {
     pub bid_iv: Option<f64>,
     pub index_price: f64,
 }
-#[derive(Clone, Copy, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct Greeks {
     pub delta: Option<f64>,
     pub gamma: Option<f64>,
@@ -71,13 +72,26 @@ impl Ticker {
 
 fn merge_object(v1: Value, v2: Value) -> Result<Value, Box<dyn Error>> {
     match (v1, v2) {
-        (Value::Object(ref mut map1), Value::Object(map2)) => {
+        (Value::Object(mut map1), Value::Object(map2)) => {
             for (k, v) in map2 {
-                map1.entry(k).or_insert(v.clone());
+                if !is_default_value(&v) {
+                    map1.insert(k, v);
+                }
             }
-            Ok(Value::Object(map1.clone()))
+            Ok(Value::Object(map1))
         }
-        (_, v) => Ok(v),
+        (v, _) => Ok(v), // If v2 is not an object, return v1 as the merged result
+    }
+}
+
+fn is_default_value(v: &Value) -> bool {
+    match v {
+        Value::String(s) => s.is_empty(),
+        Value::Number(n) => n.as_f64().unwrap_or_default() == 0.0,
+        Value::Bool(b) => !*b,
+        Value::Array(arr) => arr.is_empty(),
+        Value::Object(map) => map.is_empty(),
+        Value::Null => true,
     }
 }
 
@@ -94,73 +108,6 @@ impl Ord for Ticker {
 impl PartialOrd for Ticker {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
-    }
-}
-
-impl fmt::Display for Ticker {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Ticker {{
-    instrument_name: {},
-    best_bid_price: {:.2},
-    best_ask_price: {:.2},
-    best_bid_amount: {:.2},
-    best_ask_amount: {:.2},
-    mark_price: {:.2},
-    last_price: {:.2},
-    open_interest: {:.2},
-    state: {},
-    timestamp: {},
-    greeks: {},
-    interest_rate: {:?},
-    mark_iv: {:?},
-    delivery_price: {:?},
-    current_funding: {:?},
-    interest_value: {:?},
-    ask_iv: {:?},
-    bid_iv: {:?},
-    index_price: {:.2}
-}}",
-            self.instrument_name,
-            self.best_bid_price,
-            self.best_ask_price,
-            self.best_bid_amount,
-            self.best_ask_amount,
-            self.mark_price,
-            self.last_price,
-            self.open_interest,
-            self.state,
-            self.timestamp,
-            match &self.greeks {
-                Some(greeks) => format!("{:?}", greeks),
-                None => "None".to_string(),
-            },
-            self.interest_rate,
-            self.mark_iv,
-            self.delivery_price,
-            self.current_funding,
-            self.interest_value,
-            self.ask_iv,
-            self.bid_iv,
-            self.index_price
-        )
-    }
-}
-
-impl fmt::Debug for Greeks {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Greeks {{
-    delta: {:?},
-    gamma: {:?},
-    theta: {:?},
-    vega: {:?},
-    rho: {:?}
-}}",
-            self.delta, self.gamma, self.theta, self.vega, self.rho
-        )
     }
 }
 

@@ -36,8 +36,8 @@ async fn main() {
     let mut joined_ticker_stream = ticker_streams.join_map().await;
 
     // Spawn a task to process Ticker data
-    while let Some((exchange, ticker)) = joined_ticker_stream.next().await {
-        info!("Exchange: {exchange}, TickerData: {ticker:?}");
+    while let Some((_exchange, ticker)) = joined_ticker_stream.next().await {
+        info!("{:?}", ticker.kind);
     }
 }
 

@@ -39,6 +39,7 @@ where
         update: Self::Update,
     ) -> Result<Option<Self::Ticker>, DataError>;
 }
+
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct InstrumentTicker<Updater> {
     pub instrument: Instrument,
@@ -59,6 +60,7 @@ impl<Updater: PartialEq + PartialOrd> PartialOrd for InstrumentTicker<Updater> {
         Some(self.cmp(other))
     }
 }
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct MultiTickerTransformer<Exchange, Kind, Updater> {
     pub ticker_map: Map<InstrumentTicker<Updater>>,

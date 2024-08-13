@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use serde::Serialize;
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct TopOfBook {
     #[serde(deserialize_with = "de::de_str_to_i64")]

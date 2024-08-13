@@ -8,7 +8,7 @@ use crate::exchange::powertrade::book::l3::PowerTradeOrderBookL3;
 use crate::exchange::powertrade::channel::PowerTradeChannel;
 use crate::exchange::powertrade::market::PowerTradeMarket;
 use crate::exchange::powertrade::subscription::PowerTradeSubResponse;
-use crate::exchange::powertrade::ticker::PowerTradeTicker;
+use crate::exchange::powertrade::ticker::PowerTradeTickerUpdater;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
@@ -73,7 +73,6 @@ impl StreamSelector<OrderBooksL3> for PowerTrade {
     type Stream = ExchangeWsStream<StatelessTransformer<Self, OrderBooksL3, PowerTradeOrderBookL3>>;
 }
 
-// TODO: Should be implemented for type of Updater
 impl StreamSelector<Tickers> for PowerTrade {
-    type Stream = ExchangeWsStream<MultiTickerTransformer<Self, Tickers, PowerTradeTicker>>;
+    type Stream = ExchangeWsStream<MultiTickerTransformer<Self, Tickers, PowerTradeTickerUpdater>>;
 }

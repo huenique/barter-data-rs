@@ -12,8 +12,6 @@ use crate::exchange::coincall::Coincall;
 use crate::exchange::ExchangeServer;
 use crate::ExchangeId;
 
-pub const COINCALL_URL: &str = "https://www.coincall.com/";
-
 lazy_static! {
     static ref WEBSOCKET_URL: Mutex<ManuallyDrop<Option<Box<str>>>> =
         Mutex::new(ManuallyDrop::new(None));
@@ -121,15 +119,10 @@ impl ExchangeServer for CoincallServerBypass {
 
 pub fn get_token() -> Result<String, Box<dyn std::error::Error>> {
     debug!("Getting token from Coincall");
-    let token = tokio::task::block_in_place(|| {
+    tokio::task::block_in_place(|| {
         let rt = tokio::runtime::Handle::current();
-        rt.block_on(fetch_token_from_url(COINCALL_URL))
-    })?;
-
-    match token {
-        Some(token) => Ok(token),
-        None => Err("Token not found".into()),
-    }
+        rt.block_on(fetch_token_from_url())
+    })
 }
 
 fn generate_wss_url(token: &str) -> String {

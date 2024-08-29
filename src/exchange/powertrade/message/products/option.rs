@@ -67,6 +67,7 @@ pub struct RiskSnapshot {
     #[serde(deserialize_with = "de::de_str_to_i64")]
     pub timestamp: i64,
     pub time_to_expire: f64,
+    pub spot_index: f64,
     pub theoretical: Option<PriceDetail>,
     pub mid: Option<PriceDetail>,
     pub bid: Option<PriceDetail>,

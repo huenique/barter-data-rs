@@ -22,10 +22,10 @@ use crate::exchange::powertrade::message::deliverable::Deliverable;
 use crate::exchange::powertrade::message::deliverable::ProductType;
 use crate::exchange::powertrade::message::funding_rate::FundingRate;
 use crate::exchange::powertrade::message::last_trade_price::LastTradePrice;
+use crate::exchange::powertrade::message::pb_snapshot::PriceBookSnapshot;
 use crate::exchange::powertrade::message::products::option::RiskSnapshot;
 use crate::exchange::powertrade::message::rte_last_trade_price::RteLastTradePrice;
 use crate::exchange::powertrade::message::rte_trade::RteTrade;
-use crate::exchange::powertrade::message::top_of_book::TopOfBook;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
 use crate::subscription::ticker::Greeks;
@@ -61,10 +61,6 @@ pub enum PowerTradeTicker {
         #[serde(rename = "deliverable")]
         deliverable: Deliverable<ProductType>,
     },
-    TopOfBook {
-        #[serde(rename = "top_of_book")]
-        top_of_book: TopOfBook,
-    },
     FundingRate {
         #[serde(rename = "funding_rate")]
         funding_rate: FundingRate,
@@ -85,6 +81,10 @@ pub enum PowerTradeTicker {
         #[serde(rename = "risk_snapshot")]
         risk_snapshot: RiskSnapshot,
     },
+    PbSnapshot {
+        #[serde(rename = "pb_snapshot")]
+        pb_snapshot: PriceBookSnapshot,
+    },
     Unknown(serde_json::Value),
 }
 
@@ -104,12 +104,12 @@ impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
                 ))
                 .id(),
             ),
-            PowerTradeTicker::TopOfBook { top_of_book } => Some(
+            PowerTradeTicker::PbSnapshot { pb_snapshot } => Some(
                 ExchangeSub::from((
                     PowerTradeChannel::TICKER,
-                    fetch_symbol(&top_of_book.tradeable_entity_id).unwrap_or(format!(
-                        "BestBidAsk {}: {}",
-                        FAILED_FETCH, top_of_book.tradeable_entity_id
+                    fetch_symbol(&pb_snapshot.tradeable_entity_id).unwrap_or(format!(
+                        "PbSnapshot {}: {}",
+                        FAILED_FETCH, pb_snapshot.tradeable_entity_id
                     )),
                 ))
                 .id(),
@@ -118,7 +118,7 @@ impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
                 ExchangeSub::from((
                     PowerTradeChannel::TICKER,
                     fetch_symbol(&funding_rate.tradeable_entity_id).unwrap_or(format!(
-                        "MarkPrice {}: {}",
+                        "FundingRate {}: {}",
                         FAILED_FETCH, funding_rate.tradeable_entity_id
                     )),
                 ))
@@ -162,7 +162,7 @@ impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
                 ExchangeSub::from((
                     PowerTradeChannel::TICKER,
                     fetch_symbol(&greeks.tradeable_entity_id).unwrap_or(format!(
-                        "Greeks {}: {}",
+                        "RiskSnapshot {}: {}",
                         FAILED_FETCH, greeks.tradeable_entity_id
                     )),
                 ))
@@ -212,16 +212,15 @@ impl PowerTradeTickerAggregator {
         }
     }
 
-    // TODO: Ensure timestamp is updated on every message
     pub fn process_message(&mut self, message: PowerTradeTicker) {
         match message {
             PowerTradeTicker::Deliverable { deliverable } => {
                 debug!("Processing deliverable data: {:?}", deliverable);
                 self.process_deliverable_data(deliverable);
             }
-            PowerTradeTicker::TopOfBook { top_of_book } => {
-                debug!("Processing best bid ask: {:?}", top_of_book);
-                self.process_best_bid_ask(top_of_book);
+            PowerTradeTicker::PbSnapshot { pb_snapshot } => {
+                debug!("Processing best bid ask: {:?}", pb_snapshot);
+                self.process_best_bid_ask(pb_snapshot);
             }
             PowerTradeTicker::FundingRate { funding_rate } => {
                 debug!("Processing mark price: {:?}", funding_rate);
@@ -275,12 +274,16 @@ impl PowerTradeTickerAggregator {
         self.ticker.interest_value = None;
     }
 
-    fn process_best_bid_ask(&mut self, data: TopOfBook) {
+    fn process_best_bid_ask(&mut self, data: PriceBookSnapshot) {
+        let ob_default = vec!["0".to_string(), "0".to_string()];
+        let best_bid = data.bids.levels.first().unwrap_or(&ob_default);
+        let best_ask = data.asks.levels.first().unwrap_or(&ob_default);
+
         self.ticker.timestamp = data.timestamp;
-        self.ticker.best_bid_price = data.buy_price.unwrap_or_default();
-        self.ticker.best_ask_price = data.sell_price.unwrap_or_default();
-        self.ticker.best_bid_amount = data.buy_quantity.unwrap_or_default();
-        self.ticker.best_ask_amount = data.sell_quantity.unwrap_or_default();
+        self.ticker.best_bid_price = best_bid[0].parse().unwrap_or_default();
+        self.ticker.best_ask_price = best_ask[0].parse().unwrap_or_default();
+        self.ticker.best_bid_amount = best_bid[1].parse().unwrap_or_default();
+        self.ticker.best_ask_amount = best_ask[1].parse().unwrap_or_default();
     }
 
     fn process_last_trade_price(&mut self, data: LTPrice) {
@@ -326,6 +329,10 @@ impl PowerTradeTickerAggregator {
             vega: Some(greeks.vega),
             rho: Some(greeks.rho),
         });
+
+        self.ticker.bid_iv = Some(data.bid.unwrap_or_default().volatility);
+        self.ticker.ask_iv = Some(data.ask.unwrap_or_default().volatility);
+        self.ticker.index_price = data.spot_index;
     }
 }
 

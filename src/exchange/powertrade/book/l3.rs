@@ -2,7 +2,7 @@ use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
 use barter_integration::model::SubscriptionId;
-use chrono::DateTime;
+use chrono::TimeZone;
 use chrono::Utc;
 use serde::Deserialize;
 use serde::Deserializer;
@@ -63,23 +63,17 @@ impl From<(ExchangeId, Instrument, PowerTradeOrderBookL3)> for MarketIter<OrderB
         (exchange_id, instrument, book): (ExchangeId, Instrument, PowerTradeOrderBookL3),
     ) -> Self {
         match book {
-            PowerTradeOrderBookL3::OrderBookL3(book) => {
-                let timestamp = DateTime::parse_from_rfc3339(&book.timestamp)
-                    .unwrap_or_else(|_| Utc::now().into())
-                    .with_timezone(&Utc);
-
-                Self(vec![Ok(MarketEvent {
-                    exchange_time: timestamp,
-                    received_time: Utc::now(),
-                    exchange: Exchange::from(exchange_id),
-                    instrument,
-                    kind: OrderBook {
-                        last_update_time: timestamp,
-                        bids: parse_order_data(Side::Buy, &book.bids),
-                        asks: parse_order_data(Side::Sell, &book.asks),
-                    },
-                })])
-            }
+            PowerTradeOrderBookL3::OrderBookL3(book) => Self(vec![Ok(MarketEvent {
+                exchange_time: Utc.timestamp_millis_opt(book.timestamp).unwrap(),
+                received_time: Utc::now(),
+                exchange: Exchange::from(exchange_id),
+                instrument,
+                kind: OrderBook {
+                    last_update_time: Utc::now(),
+                    bids: parse_order_data(Side::Buy, &book.bids),
+                    asks: parse_order_data(Side::Sell, &book.asks),
+                },
+            })]),
             _ => Self(vec![]),
         }
     }

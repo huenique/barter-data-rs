@@ -135,9 +135,9 @@ pub enum TickerState {
 impl From<&str> for TickerState {
     fn from(s: &str) -> Self {
         match s.to_lowercase().as_str() {
-            "open" => TickerState::Open,
+            "open" | "active" => TickerState::Open,
             "closed" => TickerState::Closed,
-            _ => panic!("Invalid TickerState"),
+            _ => panic!("Invalid TickerState: {}", s),
         }
     }
 }

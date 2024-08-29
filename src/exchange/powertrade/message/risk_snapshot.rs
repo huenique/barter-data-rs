@@ -1,9 +1,11 @@
 use serde::Deserialize;
 use serde::Serialize;
+
 #[derive(Debug, Deserialize, Serialize)]
 struct Response {
     risk_snapshot: RiskSnapshot,
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 struct RiskSnapshot {
     symbol: String,
@@ -16,12 +18,14 @@ struct RiskSnapshot {
     bid: PriceDetail,
     ask: PriceDetail,
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 struct PriceDetail {
     price: String,
     volatility: String,
     greeks: Greeks,
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 struct Greeks {
     delta: String,

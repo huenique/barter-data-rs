@@ -8,7 +8,7 @@ use barter_integration::protocol::websocket::WsMessage;
 use cached::proc_macro::cached;
 use chrono::TimeZone;
 use chrono::Utc;
-use serde::ser::Error as _;
+use serde::de::Error as _;
 use serde::Deserialize;
 use serde::Serialize;
 use tokio::sync::mpsc;
@@ -30,6 +30,7 @@ use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
 use crate::subscription::ticker::Greeks;
 use crate::subscription::ticker::Ticker;
+use crate::subscription::ticker::TickerState;
 use crate::transformer::ticker::InstrumentTicker;
 use crate::transformer::ticker::TickerUpdater;
 use crate::Identifier;
@@ -211,6 +212,7 @@ impl PowerTradeTickerAggregator {
         }
     }
 
+    // TODO: Ensure timestmap is updated on every message
     pub fn process_message(&mut self, message: PowerTradeTicker) {
         match message {
             PowerTradeTicker::DeliverableData { deliverable } => {
@@ -260,7 +262,7 @@ impl PowerTradeTickerAggregator {
                 let option = option.option;
                 self.ticker.instrument_name = data.symbol;
                 self.ticker.open_interest = option.contract_size;
-                self.ticker.state = data.listing_status;
+                self.ticker.state = TickerState::from(data.listing_status.as_str());
             }
             ProductType::Perpetual => {}
             _ => {}

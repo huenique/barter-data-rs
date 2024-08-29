@@ -32,7 +32,7 @@ pub struct Ticker {
     pub mark_price: f64,
     pub last_price: f64,
     pub open_interest: f64,
-    pub state: String,
+    pub state: TickerState,
     pub timestamp: i64,
     pub greeks: Option<Greeks>,
     pub interest_rate: Option<f64>,   // Option specific
@@ -120,5 +120,22 @@ impl From<(ExchangeId, Instrument, Ticker)> for MarketIter<Ticker> {
             instrument,
             kind: ticker,
         })])
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
+pub enum TickerState {
+    #[default]
+    Open,
+    Closed,
+}
+
+impl From<&str> for TickerState {
+    fn from(s: &str) -> Self {
+        match s.to_lowercase().as_str() {
+            "open" => TickerState::Open,
+            "closed" => TickerState::Closed,
+            _ => panic!("Invalid TickerState"),
+        }
     }
 }

@@ -11,6 +11,7 @@ use crate::exchange::subscription::ExchangeSub;
 use crate::exchange::Instrument;
 use crate::subscription::ticker::Greeks;
 use crate::subscription::ticker::Ticker;
+use crate::subscription::ticker::TickerState;
 use crate::ExchangeId;
 use crate::Identifier;
 use crate::MarketEvent;
@@ -48,7 +49,7 @@ impl From<DeribitTickerData> for Ticker {
             mark_price: data.mark_price,
             last_price: data.last_price.unwrap_or(0.0),
             open_interest: data.open_interest.unwrap_or(0.0),
-            state: data.state,
+            state: TickerState::from(data.state.as_str()),
             timestamp: data.timestamp,
             greeks: data.greeks.map(|g| Greeks {
                 delta: Some(g.delta),

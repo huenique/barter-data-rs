@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 use std::io;
+use std::sync::Mutex;
 
 use async_trait::async_trait;
 use barter_integration::error::SocketError;
@@ -8,6 +9,7 @@ use barter_integration::model::SubscriptionId;
 use barter_integration::protocol::websocket::WsMessage;
 use chrono::TimeZone;
 use chrono::Utc;
+use once_cell::sync::Lazy;
 use serde::de::Error as _;
 use serde::Deserialize;
 use tokio::sync::mpsc;
@@ -39,13 +41,19 @@ use crate::ExchangeId;
 use crate::Identifier;
 use crate::MarketEvent;
 
+// TODO: Add/source the rest of the fields to the Ticker struct
+// * rho
+// * interest_rate
+// * delivery_price
+// * current_funding
+// * interest_value
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum CoincallTicker {
     Heartbeat(CoincallHeartbeat),
     Pricing(CoincallMessage<CoincallOptionPricingData>),
     Orderbook(CoincallMessage<CoincallOptionOrderbookData>),
-    OptionChain(CoincallMessage<CoincallOptionChainData>),
+    OptionChain(CoincallMessage<Vec<CoincallOptionChainData>>),
 }
 
 /// Coincall option pricing information.
@@ -170,21 +178,43 @@ pub struct CoincallOptionChainData {
     pub timestamp: i64,
 }
 
+static SYMBOL: Lazy<Mutex<String>> = Lazy::new(|| Mutex::new("".to_string()));
+
 impl Identifier<Option<SubscriptionId>> for CoincallTicker {
     fn id(&self) -> Option<SubscriptionId> {
         match self {
             CoincallTicker::Pricing(data) => {
-                Some(ExchangeSub::from((CoincallChannel::TICKER, data.data.symbol.clone())).id())
+                let symbol = check_and_set_symbol(&data.data.symbol);
+                Some(ExchangeSub::from((CoincallChannel::TICKER, symbol)).id())
             }
             CoincallTicker::Orderbook(data) => {
-                Some(ExchangeSub::from((CoincallChannel::TICKER, data.data.symbol.clone())).id())
+                let symbol = check_and_set_symbol(&data.data.symbol);
+                Some(ExchangeSub::from((CoincallChannel::TICKER, symbol)).id())
             }
             CoincallTicker::OptionChain(data) => {
-                Some(ExchangeSub::from((CoincallChannel::TICKER, data.data.symbol.clone())).id())
+                let symbol = data
+                    .data
+                    .iter()
+                    .find(|d| {
+                        let current_symbol = SYMBOL.lock().unwrap();
+                        d.symbol == *current_symbol
+                    })
+                    .map(|d| d.symbol.clone())
+                    .unwrap_or(String::new());
+
+                Some(ExchangeSub::from((CoincallChannel::TICKER, symbol)).id())
             }
             _ => None,
         }
     }
+}
+
+fn check_and_set_symbol(new_symbol: &str) -> String {
+    let mut symbol = SYMBOL.lock().unwrap();
+    if symbol.is_empty() {
+        *symbol = new_symbol.to_string();
+    }
+    symbol.clone()
 }
 
 impl From<(ExchangeId, Instrument, CoincallTicker)> for MarketIter<Ticker> {
@@ -209,23 +239,6 @@ impl From<CoincallTicker> for Ticker {
     }
 }
 
-// impl From<CoincallOptionPricingData> for Ticker {
-//     fn from(data: CoincallOptionPricingData) -> Self {
-//         Ticker {
-//             state: "".to_string(),
-//             greeks: Some(Greeks {
-//                 rho: None,
-//             }),
-//             interest_rate: Some(0f64),
-//             delivery_price: Some(0f64),
-//             current_funding: Some(0f64),
-//             interest_value: Some(0f64),
-//             ask_iv: Some(0f64),
-//             bid_iv: Some(0f64),
-//         }
-//     }
-// }
-
 #[derive(Clone, Debug)]
 pub struct CoincallTickerAggregator {
     ticker: Ticker,
@@ -241,19 +254,25 @@ impl CoincallTickerAggregator {
     pub fn process_message(&mut self, message: CoincallTicker) {
         match message {
             CoincallTicker::Pricing(data) => {
-                self.process_pricing_data(data.data);
+                self.process_pricing_data(&data.data);
             }
             CoincallTicker::OptionChain(data) => {
-                self.process_option_chain_data(data.data);
+                let data = data
+                    .data
+                    .iter()
+                    .find(|d| d.symbol == self.ticker.instrument_name)
+                    .unwrap_or_else(|| &data.data[0]);
+
+                self.process_option_chain_data(data);
             }
             CoincallTicker::Orderbook(data) => {
-                self.process_orderbook_data(data.data);
+                self.process_orderbook_data(&data.data);
             }
             _ => {}
         }
     }
 
-    pub fn process_pricing_data(&mut self, data: CoincallOptionPricingData) {
+    pub fn process_pricing_data(&mut self, data: &CoincallOptionPricingData) {
         debug!("Processing Coincall pricing data: {:?}", data);
         self.ticker.timestamp = data.timestamp;
         self.ticker.mark_price = data.mark_price;
@@ -270,7 +289,7 @@ impl CoincallTickerAggregator {
         self.ticker.index_price = data.index_price;
     }
 
-    pub fn process_option_chain_data(&mut self, data: CoincallOptionChainData) {
+    pub fn process_option_chain_data(&mut self, data: &CoincallOptionChainData) {
         debug!("Processing Coincall option chain data: {:?}", data);
         self.ticker.timestamp = data.timestamp;
         self.ticker.mark_price = data.mark_price;
@@ -288,7 +307,7 @@ impl CoincallTickerAggregator {
         self.ticker.ask_iv = Some(data.ask_iv);
     }
 
-    pub fn process_orderbook_data(&mut self, data: CoincallOptionOrderbookData) {
+    pub fn process_orderbook_data(&mut self, data: &CoincallOptionOrderbookData) {
         debug!("Processing Coincall orderbook data: {:?}", data);
         let ob_default = &CoincallOrderbookData::default();
         let best_bid = data.bids.first().unwrap_or(ob_default);

@@ -76,19 +76,39 @@ where
         exchange_subs
             .into_iter()
             .flat_map(|ExchangeSub { channel, market }| {
-                let chs = channel.as_ref().split('_').collect::<Vec<&str>>();
-                chs.into_iter()
-                    .map(|ch| {
-                        WsMessage::Text(
-                            json!({
+                // The market.as_ref() method returns an instrument name in this format
+                // "BTCUSD-30AUG24-65000-C". We have to convert it to a UNIX timestamp for the
+                // message payload
+                let instrument = market.as_ref().split('-').collect::<Vec<&str>>();
+                let ccy = instrument.first().expect("Invalid instrument name");
+                let exp = instrument.get(1).expect("Invalid instrument name");
+                // Coincall sets the expiration time of their instruments to 08:00 UTC
+                let expiry =
+                    utils::ddmmmyy_to_unix_timestamp(exp, Some(8)).expect("Invalid expiry date");
+
+                channel
+                    .as_ref()
+                    .split('_')
+                    .filter_map(|ch| {
+                        let dt = ch.parse::<i32>().ok()?;
+                        let message = match dt {
+                            4 => json!({
                                 "c": 20,
-                                "dt": ch.parse::<i32>().unwrap(),
+                                "dt": 4,
+                                "d": {
+                                    "s": ccy,
+                                    "end": expiry
+                                }
+                            }),
+                            _ => json!({
+                                "c": 20,
+                                "dt": dt,
                                 "d": {
                                     "s": market.as_ref()
                                 }
-                            })
-                            .to_string(),
-                        )
+                            }),
+                        };
+                        Some(WsMessage::Text(message.to_string()))
                     })
                     .collect::<Vec<WsMessage>>()
             })

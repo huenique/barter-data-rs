@@ -1,13 +1,9 @@
 use barter_integration::model::instrument::kind::InstrumentKind;
-use barter_integration::model::instrument::kind::OptionKind;
 use barter_integration::model::instrument::Instrument;
-use chrono::format::DelayedFormat;
-use chrono::format::StrftimeItems;
-use chrono::DateTime;
-use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::exchange::coincall::utils::format_opt_instr;
 use crate::exchange::coincall::Coincall;
 use crate::subscription::Subscription;
 use crate::Identifier;
@@ -27,18 +23,13 @@ impl<Server, Kind> Identifier<CoincallMarket> for Subscription<Coincall<Server>,
             Spot => todo!(),
             Future(_future) => todo!(),
             Perpetual => todo!(),
-            Option(option) => format!(
-                "{base}{quote}-{expiry}-{strike}-{kind}",
-                base = base,
-                quote = quote,
-                expiry = format_expiry(option.expiry),
-                strike = option.strike,
-                kind = match option.kind {
-                    OptionKind::Call => "C",
-                    OptionKind::Put => "P",
-                },
-            )
-            .to_uppercase(),
+            Option(option) => format_opt_instr(
+                base.as_ref(),
+                quote.as_ref(),
+                option.expiry,
+                option.strike,
+                option.kind,
+            ),
         })
     }
 }
@@ -47,11 +38,4 @@ impl AsRef<str> for CoincallMarket {
     fn as_ref(&self) -> &str {
         &self.0
     }
-}
-
-/// Format the expiry DateTime<Utc> to be Coincall API compatible.
-///
-/// eg/ "21JUN23" (21th of June 2023)
-fn format_expiry<'a>(expiry: DateTime<Utc>) -> DelayedFormat<StrftimeItems<'a>> {
-    expiry.date_naive().format("%-d%b%y")
 }

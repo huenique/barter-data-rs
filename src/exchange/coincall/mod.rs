@@ -9,7 +9,7 @@ use url::Url;
 
 use crate::exchange::coincall::channel::CoincallChannel;
 use crate::exchange::coincall::market::CoincallMarket;
-use crate::exchange::coincall::option::ticker::CoincallOptionTicker;
+use crate::exchange::coincall::option::ticker::CoincallTicker;
 use crate::exchange::coincall::subscription::CoincallSubResponse;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
@@ -32,6 +32,8 @@ pub mod market;
 pub mod subscription;
 
 pub mod message;
+
+pub mod utils;
 
 /// [`ExchangeServer`] and [`StreamSelector`] implementations for
 /// [`Coincall`](option::CoincallOption).
@@ -73,17 +75,22 @@ where
     fn requests(exchange_subs: Vec<ExchangeSub<Self::Channel, Self::Market>>) -> Vec<WsMessage> {
         exchange_subs
             .into_iter()
-            .map(|ExchangeSub { channel, market }| {
-                WsMessage::Text(
-                    json!({
-                        "c": 20,
-                        "dt": channel.as_ref().parse::<i32>().unwrap(),
-                        "d": {
-                            "s": market.as_ref()
-                        }
+            .flat_map(|ExchangeSub { channel, market }| {
+                let chs = channel.as_ref().split('_').collect::<Vec<&str>>();
+                chs.into_iter()
+                    .map(|ch| {
+                        WsMessage::Text(
+                            json!({
+                                "c": 20,
+                                "dt": ch.parse::<i32>().unwrap(),
+                                "d": {
+                                    "s": market.as_ref()
+                                }
+                            })
+                            .to_string(),
+                        )
                     })
-                    .to_string(),
-                )
+                    .collect::<Vec<WsMessage>>()
             })
             .collect()
     }
@@ -93,7 +100,7 @@ impl<Server> StreamSelector<Tickers> for Coincall<Server>
 where
     Server: ExchangeServer + Debug + Send + Sync,
 {
-    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, CoincallOptionTicker>>;
+    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, CoincallTicker>>;
 }
 
 impl<'de, Server> serde::Deserialize<'de> for Coincall<Server>

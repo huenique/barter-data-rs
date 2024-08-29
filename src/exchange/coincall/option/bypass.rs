@@ -7,7 +7,7 @@ use tracing::debug;
 use tracing::error;
 use tracing::info;
 
-use crate::exchange::coincall::auth::token::fetch_token_from_url;
+use crate::exchange::coincall::auth::get_cc_token;
 use crate::exchange::coincall::Coincall;
 use crate::exchange::ExchangeServer;
 use crate::ExchangeId;
@@ -121,7 +121,7 @@ pub fn get_token() -> Result<String, Box<dyn std::error::Error>> {
     debug!("Getting token from Coincall");
     tokio::task::block_in_place(|| {
         let rt = tokio::runtime::Handle::current();
-        rt.block_on(fetch_token_from_url())
+        rt.block_on(get_cc_token())
     })
 }
 

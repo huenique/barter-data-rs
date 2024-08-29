@@ -27,7 +27,7 @@ pub struct CoincallOptionAuthResponse {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CoincallOptionAuthData {
-    pub server_ts: u128,
+    pub server_ts: i128,
     pub uuid: String,
     pub key: String,
     pub token: String,
@@ -43,7 +43,7 @@ pub async fn get_cc_token() -> Result<String, Box<dyn Error>> {
 pub struct SigGenParams<'a> {
     pub key: String,
     pub uuid: String,
-    pub ts: u128,
+    pub ts: i128,
     pub tsdiff: i128,
     pub instrument_name: Cow<'a, str>,
 }
@@ -55,14 +55,14 @@ pub async fn get_cc_auth_parms() -> Result<CoincallOptionAuthData, Box<dyn Error
     Ok(response_json.data)
 }
 
-pub fn calc_cc_ts(server_ts: u128) -> (u128, i128) {
+pub fn calc_cc_ts(server_ts: i128) -> (i128, i128) {
     debug!("Calculating timestamp difference for Coincall");
     let start = SystemTime::now();
     let ts = start
         .duration_since(UNIX_EPOCH)
         .expect("Time went backwards")
-        .as_millis();
-    let tsdiff = (ts - server_ts) as i128;
+        .as_millis() as i128;
+    let tsdiff = ts - server_ts;
     (ts, tsdiff)
 }
 
@@ -128,7 +128,11 @@ mod tests {
             instrument_name: Cow::Borrowed("BTC-30AUG24"),
         };
 
-        let secret = gen_cc_secret(&sig_params, reqwest::Method::GET.as_str(), COINCALL_ORDERBOOK_V1);
+        let secret = gen_cc_secret(
+            &sig_params,
+            reqwest::Method::GET.as_str(),
+            COINCALL_ORDERBOOK_V1,
+        );
         assert_eq!(
             secret,
             "GET/trade/order/orderBook/v1/BTC-30AUG24?uuid=e0afd95474f34ee4b4befbfde6a9f581&ts=1723754167709&tsdiff=-916",

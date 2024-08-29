@@ -13,10 +13,12 @@ pub struct CoincallChannel(pub &'static str);
 impl CoincallChannel {
     /// [`Coincall`](super::Coincall) Pricing information channel.
     ///
-    /// To get the complete ticker information, we need to subscribe to the following channels:
+    /// To get the complete ticker information, we need to subscribe to the
+    /// following channels:
     /// - <https://docs.coincall.com/#options-websocket-pricing-information>
+    /// - <https://docs.coincall.com/#options-websocket-option-chain-data>
     /// - <https://docs.coincall.com/#options-websocket-orderbook>
-    pub const TICKER: Self = Self("3_5");
+    pub const TICKER: Self = Self("3_4_5");
 
     /// [`Coincall`](super::Coincall) Order book channel.
     ///

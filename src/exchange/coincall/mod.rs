@@ -4,12 +4,12 @@ use std::time::Duration;
 
 use barter_integration::error::SocketError;
 use barter_integration::protocol::websocket::WsMessage;
+use option::ticker::CoincallTickerUpdater;
 use serde_json::json;
 use url::Url;
 
 use crate::exchange::coincall::channel::CoincallChannel;
 use crate::exchange::coincall::market::CoincallMarket;
-use crate::exchange::coincall::option::ticker::CoincallTicker;
 use crate::exchange::coincall::subscription::CoincallSubResponse;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
@@ -19,7 +19,7 @@ use crate::exchange::StreamSelector;
 use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
 use crate::subscription::ticker::Tickers;
-use crate::transformer::stateless::StatelessTransformer;
+use crate::transformer::ticker::MultiTickerTransformer;
 use crate::ExchangeWsStream;
 use crate::PingInterval;
 
@@ -100,7 +100,7 @@ impl<Server> StreamSelector<Tickers> for Coincall<Server>
 where
     Server: ExchangeServer + Debug + Send + Sync,
 {
-    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, CoincallTicker>>;
+    type Stream = ExchangeWsStream<MultiTickerTransformer<Self, Tickers, CoincallTickerUpdater>>;
 }
 
 impl<'de, Server> serde::Deserialize<'de> for Coincall<Server>

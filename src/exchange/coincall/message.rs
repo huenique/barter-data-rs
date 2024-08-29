@@ -27,7 +27,7 @@ pub struct CoincallOrderbook {
     pub data: Option<CoincallObData>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct CoincallObData {
     pub symbol: String,
     pub display_name: Option<String>,
@@ -36,7 +36,7 @@ pub struct CoincallObData {
     pub asks: Vec<CoincallObOrder>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct CoincallObOrder {
     pub size: String,
     pub price: String,

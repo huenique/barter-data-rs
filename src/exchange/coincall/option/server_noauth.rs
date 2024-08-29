@@ -17,12 +17,12 @@ lazy_static! {
         Mutex::new(ManuallyDrop::new(None));
 }
 
-pub type CoincallServerOptionNoAuth = Coincall<CoincallServerBypass>;
+pub type CoincallServerOptionNoAuth = Coincall<CoincallServerOption>;
 
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct CoincallServerBypass;
+pub struct CoincallServerOption;
 
-impl ExchangeServer for CoincallServerBypass {
+impl ExchangeServer for CoincallServerOption {
     const ID: ExchangeId = ExchangeId::CoincallOption;
 
     /// Returns the WebSocket URL as a `&'static str`.

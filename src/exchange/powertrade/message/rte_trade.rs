@@ -6,7 +6,8 @@ pub struct Response {
 }
 #[derive(Debug, Deserialize, Serialize)]
 pub struct RteTrade {
-    pub timestamp: String,
+    #[serde(deserialize_with = "barter_integration::de::de_str")]
+    pub timestamp: i64,
     pub symbol: String,
     pub tradeable_entity_id: String,
     pub market_id: String,

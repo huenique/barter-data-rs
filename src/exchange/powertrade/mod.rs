@@ -33,6 +33,8 @@ pub mod subscription;
 
 pub mod ticker;
 
+pub mod utils;
+
 /// <https://power-trade.github.io/api-docs-source/ws_feeds.html#Market_Feeds_Connection_Parameters>
 pub const BASE_URL_POWERTRADE: &str = "wss://api.wss.prod.power.trade/v1/feeds/market_data?type[]=all_rte,deliverable,funding_rate,last_trade_price,risk&mbp_period=1&mbo_period=0&snapshot_depth=100";
 #[derive(Clone, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange)]

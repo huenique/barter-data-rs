@@ -57,15 +57,15 @@ pub struct PowerTradeInstrumentSummary {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum PowerTradeTicker {
-    DeliverableData {
+    Deliverable {
         #[serde(rename = "deliverable")]
         deliverable: Deliverable<ProductType>,
     },
-    BestBidAsk {
+    TopOfBook {
         #[serde(rename = "top_of_book")]
         top_of_book: TopOfBook,
     },
-    MarkPrice {
+    FundingRate {
         #[serde(rename = "funding_rate")]
         funding_rate: FundingRate,
     },
@@ -81,7 +81,7 @@ pub enum PowerTradeTicker {
         #[serde(rename = "rte_last_trade_price")]
         rte_last_trade_price: RteLastTradePrice,
     },
-    Greeks {
+    RiskSnapshot {
         #[serde(rename = "risk_snapshot")]
         risk_snapshot: RiskSnapshot,
     },
@@ -94,7 +94,7 @@ const FAILED_FETCH: &str = "Failed to fetch symbol";
 impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
     fn id(&self) -> Option<SubscriptionId> {
         match self {
-            PowerTradeTicker::DeliverableData { deliverable } => Some(
+            PowerTradeTicker::Deliverable { deliverable } => Some(
                 ExchangeSub::from((
                     PowerTradeChannel::TICKER,
                     match &deliverable.details {
@@ -104,7 +104,7 @@ impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
                 ))
                 .id(),
             ),
-            PowerTradeTicker::BestBidAsk { top_of_book } => Some(
+            PowerTradeTicker::TopOfBook { top_of_book } => Some(
                 ExchangeSub::from((
                     PowerTradeChannel::TICKER,
                     fetch_symbol(&top_of_book.tradeable_entity_id).unwrap_or(format!(
@@ -114,7 +114,7 @@ impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
                 ))
                 .id(),
             ),
-            PowerTradeTicker::MarkPrice { funding_rate } => Some(
+            PowerTradeTicker::FundingRate { funding_rate } => Some(
                 ExchangeSub::from((
                     PowerTradeChannel::TICKER,
                     fetch_symbol(&funding_rate.tradeable_entity_id).unwrap_or(format!(
@@ -156,7 +156,7 @@ impl Identifier<Option<SubscriptionId>> for PowerTradeTicker {
                 ))
                 .id(),
             ),
-            PowerTradeTicker::Greeks {
+            PowerTradeTicker::RiskSnapshot {
                 risk_snapshot: greeks,
             } => Some(
                 ExchangeSub::from((
@@ -212,18 +212,18 @@ impl PowerTradeTickerAggregator {
         }
     }
 
-    // TODO: Ensure timestmap is updated on every message
+    // TODO: Ensure timestamp is updated on every message
     pub fn process_message(&mut self, message: PowerTradeTicker) {
         match message {
-            PowerTradeTicker::DeliverableData { deliverable } => {
+            PowerTradeTicker::Deliverable { deliverable } => {
                 debug!("Processing deliverable data: {:?}", deliverable);
                 self.process_deliverable_data(deliverable);
             }
-            PowerTradeTicker::BestBidAsk { top_of_book } => {
+            PowerTradeTicker::TopOfBook { top_of_book } => {
                 debug!("Processing best bid ask: {:?}", top_of_book);
                 self.process_best_bid_ask(top_of_book);
             }
-            PowerTradeTicker::MarkPrice { funding_rate } => {
+            PowerTradeTicker::FundingRate { funding_rate } => {
                 debug!("Processing mark price: {:?}", funding_rate);
                 self.process_mark_price(funding_rate);
             }
@@ -244,7 +244,7 @@ impl PowerTradeTickerAggregator {
                 );
                 self.process_last_trade_price(LTPrice::RteLastTradePrice(rte_last_trade_price));
             }
-            PowerTradeTicker::Greeks {
+            PowerTradeTicker::RiskSnapshot {
                 risk_snapshot: greeks,
             } => {
                 debug!("Processing greeks: {:?}", greeks);
@@ -255,6 +255,8 @@ impl PowerTradeTickerAggregator {
     }
 
     fn process_deliverable_data(&mut self, data: Deliverable<ProductType>) {
+        self.ticker.timestamp = Utc::now().timestamp_nanos_opt().unwrap_or_default();
+
         match data.details {
             ProductType::Spot => {}
             ProductType::Future => {}
@@ -284,25 +286,32 @@ impl PowerTradeTickerAggregator {
     fn process_last_trade_price(&mut self, data: LTPrice) {
         match data {
             LTPrice::LastTradePrice(data) => {
+                self.ticker.timestamp = data.timestamp;
                 self.ticker.last_price = data.price;
             }
             LTPrice::RteLastTradePrice(data) => {
+                self.ticker.timestamp = data.timestamp;
                 self.ticker.last_price = data.price;
             }
         }
     }
 
     fn process_trade(&mut self, data: RteTrade) {
+        self.ticker.timestamp = data.timestamp;
         self.ticker.last_price = data.price;
     }
 
     fn process_mark_price(&mut self, data: FundingRate) {
+        self.ticker.timestamp = data.timestamp;
         self.ticker.mark_price = data.mark_price;
         self.ticker.index_price = data.underlying_price;
         self.ticker.delivery_price = Some(data.underlying_price);
+        self.ticker.current_funding = Some(0f64);
     }
 
     fn process_greeks(&mut self, data: RiskSnapshot) {
+        self.ticker.timestamp = data.timestamp;
+
         let greeks = match data.mid {
             Some(mid) => mid.greeks,
             None => {

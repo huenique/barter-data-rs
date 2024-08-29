@@ -1,9 +1,13 @@
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::exchange::powertrade::utils::de;
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct OptionDetails {
     pub option: MoreOptionDetails,
 }
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MoreOptionDetails {
     pub expiry: Expiry,
@@ -22,22 +26,26 @@ pub struct MoreOptionDetails {
     pub margin_spec_id: String,
     pub strikes_spec_id: String,
 }
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Expiry {
     pub datetime: DateTime,
     pub timezone: String,
 }
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DateTime {
     pub date: Date,
     pub time: Time,
 }
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Date {
     pub year: String,
     pub month: String,
     pub day: String,
 }
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Time {
     pub hours: String,
@@ -45,12 +53,12 @@ pub struct Time {
     pub seconds: String,
     pub nanoseconds: String,
 }
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Response {
     pub risk_snapshot: RiskSnapshot,
 }
 
-// Struct definitions
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct RiskSnapshot {
     pub symbol: String,
@@ -64,12 +72,14 @@ pub struct RiskSnapshot {
     pub bid: Option<PriceDetail>,
     pub ask: Option<PriceDetail>,
 }
+
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
 pub struct PriceDetail {
     pub price: f64,
     pub volatility: f64,
     pub greeks: Greeks,
 }
+
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
 pub struct Greeks {
     pub delta: f64,
@@ -77,30 +87,4 @@ pub struct Greeks {
     pub theta: f64,
     pub rho: f64,
     pub gamma: f64,
-}
-
-pub mod de {
-    use serde::Deserialize;
-    use serde::Deserializer;
-    use serde::{
-        self,
-    };
-
-    pub fn de_str<'de, D, T>(deserializer: D) -> Result<T, D::Error>
-    where
-        D: Deserializer<'de>,
-        T: std::str::FromStr,
-        T::Err: std::fmt::Display,
-    {
-        let s = String::deserialize(deserializer)?;
-        s.parse::<T>().map_err(serde::de::Error::custom)
-    }
-
-    pub fn de_str_to_i64<'de, D>(deserializer: D) -> Result<i64, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        s.parse::<i64>().map_err(serde::de::Error::custom)
-    }
 }

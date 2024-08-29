@@ -1,5 +1,7 @@
 use std::cmp::Ordering;
 use std::error::Error;
+use std::fmt::Display;
+use std::fmt::Formatter;
 
 use chrono::TimeZone;
 use chrono::Utc;
@@ -136,6 +138,15 @@ impl From<&str> for TickerState {
             "open" => TickerState::Open,
             "closed" => TickerState::Closed,
             _ => panic!("Invalid TickerState"),
+        }
+    }
+}
+
+impl Display for TickerState {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TickerState::Open => write!(f, "open"),
+            TickerState::Closed => write!(f, "closed"),
         }
     }
 }

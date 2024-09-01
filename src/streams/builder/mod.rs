@@ -144,13 +144,6 @@ where
     /// * `Result<mpsc::UnboundedReceiver<MarketEvent<Kind::Event>>, DataError>`
     ///   - Returns an `UnboundedReceiver` for receiving `MarketEvent` messages
     ///     or a `DataError` if initialization fails.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// let local_set = LocalSet::new();
-    /// let receiver = stream_builder.init_with_local_set(&local_set).await.unwrap();
-    /// ```
     pub async fn init_local(
         self,
         local_set: &LocalSet,

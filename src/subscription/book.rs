@@ -225,6 +225,9 @@ impl OrderBookSide {
 /// # Example
 ///
 /// ```
+/// use barter_data::subscription::book::Level;
+/// use barter_data::subscription::book::quicksort_iterative;
+///
 /// let mut levels = vec![
 ///     Level { price: 56762.1, amount: 0.003 },
 ///     Level { price: 56757.8, amount: 0.156 },
@@ -232,7 +235,7 @@ impl OrderBookSide {
 /// ];
 /// quicksort_iterative(&mut levels);
 /// ```
-fn quicksort_iterative(arr: &mut [Level]) {
+pub fn quicksort_iterative(arr: &mut [Level]) {
     let len = arr.len();
     let mut stack = Vec::with_capacity(len);
 
@@ -265,14 +268,19 @@ fn quicksort_iterative(arr: &mut [Level]) {
 /// # Example
 ///
 /// ```
+/// use barter_data::subscription::book::Level;
+/// use barter_data::subscription::book::partition;
+///
 /// let mut levels = vec![
 ///     Level { price: 56762.1, amount: 0.003 },
 ///     Level { price: 56757.8, amount: 0.156 },
 ///     Level { price: 56751.3, amount: 0.194 },
 /// ];
-/// let pivot_index = partition(&mut levels, 0, levels.len() as isize - 1);
+///
+/// let len = levels.len();
+/// let pivot_index = partition(&mut levels, 0, len as isize - 1);
 /// ```
-fn partition(arr: &mut [Level], low: isize, high: isize) -> isize {
+pub fn partition(arr: &mut [Level], low: isize, high: isize) -> isize {
     let pivot = arr[high as usize];
     let mut i = low - 1;
 
@@ -310,9 +318,13 @@ impl Ord for Level {
     }
 }
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for Level {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+        match self.price.partial_cmp(&other.price)? {
+            Ordering::Equal => self.amount.partial_cmp(&other.amount),
+            non_equal => Some(non_equal),
+        }
     }
 }
 

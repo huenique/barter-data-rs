@@ -427,8 +427,8 @@ fn validate_and_format_instrument_name(instrument: &Instrument) -> Result<String
 fn generate_secret(
     auth: &CoincallOptionAuthData,
     instrument_name: &str,
-    ts: i128,
-    tsdiff: i128,
+    ts: i64,
+    tsdiff: i64,
 ) -> Result<String, DataError> {
     let sig_params = SigGenParams {
         key: auth.key.clone(),
@@ -452,8 +452,8 @@ async fn send_request(
     auth: &CoincallOptionAuthData,
     instrument_name: &str,
     sign: &str,
-    ts: i128,
-    tsdiff: i128,
+    ts: i64,
+    tsdiff: i64,
 ) -> Result<reqwest::Response, DataError> {
     let req = reqwest::Client::new()
         .get(&format!(

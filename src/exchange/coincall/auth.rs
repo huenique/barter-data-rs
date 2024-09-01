@@ -27,7 +27,7 @@ pub struct CoincallOptionAuthResponse {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CoincallOptionAuthData {
-    pub server_ts: i128,
+    pub server_ts: i64,
     pub uuid: String,
     pub key: String,
     pub token: String,
@@ -43,8 +43,8 @@ pub async fn get_cc_token() -> Result<String, Box<dyn Error>> {
 pub struct SigGenParams<'a> {
     pub key: String,
     pub uuid: String,
-    pub ts: i128,
-    pub tsdiff: i128,
+    pub ts: i64,
+    pub tsdiff: i64,
     pub instrument_name: Cow<'a, str>,
 }
 
@@ -55,13 +55,13 @@ pub async fn get_cc_auth_parms() -> Result<CoincallOptionAuthData, Box<dyn Error
     Ok(response_json.data)
 }
 
-pub fn calc_cc_ts(server_ts: i128) -> (i128, i128) {
+pub fn calc_cc_ts(server_ts: i64) -> (i64, i64) {
     debug!("Calculating timestamp difference for Coincall");
     let start = SystemTime::now();
     let ts = start
         .duration_since(UNIX_EPOCH)
         .expect("Time went backwards")
-        .as_millis() as i128;
+        .as_millis() as i64;
     let tsdiff = ts - server_ts;
     (ts, tsdiff)
 }
@@ -99,7 +99,7 @@ mod tests {
         );
         assert_eq!(
             tsdiff,
-            (ts - server_ts).try_into().unwrap(),
+            ts - server_ts,
             "Tsdiff should be the difference between ts and server_ts"
         );
     }

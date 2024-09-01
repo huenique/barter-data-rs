@@ -90,7 +90,7 @@ fn init_logging() {
         // Filter messages based on the INFO
         .with_env_filter(
             tracing_subscriber::filter::EnvFilter::builder()
-                .with_default_directive(tracing_subscriber::filter::LevelFilter::INFO.into())
+                .with_default_directive(tracing_subscriber::filter::LevelFilter::DEBUG.into())
                 .from_env_lossy(),
         )
         // Disable colours on release builds

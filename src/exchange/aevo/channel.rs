@@ -13,10 +13,10 @@ use crate::Identifier;
 pub struct AevoChannel(pub &'static str);
 
 impl AevoChannel {
-    /// [`Aevo`](super::Aevo) OrderBook Level2 channel name (raw updates).
+    /// [`Aevo`](super::Aevo) OrderBook Level2 channel name (100ms).
     ///
-    /// See docs: <https://docs.aevo.xyz/reference/subscribe>
-    pub const ORDER_BOOK_L2: Self = Self("orderbook");
+    /// See docs: <https://api-docs.aevo.xyz/reference/subscribe-orderbook-throttled>
+    pub const ORDER_BOOK_L2: Self = Self("orderbook-100ms");
 }
 
 impl Identifier<AevoChannel> for Subscription<Aevo, OrderBooksL2> {

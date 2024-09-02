@@ -119,8 +119,9 @@ impl ExchangeServer for CoincallServerOption {
 
 pub fn get_token() -> Result<String, Box<dyn std::error::Error>> {
     debug!("Getting token from Coincall");
+
     tokio::task::block_in_place(|| {
-        let rt = tokio::runtime::Handle::current();
+        let rt = tokio::runtime::Runtime::new()?;
         rt.block_on(get_cc_token())
     })
 }

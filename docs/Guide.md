@@ -30,7 +30,6 @@ Each exchange has a structure suited to its specific needs, such as handling fut
 - **`market.rs`** – Translates subscription requests into exchange-specific market formats and handles instrument identification.
 - **`message.rs`** – Formats incoming WebSocket messages and structures them for the library’s use.
 - **`subscription.rs`** – Manages subscription requests and responses for data streams like tickers or order books.
-- **`ticker.rs`** – Processes and formats ticker data, including prices, volumes, and additional metrics like greeks for options.
 - **`mod.rs`** – Serves as the main entry point, integrating all components and defining the overall structure for the exchange module.
 
 ## Creating the Exchange Module
@@ -117,6 +116,8 @@ To integrate `ExampleExchange`, you’ll need to implement various traits that d
 ### Example: `ExampleExchange` Integration
 
 1. **Market Definition**  
+   `src/exchange/example/market.rs`
+
    The `ExampleMarket` struct defines how a market is translated from a Barter `Subscription` into a string format for `ExampleExchange`. This implementation supports different instrument types such as options and futures.
 
    ```rust
@@ -149,33 +150,9 @@ To integrate `ExampleExchange`, you’ll need to implement various traits that d
    }
    ```
 
-2. **Ticker Translation**  
-   `ExampleTicker` converts exchange-specific ticker data into the `Ticker` format. It maps fields like `best_bid_price`, `best_ask_price`, and options pricing (greeks).
+2. **Channel Definition**  
+   `src/exchange/example/channel.rs`
 
-   ```rust
-   impl From<ExampleInstrumentTicker> for Ticker {
-       fn from(data: ExampleInstrumentTicker) -> Self {
-           Ticker {
-               instrument_name: data.instrument_name,
-               best_bid_price: data.best_bid_price,
-               best_ask_price: data.best_ask_price,
-               open_interest: data.stats.open_interest,
-               greeks: Some(Greeks {
-                   delta: Some(data.option_pricing.delta),
-                   gamma: Some(data.option_pricing.gamma),
-                   theta: Some(data.option_pricing.theta),
-                   vega: Some(data.option_pricing.vega),
-                   rho: Some(data.option_pricing.rho),
-               }),
-               index_price: data.index_price,
-               mark_price: data.mark_price,
-               ..Default::default()
-           }
-       }
-   }
-   ```
-
-3. **Channel Definition**  
    `ExampleChannel` defines the available channels (e.g., ticker or order book updates) for the exchange and converts the `Subscription` into the appropriate channel format.
 
    ```rust
@@ -199,7 +176,9 @@ To integrate `ExampleExchange`, you’ll need to implement various traits that d
    }
    ```
 
-4. **Subscription Validation**  
+3. **Subscription Validation**  
+   `src/exchange/example/subscription.rs`
+
    `ExampleSubResponse` validates the responses received from `ExampleExchange` after sending subscription requests.
 
    ```rust
@@ -218,40 +197,6 @@ To integrate `ExampleExchange`, you’ll need to implement various traits that d
                Err(SocketError::Subscribe("Invalid subscription response".into()))
            }
        }
-   }
-   ```
-
-5. **Connector Implementation**  
-   The `Connector` trait is implemented for `ExampleExchange`, defining how it connects to the exchange, sends subscription requests, and handles WebSocket messages.
-
-   ```rust
-   impl Connector for ExampleExchange {
-       const ID: ExchangeId = ExchangeId::ExampleExchange;
-       type Channel = ExampleChannel;
-       type Market = ExampleMarket;
-       type Subscriber = WebSocketSubscriber;
-       type SubValidator = WebSocketSubValidator;
-       type SubResponse = ExampleSubResponse;
-
-       fn url() -> Result<Url, SocketError> {
-           Url::parse("wss://api.example.com/ws").map_err(SocketError::UrlParse)
-       }
-
-       fn requests(exchange_subs: Vec<ExchangeSub<Self::Channel, Self::Market>>) -> Vec<WsMessage> {
-           let stream_names = exchange_subs
-               .into_iter()
-               .map(|sub| sub.channel.as_ref().replace("{}", sub.market.as_ref()))
-               .collect::<Vec<String>>();
-
-           vec![WsMessage::Text(
-               json!({"id": "subscribe", "params": {"channels": stream_names}})
-                   .to_string(),
-           )]
-       }
-   }
-
-   impl StreamSelector<Tickers> for ExampleExchange {
-       type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, ExampleTicker>>;
    }
    ```
 

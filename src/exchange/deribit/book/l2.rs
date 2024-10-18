@@ -46,6 +46,7 @@ impl Identifier<Option<SubscriptionId>> for DeribitOrderBookL2 {
 impl From<DeribitOrderBookL2Delta> for OrderBook {
     fn from(snapshot: DeribitOrderBookL2Delta) -> Self {
         Self {
+            instrument_name: snapshot.instrument_name,
             last_update_time: Utc::now(),
             bids: OrderBookSide::new(Side::Buy, snapshot.bids),
             asks: OrderBookSide::new(Side::Sell, snapshot.asks),

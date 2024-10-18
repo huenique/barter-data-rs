@@ -456,7 +456,7 @@ async fn send_request(
     tsdiff: i64,
 ) -> Result<reqwest::Response, DataError> {
     let req = reqwest::Client::new()
-        .get(&format!(
+        .get(format!(
             "https://www.coincall.com/api{}/{}",
             COINCALL_ORDERBOOK_V1, instrument_name
         ))

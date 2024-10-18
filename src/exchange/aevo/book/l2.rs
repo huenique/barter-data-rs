@@ -46,6 +46,7 @@ impl Identifier<Option<SubscriptionId>> for AevoOrderBookL2 {
 impl From<AevoOrderBookL2Delta> for OrderBook {
     fn from(snapshot: AevoOrderBookL2Delta) -> Self {
         Self {
+            instrument_name: snapshot.instrument_name,
             last_update_time: Utc::now(),
             bids: OrderBookSide::new(Side::Buy, snapshot.bids),
             asks: OrderBookSide::new(Side::Sell, snapshot.asks),

@@ -27,16 +27,16 @@ tracing = "0.1.36"
 
 # Async
 async-trait = "0.1"
-futures = "0.3.21"
+futures = "0.3"
 tokio = { version = "1.40", features = ["sync", "macros", "rt-multi-thread"] }
 tokio-stream = { version = "0.1", features = ["sync"] }
 
 # Protocol
 url = "2.3.1"
-reqwest = { version = "0.12.7", features = ["blocking"] }
+reqwest = { version = "0.12", features = ["blocking"] }
 
 # Error
-thiserror = "1.0.32"
+thiserror = "1.0"
 
 # SerDe
 serde = { version = "1.0", features = ["derive"] }
@@ -65,7 +65,7 @@ lazy_static = "1.5.0"
 cached = "0.53.1"
 rust_decimal = "1.36.0"
 rust_decimal_macros = "1.36.0"
-once_cell = "1.19.0"
+once_cell = "1.20"
 
 [[bench]]
 name = "sorting"

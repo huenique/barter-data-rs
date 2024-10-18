@@ -81,6 +81,7 @@ impl SubKind for OrderBooksL3 {
 /// Normalised Barter [`OrderBook`] snapshot.
 #[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct OrderBook {
+    pub instrument_name: String,
     pub last_update_time: DateTime<Utc>,
     pub bids: OrderBookSide,
     pub asks: OrderBookSide,
@@ -488,6 +489,7 @@ mod tests {
                 TestCase {
                     // TC0: no levels so 0.0 mid-price
                     input: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Default::default(),
                         bids: OrderBookSide {
                             side: Side::Buy,
@@ -503,6 +505,7 @@ mod tests {
                 TestCase {
                     // TC1: no asks in the book so take best bid price
                     input: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Default::default(),
                         bids: OrderBookSide {
                             side: Side::Buy,
@@ -518,6 +521,7 @@ mod tests {
                 TestCase {
                     // TC2: no bids in the book so take ask price
                     input: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Default::default(),
                         bids: OrderBookSide {
                             side: Side::Buy,
@@ -533,6 +537,7 @@ mod tests {
                 TestCase {
                     // TC3: best bid and ask amount is the same, so regular mid-price
                     input: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Default::default(),
                         bids: OrderBookSide {
                             side: Side::Buy,
@@ -563,6 +568,7 @@ mod tests {
                 TestCase {
                     // TC0: no levels so 0.0 mid-price
                     input: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Default::default(),
                         bids: OrderBookSide {
                             side: Side::Buy,
@@ -578,6 +584,7 @@ mod tests {
                 TestCase {
                     // TC1: no asks in the book so take best bid price
                     input: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Default::default(),
                         bids: OrderBookSide {
                             side: Side::Buy,
@@ -593,6 +600,7 @@ mod tests {
                 TestCase {
                     // TC2: no bids in the book so take ask price
                     input: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Default::default(),
                         bids: OrderBookSide {
                             side: Side::Buy,
@@ -608,6 +616,7 @@ mod tests {
                 TestCase {
                     // TC3: best bid and ask amount is the same, so regular mid-price
                     input: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Default::default(),
                         bids: OrderBookSide {
                             side: Side::Buy,
@@ -623,6 +632,7 @@ mod tests {
                 TestCase {
                     // TC4: valid volume weighted mid-price
                     input: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Default::default(),
                         bids: OrderBookSide {
                             side: Side::Buy,

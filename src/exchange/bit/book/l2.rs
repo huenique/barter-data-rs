@@ -58,6 +58,7 @@ impl From<(ExchangeId, Instrument, BitOrderBookL2)> for MarketIter<OrderBook> {
                     exchange: Exchange::from(exchange_id),
                     instrument,
                     kind: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: Utc.timestamp_millis_opt(sub.timestamp).unwrap(),
                         bids: OrderBookSide::new(Side::Sell, sub.data.bids),
                         asks: OrderBookSide::new(Side::Buy, sub.data.asks),

@@ -503,6 +503,7 @@ mod tests {
                         prev_last_update_id: 0,
                     },
                     book: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: time,
                         bids: OrderBookSide::new(Side::Buy, vec![Level::new(50, 1)]),
                         asks: OrderBookSide::new(Side::Sell, vec![Level::new(100, 1)]),
@@ -524,6 +525,7 @@ mod tests {
                         prev_last_update_id: 100,
                     },
                     book: OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: time,
                         bids: OrderBookSide::new(
                             Side::Buy,
@@ -564,6 +566,7 @@ mod tests {
                         ],
                     },
                     expected: Ok(Some(OrderBook {
+                        instrument_name: String::new(),
                         last_update_time: time,
                         bids: OrderBookSide::new(
                             Side::Buy,

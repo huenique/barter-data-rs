@@ -96,6 +96,7 @@ impl OrderBookUpdater for HyperliquidOrderBookUpdater {
 impl From<HyperliquidOrderBookL2Snapshot> for OrderBook {
     fn from(snapshot: HyperliquidOrderBookL2Snapshot) -> Self {
         Self {
+            instrument_name: snapshot.data.coin,
             bids: OrderBookSide::new(Side::Buy, snapshot.data.levels.0),
             asks: OrderBookSide::new(Side::Sell, snapshot.data.levels.1),
             last_update_time: Utc::now(),

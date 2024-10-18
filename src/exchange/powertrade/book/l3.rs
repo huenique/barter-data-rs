@@ -69,6 +69,7 @@ impl From<(ExchangeId, Instrument, PowerTradeOrderBookL3)> for MarketIter<OrderB
                 exchange: Exchange::from(exchange_id),
                 instrument,
                 kind: OrderBook {
+                    instrument_name: book.symbol.clone(),
                     last_update_time: Utc::now(),
                     bids: parse_order_data(Side::Buy, &book.bids),
                     asks: parse_order_data(Side::Sell, &book.asks),

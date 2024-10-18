@@ -46,6 +46,7 @@ impl From<DydxOrderBookL2> for OrderBook {
                 contents: ChannelDataMessageContents { bids, asks },
                 ..
             }) => Self {
+                instrument_name: String::new(),
                 last_update_time: Utc::now(),
                 bids: parse_order_data(Side::Buy, &bids.unwrap_or_default()),
                 asks: parse_order_data(Side::Sell, &asks.unwrap_or_default()),
@@ -54,11 +55,13 @@ impl From<DydxOrderBookL2> for OrderBook {
                 contents: OrderBookSnapshotContents { bids, asks },
                 ..
             }) => Self {
+                instrument_name: String::new(),
                 last_update_time: Utc::now(),
                 bids: OrderBookSide::new(Side::Buy, bids),
                 asks: OrderBookSide::new(Side::Sell, asks),
             },
             _ => Self {
+                instrument_name: String::new(),
                 last_update_time: Utc::now(),
                 bids: OrderBookSide::new(Side::Buy, Vec::<Level>::new()),
                 asks: OrderBookSide::new(Side::Sell, Vec::<Level>::new()),

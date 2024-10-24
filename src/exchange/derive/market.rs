@@ -8,19 +8,19 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::exchange::lyra::Lyra;
+use crate::exchange::derive::Derive;
 use crate::subscription::Subscription;
 use crate::Identifier;
 
 /// Type that defines how to translate a Barter [`Subscription`] into a
-/// [`Lyra`](super::Lyra) market that can be subscribed to.
+/// [`Derive`](super::Derive) market that can be subscribed to.
 ///
 /// See docs: <https://www.okx.com/docs-v5/en/#websocket-api-public-channel>
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
-pub struct LyraMarket(pub String);
+pub struct DeriveMarket(pub String);
 
-impl<Kind> Identifier<LyraMarket> for Subscription<Lyra, Kind> {
-    fn id(&self) -> LyraMarket {
+impl<Kind> Identifier<DeriveMarket> for Subscription<Derive, Kind> {
+    fn id(&self) -> DeriveMarket {
         use InstrumentKind::*;
 
         let Instrument {
@@ -29,7 +29,7 @@ impl<Kind> Identifier<LyraMarket> for Subscription<Lyra, Kind> {
             kind,
         } = &self.instrument;
 
-        LyraMarket(match kind {
+        DeriveMarket(match kind {
             Option(option) => format!(
                 "{base}-{}-{}-{}",
                 format_expiry(option.expiry),
@@ -47,7 +47,7 @@ impl<Kind> Identifier<LyraMarket> for Subscription<Lyra, Kind> {
     }
 }
 
-impl AsRef<str> for LyraMarket {
+impl AsRef<str> for DeriveMarket {
     fn as_ref(&self) -> &str {
         &self.0
     }

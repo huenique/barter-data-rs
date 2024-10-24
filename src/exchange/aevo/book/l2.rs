@@ -53,6 +53,7 @@ impl From<AevoOrderBookL2Delta> for OrderBook {
         }
     }
 }
+
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct AevoBookUpdater {
     pub updates_processed: u64,

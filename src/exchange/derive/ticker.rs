@@ -3,9 +3,9 @@ use chrono::DateTime;
 use chrono::Utc;
 
 use crate::event::MarketIter;
-use crate::exchange::lyra::channel::LyraChannel;
-use crate::exchange::lyra::message::LyraInstrumentTicker;
-use crate::exchange::lyra::message::Message;
+use crate::exchange::derive::channel::DeriveChannel;
+use crate::exchange::derive::message::DeriveInstrumentTicker;
+use crate::exchange::derive::message::Message;
 use crate::exchange::subscription::ExchangeSub;
 use crate::exchange::Instrument;
 use crate::subscription::ticker::Greeks;
@@ -14,13 +14,13 @@ use crate::ExchangeId;
 use crate::Identifier;
 use crate::MarketEvent;
 
-pub type LyraTicker = Message;
+pub type DeriveTicker = Message;
 
-impl Identifier<Option<SubscriptionId>> for LyraTicker {
+impl Identifier<Option<SubscriptionId>> for DeriveTicker {
     fn id(&self) -> Option<SubscriptionId> {
         Some(
             ExchangeSub::from((
-                LyraChannel::TICKER,
+                DeriveChannel::TICKER,
                 &self.params.data.instrument_ticker.instrument_name,
             ))
             .id(),
@@ -28,8 +28,8 @@ impl Identifier<Option<SubscriptionId>> for LyraTicker {
     }
 }
 
-impl From<(ExchangeId, Instrument, LyraTicker)> for MarketIter<Ticker> {
-    fn from((exchange_id, instrument, ticker): (ExchangeId, Instrument, LyraTicker)) -> Self {
+impl From<(ExchangeId, Instrument, DeriveTicker)> for MarketIter<Ticker> {
+    fn from((exchange_id, instrument, ticker): (ExchangeId, Instrument, DeriveTicker)) -> Self {
         Self(vec![Ok(MarketEvent {
             exchange_time: DateTime::parse_from_rfc3339(&ticker.params.data.timestamp.to_string())
                 .unwrap_or_else(|_| Utc::now().into())
@@ -42,8 +42,8 @@ impl From<(ExchangeId, Instrument, LyraTicker)> for MarketIter<Ticker> {
     }
 }
 
-impl From<LyraInstrumentTicker> for Ticker {
-    fn from(data: LyraInstrumentTicker) -> Self {
+impl From<DeriveInstrumentTicker> for Ticker {
+    fn from(data: DeriveInstrumentTicker) -> Self {
         Ticker {
             instrument_name: data.instrument_name,
             best_bid_price: data.best_bid_price,

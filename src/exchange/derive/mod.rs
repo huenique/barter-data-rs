@@ -5,10 +5,10 @@ use barter_macro::SerExchange;
 use serde_json::json;
 use url::Url;
 
-use crate::exchange::lyra::channel::LyraChannel;
-use crate::exchange::lyra::market::LyraMarket;
-use crate::exchange::lyra::subscription::LyraSubResponse;
-use crate::exchange::lyra::ticker::LyraTicker;
+use crate::exchange::derive::channel::DeriveChannel;
+use crate::exchange::derive::market::DeriveMarket;
+use crate::exchange::derive::subscription::DeriveSubResponse;
+use crate::exchange::derive::ticker::DeriveTicker;
 use crate::exchange::Connector;
 use crate::exchange::ExchangeId;
 use crate::exchange::ExchangeSub;
@@ -29,29 +29,29 @@ pub mod message;
 
 pub mod ticker;
 
-/// [`Lyra`] server base url.
+/// [`Derive`] server base url.
 ///
-/// See docs: <https://docs.lyra.finance/reference/subscribe>
-pub const BASE_URL_LYRA: &str = "wss://api.lyra.finance/ws";
+/// See docs: <https://docs.derive.finance/reference/subscribe>
+pub const BASE_URL_DERIVE: &str = "wss://api.derive.finance/ws";
 
-/// [`Lyra`] exchange.
+/// [`Derive`] exchange.
 ///
-/// See docs: <https://docs.lyra.finance/reference/json-rpc#websocket>
+/// See docs: <https://docs.derive.finance/reference/json-rpc#websocket>
 #[derive(
     Clone, Copy, DeExchange, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, SerExchange,
 )]
-pub struct Lyra;
+pub struct Derive;
 
-impl Connector for Lyra {
-    const ID: ExchangeId = ExchangeId::Lyra;
-    type Channel = LyraChannel;
-    type Market = LyraMarket;
+impl Connector for Derive {
+    const ID: ExchangeId = ExchangeId::Derive;
+    type Channel = DeriveChannel;
+    type Market = DeriveMarket;
     type Subscriber = WebSocketSubscriber;
     type SubValidator = WebSocketSubValidator;
-    type SubResponse = LyraSubResponse;
+    type SubResponse = DeriveSubResponse;
 
     fn url() -> Result<Url, SocketError> {
-        Url::parse(BASE_URL_LYRA).map_err(SocketError::UrlParse)
+        Url::parse(BASE_URL_DERIVE).map_err(SocketError::UrlParse)
     }
 
     fn requests(exchange_subs: Vec<ExchangeSub<Self::Channel, Self::Market>>) -> Vec<WsMessage> {
@@ -67,6 +67,6 @@ impl Connector for Lyra {
     }
 }
 
-impl StreamSelector<Tickers> for Lyra {
-    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, LyraTicker>>;
+impl StreamSelector<Tickers> for Derive {
+    type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, DeriveTicker>>;
 }

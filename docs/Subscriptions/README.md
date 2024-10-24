@@ -74,7 +74,7 @@
    - Public Trades
    - Order Books (L1)
 
-## 14. **Lyra**
+## 14. **Derive**
    - Options Market
      - Public Trades
      - Ticker

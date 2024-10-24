@@ -6,17 +6,17 @@ use serde::Deserialize;
 use serde::Serialize;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct LyraSubResponse {
+pub struct DeriveSubResponse {
     id: Option<String>,
-    result: Option<LyraSubResult>,
+    result: Option<DeriveSubResult>,
 }
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct LyraSubResult {
+pub struct DeriveSubResult {
     status: HashMap<String, String>,
     current_subscriptions: Vec<String>,
 }
 
-impl Validator for LyraSubResponse {
+impl Validator for DeriveSubResponse {
     fn validate(self) -> Result<Self, SocketError>
     where
         Self: Sized,

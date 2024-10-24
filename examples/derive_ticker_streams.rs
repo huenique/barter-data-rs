@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use barter_data::exchange::lyra::Lyra;
+use barter_data::exchange::derive::Derive;
 use barter_data::streams::Streams;
 use barter_data::subscription::ticker::Tickers;
 use barter_integration::model::instrument::kind::InstrumentKind;
@@ -84,7 +84,7 @@ async fn main() {
         .into_iter()
         .map(|(kind, strike)| {
             (
-                Lyra,
+                Derive,
                 "btc",
                 "usd",
                 InstrumentKind::Option(OptionContract {

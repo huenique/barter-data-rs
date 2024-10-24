@@ -60,8 +60,8 @@ pub mod dydx;
 /// `Bit` [`Connector`] and [`StreamSelector`] implementations.
 pub mod bit;
 
-/// `Lyra` [`Connector`] and [`StreamSelector`] implementations.
-pub mod lyra;
+/// `Derive` [`Connector`] and [`StreamSelector`] implementations.
+pub mod derive;
 
 /// `Okx` [`Connector`] and [`StreamSelector`] implementations.
 pub mod okx;
@@ -231,7 +231,7 @@ pub enum ExchangeId {
     GateioSpot,
     Hyperliquid,
     Kraken,
-    Lyra,
+    Derive,
     Okx,
     PowerTrade,
 }
@@ -273,7 +273,7 @@ impl ExchangeId {
             ExchangeId::GateioSpot => "gateio_spot",
             ExchangeId::Hyperliquid => "hyperliquid",
             ExchangeId::Kraken => "kraken",
-            ExchangeId::Lyra => "lyra",
+            ExchangeId::Derive => "derive",
             ExchangeId::Okx => "okx",
             ExchangeId::PowerTrade => "powertrade",
         }
@@ -315,7 +315,7 @@ impl ExchangeId {
             // Option
             (
                 Aevo | Bit | CoincallOption | DeribitMainnet | DeribitTestnet | GateioOptions
-                | Lyra | Okx | PowerTrade,
+                | Derive | Okx | PowerTrade,
                 Option(_),
             ) => true,
             (_, Option(_)) => false,

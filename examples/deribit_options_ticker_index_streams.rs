@@ -1,19 +1,24 @@
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+use std::sync::Arc;
+
 use barter_data::event::MarketEvent;
 use barter_data::exchange::deribit::DeribitMain;
 use barter_data::streams::Streams;
 use barter_data::subscription::ticker::Ticker;
 use barter_data::subscription::ticker::Tickers;
-use barter_integration::model::instrument::kind::{
-    InstrumentKind, OptionContract, OptionExercise, OptionKind,
-};
-use chrono::{TimeZone, Utc};
-use futures::task::{Context, Poll};
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    Arc,
-};
-use tokio::sync::{watch, Mutex};
-use tokio::time::{sleep, Duration as TokioDuration};
+use barter_integration::model::instrument::kind::InstrumentKind;
+use barter_integration::model::instrument::kind::OptionContract;
+use barter_integration::model::instrument::kind::OptionExercise;
+use barter_integration::model::instrument::kind::OptionKind;
+use chrono::TimeZone;
+use chrono::Utc;
+use futures::task::Context;
+use futures::task::Poll;
+use tokio::sync::watch;
+use tokio::sync::Mutex;
+use tokio::time::sleep;
+use tokio::time::Duration as TokioDuration;
 use tracing::info;
 use tracing_subscriber;
 
@@ -47,7 +52,8 @@ async fn main() {
     info!("Market data streaming task exited.");
 }
 
-/// Initializes the ticker stream and sets up the subscription to Deribit options
+/// Initializes the ticker stream and sets up the subscription to Deribit
+/// options
 async fn setup_ticker_stream(
     expiry_timestamp: i64,
 ) -> tokio::sync::mpsc::UnboundedReceiver<MarketEvent<Ticker>> {
@@ -97,7 +103,8 @@ fn spawn_expiry_checker(expiry_timestamp: i64, close_tx: watch::Sender<bool>) {
     });
 }
 
-/// Spawns a task to handle the close signal and close the ticker stream gracefully
+/// Spawns a task to handle the close signal and close the ticker stream
+/// gracefully
 fn spawn_close_signal_handler(
     ticker_stream: Arc<Mutex<tokio::sync::mpsc::UnboundedReceiver<MarketEvent<Ticker>>>>,
     mut close_rx: watch::Receiver<bool>,

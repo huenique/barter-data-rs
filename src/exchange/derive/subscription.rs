@@ -10,6 +10,7 @@ pub struct DeriveSubResponse {
     id: Option<String>,
     result: Option<DeriveSubResult>,
 }
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct DeriveSubResult {
     status: HashMap<String, String>,

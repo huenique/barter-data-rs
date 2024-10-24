@@ -24,6 +24,7 @@ pub struct OptionPricing {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub ask_iv: f64,
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct OptionDetails {
     pub index: String,
@@ -32,6 +33,7 @@ pub struct OptionDetails {
     pub option_type: String,
     pub settlement_price: Option<String>,
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Stats {
     pub contract_volume: String,
@@ -43,6 +45,7 @@ pub struct Stats {
     pub percent_change: String,
     pub usd_change: String,
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DeriveInstrumentTicker {
     pub instrument_type: String,
@@ -99,16 +102,19 @@ pub struct DeriveInstrumentTicker {
     #[serde(deserialize_with = "barter_integration::de::de_str")]
     pub max_price: f64,
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Data {
     pub timestamp: i64,
     pub instrument_ticker: DeriveInstrumentTicker,
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Params {
     pub channel: String,
     pub data: Data,
 }
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Message {
     pub method: String,

@@ -25,9 +25,9 @@ pub mod market;
 
 pub mod subscription;
 
-pub mod message;
-
 pub mod ticker;
+
+pub mod book;
 
 /// [`Derive`] server base url.
 ///

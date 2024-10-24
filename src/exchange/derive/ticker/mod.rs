@@ -1,11 +1,13 @@
+pub mod message;
+
 use barter_integration::model::SubscriptionId;
 use chrono::DateTime;
 use chrono::Utc;
 
 use crate::event::MarketIter;
 use crate::exchange::derive::channel::DeriveChannel;
-use crate::exchange::derive::message::DeriveInstrumentTicker;
-use crate::exchange::derive::message::Message;
+use crate::exchange::derive::ticker::message::DeriveInstrumentTicker;
+use crate::exchange::derive::ticker::message::Message;
 use crate::exchange::subscription::ExchangeSub;
 use crate::exchange::Instrument;
 use crate::subscription::ticker::Greeks;

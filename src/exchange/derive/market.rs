@@ -42,7 +42,7 @@ impl<Kind> Identifier<DeriveMarket> for Subscription<Derive, Kind> {
             .to_uppercase(),
             Spot => todo!(),
             Future(_) => todo!(),
-            Perpetual => todo!(),
+            Perpetual => format!("{base}-PERP").to_uppercase(),
         })
     }
 }

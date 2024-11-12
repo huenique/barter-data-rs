@@ -5,6 +5,7 @@ use barter_data::subscription::book::OrderBooksL2;
 use barter_integration::model::instrument::kind::InstrumentKind;
 use tabled::Table;
 use tabled::Tabled;
+
 #[derive(Tabled)]
 struct TabledOrderBook {
     #[tabled(rename = "Size (BTC)")]

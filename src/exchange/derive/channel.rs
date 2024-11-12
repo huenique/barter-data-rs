@@ -1,7 +1,7 @@
 use serde::Serialize;
 
 use crate::exchange::derive::Derive;
-use crate::subscription::book::OrderBook;
+use crate::subscription::book::OrderBooksL2;
 use crate::subscription::ticker::Tickers;
 use crate::subscription::Subscription;
 use crate::Identifier;
@@ -12,7 +12,7 @@ pub struct DeriveChannel(pub &'static str);
 impl DeriveChannel {
     /// [`Derive`](super::Derive) real-time Ticker channel.
     ///
-    /// See docs: <https://docs.derive.finance/reference/ticker-instrument_name-interval>
+    /// See docs: <https://docs.derive.xyz/reference/ticker-instrument_name-interval>
     pub const TICKER: Self = Self("ticker.{}.100");
 
     /// [`Derive`](super::Derive) real-time Order Book channel.
@@ -27,7 +27,7 @@ impl Identifier<DeriveChannel> for Subscription<Derive, Tickers> {
     }
 }
 
-impl Identifier<DeriveChannel> for Subscription<Derive, OrderBook> {
+impl Identifier<DeriveChannel> for Subscription<Derive, OrderBooksL2> {
     fn id(&self) -> DeriveChannel {
         DeriveChannel::ORDER_BOOK
     }

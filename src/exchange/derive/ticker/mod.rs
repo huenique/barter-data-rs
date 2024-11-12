@@ -7,7 +7,7 @@ use chrono::Utc;
 use crate::event::MarketIter;
 use crate::exchange::derive::channel::DeriveChannel;
 use crate::exchange::derive::ticker::message::DeriveInstrumentTicker;
-use crate::exchange::derive::ticker::message::Message;
+use crate::exchange::derive::ticker::message::TickerMessage;
 use crate::exchange::subscription::ExchangeSub;
 use crate::exchange::Instrument;
 use crate::subscription::ticker::Greeks;
@@ -16,7 +16,7 @@ use crate::ExchangeId;
 use crate::Identifier;
 use crate::MarketEvent;
 
-pub type DeriveTicker = Message;
+pub type DeriveTicker = TickerMessage;
 
 impl Identifier<Option<SubscriptionId>> for DeriveTicker {
     fn id(&self) -> Option<SubscriptionId> {

@@ -5,6 +5,7 @@ use barter_macro::SerExchange;
 use serde_json::json;
 use url::Url;
 
+use crate::exchange::derive::book::l2::DeriveOrderBookL2;
 use crate::exchange::derive::channel::DeriveChannel;
 use crate::exchange::derive::market::DeriveMarket;
 use crate::exchange::derive::subscription::DeriveSubResponse;
@@ -15,6 +16,7 @@ use crate::exchange::ExchangeSub;
 use crate::exchange::StreamSelector;
 use crate::subscriber::validator::WebSocketSubValidator;
 use crate::subscriber::WebSocketSubscriber;
+use crate::subscription::book::OrderBooksL2;
 use crate::subscription::ticker::Tickers;
 use crate::transformer::stateless::StatelessTransformer;
 use crate::ExchangeWsStream;
@@ -31,8 +33,8 @@ pub mod book;
 
 /// [`Derive`] server base url.
 ///
-/// See docs: <https://docs.derive.finance/reference/subscribe>
-pub const BASE_URL_DERIVE: &str = "wss://api.derive.finance/ws";
+/// See docs: <https://docs.derive.xyz/reference/subscribe>
+pub const BASE_URL_DERIVE: &str = "wss://api.lyra.finance/ws";
 
 /// [`Derive`] exchange.
 ///
@@ -69,4 +71,8 @@ impl Connector for Derive {
 
 impl StreamSelector<Tickers> for Derive {
     type Stream = ExchangeWsStream<StatelessTransformer<Self, Tickers, DeriveTicker>>;
+}
+
+impl StreamSelector<OrderBooksL2> for Derive {
+    type Stream = ExchangeWsStream<StatelessTransformer<Self, OrderBooksL2, DeriveOrderBookL2>>;
 }

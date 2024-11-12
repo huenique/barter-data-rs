@@ -116,7 +116,7 @@ pub struct Params {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Message {
+pub struct TickerMessage {
     pub method: String,
     pub params: Params,
 }

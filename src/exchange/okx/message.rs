@@ -1,3 +1,9 @@
+pub mod funding_rate;
+pub mod index_tickers;
+pub mod mark_price;
+pub mod open_interest;
+pub mod tickers;
+
 use barter_integration::model::SubscriptionId;
 use serde::Deserialize;
 use serde::Serialize;

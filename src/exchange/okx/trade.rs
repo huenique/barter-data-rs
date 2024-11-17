@@ -1,7 +1,6 @@
 use barter_integration::model::instrument::Instrument;
 use barter_integration::model::Exchange;
 use barter_integration::model::Side;
-use barter_integration::model::SubscriptionId;
 use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
@@ -9,73 +8,13 @@ use serde::Serialize;
 
 use crate::event::MarketEvent;
 use crate::event::MarketIter;
+use crate::exchange::okx::message::OkxMessage;
 use crate::exchange::ExchangeId;
-use crate::exchange::ExchangeSub;
 use crate::subscription::trade::PublicTrade;
-use crate::Identifier;
 
 /// Terse type alias for an [`Okx`](super::Okx) real-time trades WebSocket
 /// message.
 pub type OkxTrades = OkxMessage<OkxTrade>;
-
-/// [`Okx`](super::Okx) market data WebSocket message.
-///
-/// ### Raw Payload Examples
-/// See docs: <https://www.okx.com/docs-v5/en/#websocket-api-public-channel>
-/// #### Spot Buy Trade
-/// ```json
-/// {
-///   "arg": {
-///     "channel": "trades",
-///     "instId": "BTC-USDT"
-///   },
-///   "data": [
-///     {
-///       "instId": "BTC-USDT",
-///       "tradeId": "130639474",
-///       "px": "42219.9",
-///       "sz": "0.12060306",
-///       "side": "buy",
-///       "ts": "1630048897897"
-///     }
-///   ]
-/// }
-/// ```
-///
-/// #### Option Call Sell Trade
-/// ```json
-/// {
-///   "arg": {
-///     "channel": "trades",
-///     "instId": "BTC-USD-231229-35000-C"
-///   },
-///   "data": [
-///     {
-///       "instId": "BTC-USD-231229-35000-C",
-///       "tradeId": "4",
-///       "px": "0.1525",
-///       "sz": "21",
-///       "side": "sell",
-///       "ts": "1681473269025"
-///     }
-///   ]
-/// }
-/// ```
-#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
-pub struct OkxMessage<T> {
-    #[serde(
-        rename = "arg",
-        deserialize_with = "de_okx_message_arg_as_subscription_id"
-    )]
-    pub subscription_id: SubscriptionId,
-    pub data: Vec<T>,
-}
-
-impl<T> Identifier<Option<SubscriptionId>> for OkxMessage<T> {
-    fn id(&self) -> Option<SubscriptionId> {
-        Some(self.subscription_id.clone())
-    }
-}
 
 /// [`Okx`](super::Okx) real-time trade WebSocket message.
 ///
@@ -121,24 +60,6 @@ impl From<(ExchangeId, Instrument, OkxTrades)> for MarketIter<PublicTrade> {
     }
 }
 
-/// Deserialize an [`OkxMessage`] "arg" field as a Barter [`SubscriptionId`].
-fn de_okx_message_arg_as_subscription_id<'de, D>(
-    deserializer: D,
-) -> Result<SubscriptionId, D::Error>
-where
-    D: serde::de::Deserializer<'de>,
-{
-    #[derive(Deserialize)]
-    #[serde(rename_all = "camelCase")]
-    struct Arg<'a> {
-        channel: &'a str,
-        inst_id: &'a str,
-    }
-
-    Deserialize::deserialize(deserializer)
-        .map(|arg: Arg<'_>| ExchangeSub::from((arg.channel, arg.inst_id)).id())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -148,6 +69,7 @@ mod tests {
 
         use barter_integration::de::datetime_utc_from_epoch_duration;
         use barter_integration::error::SocketError;
+        use barter_integration::model::SubscriptionId;
 
         use super::*;
 

@@ -32,12 +32,18 @@ pub mod channel;
 /// [`Connector`] specific market used for generating [`Connector::requests`].
 pub mod market;
 
+/// Message types for [`Okx`].
+pub mod message;
+
 /// [`Subscription`](crate::subscription::Subscription) response type and
 /// response [`Validator`](barter_integration::Validator) for [`Okx`].
 pub mod subscription;
 
 /// Public trade types for [`Okx`].
 pub mod trade;
+
+/// Public ticker types for [`Okx`].
+pub mod ticker;
 
 /// [`Okx`] server base url.
 ///

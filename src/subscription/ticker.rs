@@ -72,6 +72,18 @@ impl Ticker {
     }
 }
 
+impl From<(ExchangeId, Instrument, Ticker)> for MarketIter<Ticker> {
+    fn from((exchange_id, instrument, ticker): (ExchangeId, Instrument, Ticker)) -> Self {
+        Self(vec![Ok(MarketEvent {
+            exchange_time: Utc.timestamp_nanos(ticker.timestamp),
+            received_time: Utc::now(),
+            exchange: exchange_id.into(),
+            instrument,
+            kind: ticker,
+        })])
+    }
+}
+
 fn merge_object(v1: Value, v2: Value) -> Result<Value, Box<dyn Error>> {
     match (v1, v2) {
         (Value::Object(mut map1), Value::Object(map2)) => {
@@ -110,18 +122,6 @@ impl Ord for Ticker {
 impl PartialOrd for Ticker {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
-    }
-}
-
-impl From<(ExchangeId, Instrument, Ticker)> for MarketIter<Ticker> {
-    fn from((exchange_id, instrument, ticker): (ExchangeId, Instrument, Ticker)) -> Self {
-        Self(vec![Ok(MarketEvent {
-            exchange_time: Utc.timestamp_nanos(ticker.timestamp),
-            received_time: Utc::now(),
-            exchange: exchange_id.into(),
-            instrument,
-            kind: ticker,
-        })])
     }
 }
 

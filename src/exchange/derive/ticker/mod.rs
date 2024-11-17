@@ -71,7 +71,7 @@ impl From<DeriveInstrumentTicker> for Ticker {
             interest_rate: None,
             mark_iv: Some(data.option_pricing.iv),
             delivery_price: Some(0_f64),
-            current_funding: Some(0_f64),
+            funding_rate: Some(0_f64),
             interest_value: Some(0_f64),
             ask_iv: Some(data.option_pricing.ask_iv),
             bid_iv: Some(data.option_pricing.bid_iv),

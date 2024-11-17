@@ -309,7 +309,7 @@ impl PowerTradeTickerAggregator {
         self.ticker.mark_price = data.mark_price;
         self.ticker.index_price = data.underlying_price;
         self.ticker.delivery_price = Some(data.underlying_price);
-        self.ticker.current_funding = Some(0f64);
+        self.ticker.funding_rate = Some(0f64);
     }
 
     fn process_greeks(&mut self, data: RiskSnapshot) {

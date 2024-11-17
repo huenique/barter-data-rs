@@ -88,7 +88,7 @@ where
 
                 channel
                     .as_ref()
-                    .split('_')
+                    .split('.')
                     .filter_map(|ch| {
                         let dt = ch.parse::<i32>().ok()?;
                         let message = match dt {

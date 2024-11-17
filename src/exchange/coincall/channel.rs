@@ -18,7 +18,7 @@ impl CoincallChannel {
     /// - <https://docs.coincall.com/#options-websocket-pricing-information>
     /// - <https://docs.coincall.com/#options-websocket-option-chain-data>
     /// - <https://docs.coincall.com/#options-websocket-orderbook>
-    pub const TICKER: Self = Self("3_4_5");
+    pub const TICKER: Self = Self("3.4.5");
 
     /// [`Coincall`](super::Coincall) Order book channel.
     ///

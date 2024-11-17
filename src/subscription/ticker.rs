@@ -37,11 +37,11 @@ pub struct Ticker {
     pub state: TickerState,
     pub timestamp: i64,
     pub greeks: Option<Greeks>,
-    pub interest_rate: Option<f64>,   // Option specific
-    pub mark_iv: Option<f64>,         // Option specific
-    pub delivery_price: Option<f64>,  // Settlement price when state is closed
-    pub current_funding: Option<f64>, // Perpetual specific
-    pub interest_value: Option<f64>,  // Perpetual specific
+    pub interest_rate: Option<f64>,  // Option specific
+    pub mark_iv: Option<f64>,        // Option specific
+    pub delivery_price: Option<f64>, // Settlement price when state is closed
+    pub funding_rate: Option<f64>,   // Perpetual specific
+    pub interest_value: Option<f64>, // Perpetual specific
     pub ask_iv: Option<f64>,
     pub bid_iv: Option<f64>,
     pub index_price: f64,

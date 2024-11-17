@@ -116,6 +116,9 @@ use crate::subscription::SubKind;
 use crate::subscription::Subscription;
 use crate::transformer::ExchangeTransformer;
 
+/// Custom deserialization functions for use with the `serde` crate.
+pub mod deserializer;
+
 /// All [`Error`](std::error::Error)s generated in Barter-Data.
 pub mod error;
 

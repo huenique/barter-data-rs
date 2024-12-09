@@ -135,6 +135,7 @@ impl OrderBookUpdater for DeribitBookUpdater {
         // Update OrderBook metadata & Levels:
         // 7. The data in each event is the absolute quantity for a price level.
         // 8. If the quantity is 0, remove the price level.
+        book.instrument_name = update.params.data.instrument_name.clone();
         book.last_update_time = Utc::now();
         book.bids.upsert(update.params.data.bids);
         book.asks.upsert(update.params.data.asks);

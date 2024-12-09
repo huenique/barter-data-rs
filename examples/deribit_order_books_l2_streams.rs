@@ -65,9 +65,9 @@ fn init_logging() {
 
 fn call_contract() -> OptionContract {
     OptionContract {
-        kind: OptionKind::Call,
+        kind: OptionKind::Put,
         exercise: OptionExercise::American,
-        expiry: Utc.timestamp_millis_opt(1688120754000).unwrap(),
-        strike: rust_decimal_macros::dec!(25000),
+        expiry: Utc.timestamp_millis_opt(1734120000000).unwrap(),
+        strike: rust_decimal_macros::dec!(95000),
     }
 }

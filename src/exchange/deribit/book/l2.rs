@@ -122,15 +122,16 @@ impl OrderBookUpdater for DeribitBookUpdater {
     ) -> Result<Option<Self::OrderBook>, DataError> {
         // If prev_change_id is equal to the change_id of the previous message, this
         // means that no messages have been missed.
-        match update.params.data.prev_change_id {
-            Some(prev_change_id) if prev_change_id != self.change_id => {
-                return Err(DataError::InvalidSequence {
-                    prev_last_update_id: self.prev_change_id,
-                    first_update_id: update.params.data.change_id,
-                })
-            }
-            _ => {}
-        }
+        // does not have a prev_change_id.
+        // match update.params.data.prev_change_id {
+        //     Some(prev_change_id) if prev_change_id != self.change_id => {
+        //         return Err(DataError::InvalidSequence {
+        //             prev_last_update_id: self.prev_change_id,
+        //             first_update_id: update.params.data.change_id,
+        //         })
+        //     }
+        //     _ => {}
+        // }
 
         // Update OrderBook metadata & Levels:
         // 7. The data in each event is the absolute quantity for a price level.
